@@ -9,9 +9,11 @@ The programming language (g)ROOT seeks to abstract the finer details away from t
 *Commands for the group as we are working through the project*
 - Compile lexer with:
     - ocamllex scanner.mll
+    
     *produces scanner.ml*
 - Compile parser with:
     - ocamlyacc parser.mly
+    
     *produces parser.ml*
 - Compile toplevel with:
     - ocamlbuild toplevel.native
@@ -40,4 +42,5 @@ The programming language (g)ROOT seeks to abstract the finer details away from t
     - make lexer
     - make toplevel.native
     - make clean
+    
     *make clean before you make toplevel. The stuff from making parser and lexer separately for some reason interferes with ocamlbuild. If files to remove don't exist in top directory, you'll just get file doesn't exist error. Thats okay.*
