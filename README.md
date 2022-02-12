@@ -36,7 +36,9 @@ The programming language (g)ROOT seeks to abstract the finer details away from t
 ## Tasks Completed
 - parser recognizes pos and neg ints. toplevel for now prints ints
 - parser recognizes char. Syntax: 'c'. toplevel prints strings of ints/chars.
-- Char can now print integers represented as chars: '1' and '?' and 'a' we  are unsure about escape characters
+- Char can now print integers represented as chars: '1' and '?' and 'a' we  are
+  unsure about escape characters
+- We have bools! We had to separately define them because it made sense
 
 
 ## Notes for Us
@@ -44,6 +46,9 @@ The programming language (g)ROOT seeks to abstract the finer details away from t
     - make parser
     - make lexer
     - make toplevel.native
-    - make clean
+    - make clean  
     
-    *make clean before you make toplevel. The stuff from making parser and lexer separately for some reason interferes with ocamlbuild. If files to remove don't exist in top directory, you'll just get file doesn't exist error. Thats okay.*
+    *make clean before you make toplevel. The stuff from making parser and lexer
+    separately for some reason interferes with ocamlbuild. If files to remove
+    don't exist in top directory, you'll just get file doesn't exist error.
+    Thats okay.*

@@ -20,7 +20,10 @@ rule tokenize = parse
     | '-'               { MINUS }
     | '''               { char_string lexbuf }
     | integer           { INT(int_of_string (Lexing.lexeme lexbuf)) }
+    | "#t"              { BOOL(true) }
+    | "#f"              { BOOL(false) }
     | eof               { EOF }
     and char_string = parse 
-      | '''             { tokenize lexbuf } 
+      | '''             { tokenize lexbuf }
       | _ as lit        { CHAR(lit) }
+      

@@ -12,6 +12,7 @@ let rec eval expr =
         let v1 = (-1) * v1
         in string_of_int v1
     | Char(c) -> String.make 1 c
+    | Bool(b) -> if b then "#t" else "#f"
 
 
 (* Temporary code to print what parser evaluates *)

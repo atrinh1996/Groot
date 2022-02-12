@@ -1,8 +1,12 @@
 (* Abstract Syntax Tree for groot *)
 
-type operator = Sub
+type bin_operator = Sub
+
+type uni_operator = Neg
 
 type expr = 
-      Int of int
-    | Char of char
-    | Unary of operator * expr
+      Int   of int
+    | Char  of char
+    | Unary of uni_operator * expr
+    | Bool  of bool
+    (* | Binary of bin_operator * expr * expr *)

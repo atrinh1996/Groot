@@ -17,9 +17,10 @@
 
         precedences
  */
-%token MINUS EOF TICK
+%token MINUS EOF
 %token <char> CHAR
-%token <int> INT
+%token <int>  INT
+%token <bool> BOOL
 
 %start expr
 %type <Ast.expr> expr
@@ -31,7 +32,8 @@
 expr:
     | INT                   { Int($1) }
     | CHAR                  { Char($1) }
-    | MINUS expr            { Unary(Sub, $2) }
+    | BOOL                  { Bool($1) }
+    | MINUS expr            { Unary(Neg, $2) }
 
 
 
