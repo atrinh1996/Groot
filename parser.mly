@@ -29,8 +29,8 @@
 
 /* Rules */
 expr:
-      INT                   { Int($1) }
-    | TICK CHAR TICK        { Char($2) }
+    | INT                   { Int($1) }
+    | CHAR                  { Char($1) }
     | MINUS expr            { Unary(Sub, $2) }
 
 

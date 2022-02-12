@@ -17,8 +17,10 @@ let integer = '-'?['0'-'9']['0'-'9']*
 (* Entry Points *)
 rule tokenize = parse
     (* RegEx { action } *)
-      '-'               { MINUS }
-    | '''               { TICK }
+    | '-'               { MINUS }
+    | '''               { char_string lexbuf }
     | integer           { INT(int_of_string (Lexing.lexeme lexbuf)) }
     | eof               { EOF }
-    | _ as lit          { CHAR(lit) }
+    and char_string = parse 
+      | '''             { tokenize lexbuf } 
+      | _ as lit        { CHAR(lit) }
