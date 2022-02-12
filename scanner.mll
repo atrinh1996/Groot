@@ -11,6 +11,7 @@
 
 (* Regular Expressions (optional *)
 let digit = ['0'-'9']
+let integer = '-'?['0'-'9']['0'-'9']*
 
 
 (* Entry Points *)
@@ -18,6 +19,6 @@ rule tokenize = parse
     (* RegEx { action } *)
       '-'               { MINUS }
     | '''               { TICK }
-    | digit+ as lit     { INT(int_of_string lit) }
+    | integer           { INT(int_of_string (Lexing.lexeme lexbuf)) }
     | eof               { EOF }
     | _ as lit          { CHAR(lit) }

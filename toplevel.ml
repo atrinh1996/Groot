@@ -8,8 +8,8 @@ let rec eval expr =
     match expr with
       Int(x) -> string_of_int x
     | Unary(op, e1) -> 
-        let v1 = eval e1 in 
-        let v1 = (-1) * (int_of_string v1) 
+        let v1 = (int_of_string (eval e1)) in 
+        let v1 = (-1) * v1
         in string_of_int v1
     | Char(c) -> String.make 1 c
 
