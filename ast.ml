@@ -3,5 +3,6 @@
 type operator = Sub
 
 type expr = 
-      Lit of int
+      Int of int
+    | Char of char
     | Unary of operator * expr

@@ -17,8 +17,9 @@
 
         precedences
  */
-%token MINUS EOF
-%token <int> LITERAL
+%token MINUS EOF TICK
+%token <char> CHAR
+%token <int> INT
 
 %start expr
 %type <Ast.expr> expr
@@ -28,7 +29,8 @@
 
 /* Rules */
 expr:
-      LITERAL               { Lit($1) }
+      INT                   { Int($1) }
+    | TICK CHAR TICK        { Char($2) }
     | MINUS expr            { Unary(Sub, $2) }
 
 

@@ -10,12 +10,14 @@
 { open Parser } (* Header *)
 
 (* Regular Expressions (optional *)
-let digits = ['0'-'9']+
+let digit = ['0'-'9']
 
 
 (* Entry Points *)
 rule tokenize = parse
     (* RegEx { action } *)
       '-'               { MINUS }
-    | digits as lit     { LITERAL(int_of_string lit) }
+    | '''               { TICK }
+    | digit+ as lit     { INT(int_of_string lit) }
     | eof               { EOF }
+    | _ as lit          { CHAR(lit) }

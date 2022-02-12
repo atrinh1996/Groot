@@ -34,6 +34,8 @@ The programming language (g)ROOT seeks to abstract the finer details away from t
 
 
 ## Tasks Completed
+- parser recognizes pos and neg ints. toplevel for now prints ints
+- parser recognizes char. Syntax: 'c'. toplevel prints strings of ints/chars.
 
 
 ## Notes for Us
