@@ -10,12 +10,16 @@
 { open Parser } (* Header *)
 
 (* Regular Expressions (optional *)
-let digits = ['0'-'9']+
+let digit = ['0'-'9']
+let integer = '-'?['0'-'9']['0'-'9']*
 
 
 (* Entry Points *)
 rule tokenize = parse
     (* RegEx { action } *)
-      '-'               { MINUS }
-    | digits as lit     { LITERAL(int_of_string lit) }
+    | '-'               { MINUS }
+    | integer           { INT(int_of_string (Lexing.lexeme lexbuf)) }
+    | "#t"              { BOOL(true) }
+    | "#f"              { BOOL(false) }
     | eof               { EOF }
+      

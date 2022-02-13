@@ -18,7 +18,8 @@
         precedences
  */
 %token MINUS EOF
-%token <int> LITERAL
+%token <int>  INT
+%token <bool> BOOL
 
 %start expr
 %type <Ast.expr> expr
@@ -28,8 +29,9 @@
 
 /* Rules */
 expr:
-      LITERAL               { Lit($1) }
-    | MINUS expr            { Unary(Sub, $2) }
+    | INT                   { Int($1) }
+    | BOOL                  { Bool($1) }
+    | MINUS expr            { Unary(Neg, $2) }
 
 
 
