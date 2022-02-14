@@ -39,6 +39,9 @@ The programming language (g)ROOT seeks to abstract the finer details away from t
 - Char can now print integers represented as chars: '1' and '?' and 'a' we  are
   unsure about escape characters
 - We have bools! We had to separately define them because it made sense
+- Parses white space, currently ignores '' ' '\n' '\t' '\r'
+- Recognizes parens ( and ). Will evaluate expr between them, does not print
+the parens.
 
 
 ## Notes for Us

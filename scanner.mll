@@ -18,6 +18,8 @@ let integer = '-'?['0'-'9']['0'-'9']*
 rule tokenize = parse
   (* RegEx { action } *)
   | [' ' '\n' '\t' '\r'] { tokenize lexbuf }
+  | '('                  { LPAREN }
+  | ')'                  { RPAREN }
   | '-'                  { MINUS }
   | integer              { INT(int_of_string (Lexing.lexeme lexbuf)) }
   | "#t"                 { BOOL(true) }

@@ -17,6 +17,7 @@
 
         precedences
  */
+%token LPAREN RPAREN
 %token MINUS EOF
 %token <int>  INT
 %token <bool> BOOL
@@ -28,10 +29,14 @@
 %%
 
 /* Rules */
-expr:
+literal:
     | INT                   { Int($1) }
     | BOOL                  { Bool($1) }
+
+expr:
+    | literal               { $1 }
     | MINUS expr            { Unary(Neg, $2) }
+    | LPAREN expr RPAREN    { $2 }
 
 
 
