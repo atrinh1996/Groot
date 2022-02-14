@@ -16,10 +16,11 @@ let integer = '-'?['0'-'9']['0'-'9']*
 
 (* Entry Points *)
 rule tokenize = parse
-    (* RegEx { action } *)
-    | '-'               { MINUS }
-    | integer           { INT(int_of_string (Lexing.lexeme lexbuf)) }
-    | "#t"              { BOOL(true) }
-    | "#f"              { BOOL(false) }
-    | eof               { EOF }
+  (* RegEx { action } *)
+  | [' ' '\n' '\t' '\r'] { tokenize lexbuf }
+  | '-'                  { MINUS }
+  | integer              { INT(int_of_string (Lexing.lexeme lexbuf)) }
+  | "#t"                 { BOOL(true) }
+  | "#f"                 { BOOL(false) }
+  | eof                  { EOF }
       
