@@ -5,7 +5,7 @@ type bin_operator = Sub | Eq
 type uni_operator = Neg
 
 type expr = 
-      Int   of int
+    | Int   of int
     | Unary of uni_operator * expr
     | Bool  of bool
     | If of expr * expr * expr

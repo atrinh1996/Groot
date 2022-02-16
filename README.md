@@ -44,6 +44,7 @@ The programming language (g)ROOT seeks to abstract the finer details away from t
   the parens.
 - If else implemented! CLeaned up parser, scanner, ast, and toplevel, changed
   Eql to Eq ('==')  
+-- Implemented (; comments ;) (winky face)
 
 
 ## Notes for Us

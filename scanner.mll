@@ -19,6 +19,7 @@ let integer = '-'?['0'-'9']['0'-'9']*
 rule tokenize = parse
   (* RegEx { action } *)
   | [' ' '\n' '\t' '\r'] { tokenize lexbuf }
+  | "(;"                 { comment lexbuf }                  
   | '('                  { LPAREN }
   | ')'                  { RPAREN }
   | '-'                  { MINUS }
@@ -28,4 +29,7 @@ rule tokenize = parse
   | "#t"                 { BOOL(true) }
   | "#f"                 { BOOL(false) }
   | eof                  { EOF }
+  and comment = parse
+    | ";)"               { tokenize lexbuf }
+    | _                  { comment lexbuf }
       
