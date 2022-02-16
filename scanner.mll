@@ -24,6 +24,8 @@ rule tokenize = parse
   | ')'                  { RPAREN }
   | '+'                  { PLUS }
   | '-'                  { MINUS }
+  | '*'                  { TIMES }
+  | '/'                  { DIVIDE }
   | "=="                 { EQ }
   | "!="                 { NEQ }
   | '<'                  { LT }

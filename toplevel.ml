@@ -27,6 +27,8 @@ let rec eval expr =
         | Gt  -> if ((int_of_string v1) > (int_of_string v2)) then "#t" else "#f"
         | Sub -> string_of_int ((int_of_string v1) - (int_of_string v2))
         | Add -> string_of_int ((int_of_string v1) + (int_of_string v2))
+        | Mul -> string_of_int ((int_of_string v1) * (int_of_string v2))
+        | Div -> string_of_int ((int_of_string v1) / (int_of_string v2)) (*DOESNT HANDLE DIVIDE BY ZERO*)
       ) 
 
 

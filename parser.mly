@@ -12,7 +12,7 @@
 %{ open Ast %} 
 
 /* Tokens */
-%token LPAREN RPAREN PLUS MINUS 
+%token LPAREN RPAREN PLUS MINUS TIMES DIVIDE
 %token EQ NEQ LT GT
 %token IF
 %token <int>  INT
@@ -20,7 +20,9 @@
 %token EOF
 
 /* Precedence */
-%nonassoc EQ /*CHANGE TO NONASSOC (and make binops nonassoc)*/
+%nonassoc EQ NEQ /*CHANGE TO NONASSOC (and make binops nonassoc)*/
+%nonassoc PLUS MINUS
+%nonassoc TIMES DIVIDE
 %nonassoc NEG
 
 /* Declarations */
@@ -45,6 +47,8 @@ expr:
     | LPAREN NEQ expr expr RPAREN            { Binops(Neq, $3, $4) }
     | LPAREN PLUS expr expr RPAREN           { Binops(Add, $3, $4) }
     | LPAREN MINUS expr expr RPAREN          { Binops(Sub, $3, $4) }
+    | LPAREN TIMES expr expr RPAREN           { Binops(Mul, $3, $4) }
+    | LPAREN DIVIDE expr expr RPAREN          { Binops(Div, $3, $4) }
 /*  | LPAREN closure (list of expr_opts?) RPAREN   { $2, $3 } */
 
 /* POSSIBLE REORGANIZATION - 
