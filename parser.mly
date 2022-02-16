@@ -17,15 +17,17 @@
 
         precedences
  */
-%token LPAREN RPAREN
-%token MINUS EOF
+%token LPAREN RPAREN MINUS 
+%token EQUALS
 %token IF
 %token <int>  INT
 %token <bool> BOOL
+%token EOF
 
 %start expr
 %type <Ast.expr> expr
 
+%left EQUALS
 
 %%
 
@@ -38,8 +40,13 @@ expr:
     | literal               { $1 }
     | MINUS expr            { Unary(Neg, $2) }
     | LPAREN expr RPAREN    { $2 }
-    | LPAREN IF LPAREN expr RPAREN expr expr RPAREN
-                            { If($4, $6, $7)}
+    | LPAREN IF expr expr expr RPAREN
+                            { If($3, $4, $5)}
+    | LPAREN EQUALS expr expr RPAREN
+                            { Binops(Eql, $3, $4) }
+    | LPAREN MINUS expr expr RPAREN %prec EQUALS
+                            { Binops(Sub, $3, $4) }
+
 
 
 
