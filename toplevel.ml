@@ -2,8 +2,7 @@
 
 open Ast
 
-
-(* Evaluator *)
+(* Evaluator - currently returns string of evaluated expression*)
 let rec eval expr =
   match expr with
   | Int(x) -> string_of_int x
@@ -12,6 +11,16 @@ let rec eval expr =
       let v1 = (-1) * v1
       in string_of_int v1
   | Bool(b) -> if b then "#t" else "#f"
+  | If(cond, e1, e2) -> 
+      (let tf = (String.equal (eval cond) "#t") in 
+      if tf then eval e1 else eval e2)
+  | Binops(op, e1, e2) -> 
+      let v1 = eval e1 in 
+      let v2 = eval e2 in
+      (match op with
+        | Eq  -> if ((int_of_string v1) == (int_of_string v2)) then "#t" else "#f"
+        | Sub -> string_of_int ((int_of_string v1) - (int_of_string v2))
+      ) 
 
 
 (* Temporary code to print what parser evaluates *)
