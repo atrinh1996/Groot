@@ -41,7 +41,9 @@ The programming language (g)ROOT seeks to abstract the finer details away from t
 - We have bools! We had to separately define them because it made sense
 - Parses white space, currently ignores '' ' '\n' '\t' '\r'
 - Recognizes parens ( and ). Will evaluate expr between them, does not print
-the parens.
+  the parens.
+- If else implemented! CLeaned up parser, scanner, ast, and toplevel, changed
+  Eql to Eq ('==')  
 
 
 ## Notes for Us
@@ -51,7 +53,7 @@ the parens.
     - make toplevel.native
     - make clean  
     
-    *make clean before you make toplevel. The stuff from making parser and lexer
+    * make clean before you make toplevel. The stuff from making parser and lexer
     separately for some reason interferes with ocamlbuild. If files to remove
     don't exist in top directory, you'll just get file doesn't exist error.
     Thats okay.*

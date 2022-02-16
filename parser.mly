@@ -1,5 +1,5 @@
 /* 
-            parser.mly
+    parser.mly
 
     produces a parser from a context-free grammar specification
 
@@ -8,46 +8,39 @@
 
 */
 
+/* Header */
+%{ open Ast %} 
 
-%{ open Ast %} /* Header */
-
-
-/* Declarations:
-        %token
-
-        precedences
- */
+/* Tokens */
 %token LPAREN RPAREN MINUS 
-%token EQUALS
+%token EQ
 %token IF
 %token <int>  INT
 %token <bool> BOOL
 %token EOF
 
+/* Precedence */
+%left EQ
+%nonassoc NEG
+
+/* Declarations */
 %start expr
 %type <Ast.expr> expr
-
-%left EQUALS
 
 %%
 
 /* Rules */
 literal:
-    | INT                   { Int($1) }
-    | BOOL                  { Bool($1) }
+    | INT                                    { Int($1) }
+    | BOOL                                   { Bool($1) }
 
 expr:
-    | literal               { $1 }
-    | MINUS expr            { Unary(Neg, $2) }
-    | LPAREN expr RPAREN    { $2 }
-    | LPAREN IF expr expr expr RPAREN
-                            { If($3, $4, $5)}
-    | LPAREN EQUALS expr expr RPAREN
-                            { Binops(Eql, $3, $4) }
-    | LPAREN MINUS expr expr RPAREN %prec EQUALS
-                            { Binops(Sub, $3, $4) }
+    | literal                                { $1 }
+    | MINUS expr %prec NEG                   { Unary(Neg, $2) }
+    | LPAREN expr RPAREN                     { $2 }
+    | LPAREN IF expr expr expr RPAREN        { If($3, $4, $5)}
+    | LPAREN EQ expr expr RPAREN             { Binops(Eq, $3, $4) }
+    | LPAREN MINUS expr expr RPAREN          { Binops(Sub, $3, $4) }
 
 
-
-
-/* %% Trailer */
+/* Trailer */

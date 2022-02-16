@@ -1,6 +1,6 @@
 (* Abstract Syntax Tree for groot *)
 
-type bin_operator = Sub | Eql
+type bin_operator = Sub | Eq
 
 type uni_operator = Neg
 

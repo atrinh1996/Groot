@@ -7,7 +7,8 @@
         ocamllex scanner.mll
 *)
 
-{ open Parser } (* Header *)
+(* Header *)
+{ open Parser } 
 
 (* Regular Expressions (optional *)
 let digit = ['0'-'9']
@@ -21,7 +22,7 @@ rule tokenize = parse
   | '('                  { LPAREN }
   | ')'                  { RPAREN }
   | '-'                  { MINUS }
-  | ['=']['=']                 { EQUALS }
+  | ['=']['=']           { EQ }
   | "if"                 { IF }
   | integer              { INT(int_of_string (Lexing.lexeme lexbuf)) }
   | "#t"                 { BOOL(true) }

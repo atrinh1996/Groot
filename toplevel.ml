@@ -18,7 +18,7 @@ let rec eval expr =
       let v1 = eval e1 in 
       let v2 = eval e2 in
       (match op with
-          Eql -> if ((int_of_string v1) == (int_of_string v2)) then "#t" else "#f"
+        | Eq  -> if ((int_of_string v1) == (int_of_string v2)) then "#t" else "#f"
         | Sub -> string_of_int ((int_of_string v1) - (int_of_string v2))
       ) 
 
