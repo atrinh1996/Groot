@@ -44,7 +44,9 @@ The programming language (g)ROOT seeks to abstract the finer details away from t
   the parens.
 - If else implemented! CLeaned up parser, scanner, ast, and toplevel, changed
   Eql to Eq ('==')  
--- Implemented (; comments ;) (winky face)
+- Implemented (; comments ;) (winky face)
+- Modified integer in parser so that an error is thrown if a negative integer is
+  not in paraentheses (i.e. (-3) <- good | -3 <- bad)
 
 
 ## Notes for Us
