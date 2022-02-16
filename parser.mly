@@ -13,7 +13,7 @@
 
 /* Tokens */
 %token LPAREN RPAREN PLUS MINUS 
-%token EQ LT
+%token EQ LT GT
 %token IF
 %token <int>  INT
 %token <bool> BOOL
@@ -40,6 +40,7 @@ expr:
     | LPAREN expr RPAREN                     { $2 }
     | LPAREN IF expr expr expr RPAREN        { If($3, $4, $5)}
     | LPAREN LT expr expr RPAREN             { Binops(Lt, $3, $4)}
+    | LPAREN GT expr expr RPAREN             { Binops(Gt, $3, $4)}
     | LPAREN EQ expr expr RPAREN             { Binops(Eq, $3, $4) }
     | LPAREN PLUS expr expr RPAREN          { Binops(Add, $3, $4) }
     | LPAREN MINUS expr expr RPAREN          { Binops(Sub, $3, $4) }

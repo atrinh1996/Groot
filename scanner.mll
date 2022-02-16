@@ -25,6 +25,7 @@ rule tokenize = parse
   | '-'                  { MINUS }
   | "=="                 { EQ }
   | '<'                  { LT }
+  | '>'                  { GT }
   | "if"                 { IF }
   | integer              { INT(int_of_string (Lexing.lexeme lexbuf)) }
   | "#t"                 { BOOL(true) }
