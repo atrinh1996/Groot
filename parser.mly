@@ -13,14 +13,14 @@
 
 /* Tokens */
 %token LPAREN RPAREN PLUS MINUS 
-%token EQ LT GT
+%token EQ NEQ LT GT
 %token IF
 %token <int>  INT
 %token <bool> BOOL
 %token EOF
 
 /* Precedence */
-%left EQ
+%nonassoc EQ /*CHANGE TO NONASSOC (and make binops nonassoc)*/
 %nonassoc NEG
 
 /* Declarations */
@@ -42,7 +42,8 @@ expr:
     | LPAREN LT expr expr RPAREN             { Binops(Lt, $3, $4)}
     | LPAREN GT expr expr RPAREN             { Binops(Gt, $3, $4)}
     | LPAREN EQ expr expr RPAREN             { Binops(Eq, $3, $4) }
-    | LPAREN PLUS expr expr RPAREN          { Binops(Add, $3, $4) }
+    | LPAREN NEQ expr expr RPAREN            { Binops(Neq, $3, $4) }
+    | LPAREN PLUS expr expr RPAREN           { Binops(Add, $3, $4) }
     | LPAREN MINUS expr expr RPAREN          { Binops(Sub, $3, $4) }
 /*  | LPAREN closure (list of expr_opts?) RPAREN   { $2, $3 } */
 

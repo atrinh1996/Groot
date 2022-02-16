@@ -24,6 +24,7 @@ rule tokenize = parse
   | '+'                  { PLUS }
   | '-'                  { MINUS }
   | "=="                 { EQ }
+  | "!="                 { NEQ }
   | '<'                  { LT }
   | '>'                  { GT }
   | "if"                 { IF }

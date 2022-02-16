@@ -1,4 +1,7 @@
-(* Toplevel file to run scanner and parser on some input *)
+(* Toplevel file to run scanner and parser on some input
+
+is supposed to be like clang - a way to feed in files, pipe stuff in, do stuff
+ *)
 
 open Ast
 
@@ -19,6 +22,7 @@ let rec eval expr =
       let v2 = eval e2 in
       (match op with
         | Eq  -> if ((int_of_string v1) == (int_of_string v2)) then "#t" else "#f"
+        | Neq  -> if ((int_of_string v1) != (int_of_string v2)) then "#t" else "#f"
         | Lt  -> if ((int_of_string v1) < (int_of_string v2)) then "#t" else "#f"
         | Gt  -> if ((int_of_string v1) > (int_of_string v2)) then "#t" else "#f"
         | Sub -> string_of_int ((int_of_string v1) - (int_of_string v2))
