@@ -36,7 +36,7 @@ literal:
 
 expr:
     | literal                                { $1 }
-    | MINUS expr %prec NEG                   { Unary(Neg, $2) }
+    | LPAREN MINUS expr %prec NEG RPAREN                 { Unary(Neg, $3) }
     | LPAREN expr RPAREN                     { $2 }
     | LPAREN IF expr expr expr RPAREN        { If($3, $4, $5)}
     | LPAREN EQ expr expr RPAREN             { Binops(Eq, $3, $4) }
