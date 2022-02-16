@@ -21,6 +21,7 @@ let rec eval expr =
         | Eq  -> if ((int_of_string v1) == (int_of_string v2)) then "#t" else "#f"
         | Lt  -> if ((int_of_string v1) < (int_of_string v2)) then "#t" else "#f"
         | Sub -> string_of_int ((int_of_string v1) - (int_of_string v2))
+        | Add -> string_of_int ((int_of_string v1) + (int_of_string v2))
       ) 
 
 

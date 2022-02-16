@@ -12,7 +12,7 @@
 %{ open Ast %} 
 
 /* Tokens */
-%token LPAREN RPAREN MINUS 
+%token LPAREN RPAREN PLUS MINUS 
 %token EQ LT
 %token IF
 %token <int>  INT
@@ -41,8 +41,9 @@ expr:
     | LPAREN IF expr expr expr RPAREN        { If($3, $4, $5)}
     | LPAREN LT expr expr RPAREN             { Binops(Lt, $3, $4)}
     | LPAREN EQ expr expr RPAREN             { Binops(Eq, $3, $4) }
+    | LPAREN PLUS expr expr RPAREN          { Binops(Add, $3, $4) }
     | LPAREN MINUS expr expr RPAREN          { Binops(Sub, $3, $4) }
-/*  | LPAREN closure (list of expr_opts?) RPAREN   { $2 } */
+/*  | LPAREN closure (list of expr_opts?) RPAREN   { $2, $3 } */
 
 /* POSSIBLE REORGANIZATION - 
 everything that needs to be enclosed in parens can be a type of closure, so we don't need

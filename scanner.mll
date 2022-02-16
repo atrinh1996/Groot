@@ -21,6 +21,7 @@ rule tokenize = parse
   | [' ' '\n' '\t' '\r'] { tokenize lexbuf }
   | '('                  { LPAREN }
   | ')'                  { RPAREN }
+  | '+'                  { PLUS }
   | '-'                  { MINUS }
   | "=="                 { EQ }
   | '<'                  { LT }
