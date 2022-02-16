@@ -22,7 +22,8 @@ rule tokenize = parse
   | '('                  { LPAREN }
   | ')'                  { RPAREN }
   | '-'                  { MINUS }
-  | ['=']['=']           { EQ }
+  | "=="                 { EQ }
+  | '<'                  { LT }
   | "if"                 { IF }
   | integer              { INT(int_of_string (Lexing.lexeme lexbuf)) }
   | "#t"                 { BOOL(true) }

@@ -13,7 +13,7 @@
 
 /* Tokens */
 %token LPAREN RPAREN MINUS 
-%token EQ
+%token EQ LT
 %token IF
 %token <int>  INT
 %token <bool> BOOL
@@ -39,8 +39,19 @@ expr:
     | MINUS expr %prec NEG                   { Unary(Neg, $2) }
     | LPAREN expr RPAREN                     { $2 }
     | LPAREN IF expr expr expr RPAREN        { If($3, $4, $5)}
+    | LPAREN LT expr expr RPAREN             { Binops(Lt, $3, $4)}
     | LPAREN EQ expr expr RPAREN             { Binops(Eq, $3, $4) }
     | LPAREN MINUS expr expr RPAREN          { Binops(Sub, $3, $4) }
+/*  | LPAREN closure (list of expr_opts?) RPAREN   { $2 } */
 
+/* POSSIBLE REORGANIZATION - 
+everything that needs to be enclosed in parens can be a type of closure, so we don't need
+to have super-long expression rules and all the expressions that need to be in parens could
+instead be the more specific "closure" case
+
+closure:
+    | expr
+    | IF expr expr expr 
+*/
 
 /* Trailer */
