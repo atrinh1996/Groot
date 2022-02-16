@@ -8,4 +8,5 @@ type expr =
       Int   of int
     | Unary of uni_operator * expr
     | Bool  of bool
+    | If of expr * expr * expr
     (* | Binary of bin_operator * expr * expr *)

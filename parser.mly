@@ -19,6 +19,7 @@
  */
 %token LPAREN RPAREN
 %token MINUS EOF
+%token IF
 %token <int>  INT
 %token <bool> BOOL
 
@@ -37,6 +38,8 @@ expr:
     | literal               { $1 }
     | MINUS expr            { Unary(Neg, $2) }
     | LPAREN expr RPAREN    { $2 }
+    | LPAREN IF LPAREN expr RPAREN expr expr RPAREN
+                            { If($4, $6, $7)}
 
 
 
