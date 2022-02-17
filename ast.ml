@@ -14,12 +14,6 @@ type expr =
     | Binops of bin_operator * expr * expr
     | Lambda of string list * expr
 
-
-
-
-
-
-
 (* Pretty print functions *)
 
 let string_of_binop = function
@@ -40,3 +34,5 @@ let rec string_of_expr = function
     | Binops(o, e1, e2) -> "("  ^ string_of_binop o ^ " " 
                                 ^ string_of_expr e1 ^ " " 
                                 ^ string_of_expr e2 ^ ")"
+    | Lambda(xs, e) -> "(lambda (" ^ String.concat "" xs ^ ") " ^ 
+        string_of_expr e ^ ")"
