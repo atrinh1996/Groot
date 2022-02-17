@@ -25,13 +25,25 @@ rule tokenize = parse
   | "(;"                 { comment lexbuf }                  
   | '('                  { LPAREN }
   | ')'                  { RPAREN }
+  | '+'                  { PLUS }
   | '-'                  { MINUS }
-  | ['=']['=']           { EQ }
+  | '*'                  { TIMES }
+  | '/'                  { DIVIDE }
+  | "mod"                { MOD }
+  | "=="                 { EQ }
+  | "!="                 { NEQ }
+  | "<="                 { LEQ }
+  | ">="                 { GEQ }
+  | '<'                  { LT }
+  | '>'                  { GT }
   | "if"                 { IF }
   | integer as ival      { INT(int_of_string ival) }
   | "#t"                 { BOOL(true) }
   | "#f"                 { BOOL(false) }
+  | "&&"                 { AND }
+  | "||"                 { OR }
   | eof                  { raise Eof }
+  
   and comment = parse
     | ";)"               { tokenize lexbuf }
     | _                  { comment lexbuf }
