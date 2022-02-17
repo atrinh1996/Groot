@@ -44,9 +44,6 @@ The programming language (g)ROOT seeks to abstract the finer details away from t
 
 ## Tasks Completed
 - parser recognizes pos and neg ints. toplevel for now prints ints
-- parser recognizes char. Syntax: 'c'. toplevel prints strings of ints/chars.
-- Char can now print integers represented as chars: '1' and '?' and 'a' we  are
-  unsure about escape characters
 - We have bools! We had to separately define them because it made sense
 - Parses white space, currently ignores '' ' '\n' '\t' '\r'
 - Recognizes parens ( and ). Will evaluate expr between them, does not print
@@ -56,7 +53,9 @@ The programming language (g)ROOT seeks to abstract the finer details away from t
 - Implemented (; comments ;) (winky face)
 - Modified integer in parser so that an error is thrown if a negative integer is
   not in paraentheses (i.e. (-3) <- good | -3 <- bad)
-
+- Lambda implemented
+- Finished binops 
+- eof 
 
 ## Notes for Us
 - Provided a makefile to make edits and checking compilation easier. 

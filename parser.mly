@@ -17,12 +17,9 @@
 %token IF
 %token <int>  INT
 %token <bool> BOOL
-<<<<<<< HEAD
 %token <string> ID
 %token EOF
 %token LAMBDA
-=======
->>>>>>> 7e0d3a838af25332c6108658adc608c573cfcd0f
 
 /* Precedence */
 %nonassoc OR
