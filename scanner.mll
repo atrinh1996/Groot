@@ -28,6 +28,8 @@ rule tokenize = parse
   | '/'                  { DIVIDE }
   | "=="                 { EQ }
   | "!="                 { NEQ }
+  | "<="                 { LEQ }
+  | ">="                 { GEQ }
   | '<'                  { LT }
   | '>'                  { GT }
   | "if"                 { IF }

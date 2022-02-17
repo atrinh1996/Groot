@@ -25,6 +25,8 @@ let rec eval expr =
         | Neq  -> if ((int_of_string v1) != (int_of_string v2)) then "#t" else "#f"
         | Lt  -> if ((int_of_string v1) < (int_of_string v2)) then "#t" else "#f"
         | Gt  -> if ((int_of_string v1) > (int_of_string v2)) then "#t" else "#f"
+        | Leq  -> if ((int_of_string v1) <= (int_of_string v2)) then "#t" else "#f"
+        | Geq  -> if ((int_of_string v1) >= (int_of_string v2)) then "#t" else "#f"
         | Sub -> string_of_int ((int_of_string v1) - (int_of_string v2))
         | Add -> string_of_int ((int_of_string v1) + (int_of_string v2))
         | Mul -> string_of_int ((int_of_string v1) * (int_of_string v2))

@@ -1,6 +1,6 @@
 (* Abstract Syntax Tree for groot *)
 
-type bin_operator = Add | Sub | Mul | Div | Eq | Neq | Lt | Gt
+type bin_operator = Add | Sub | Mul | Div | Eq | Neq | Lt | Gt | Leq | Geq
 
 type uni_operator = Neg
 
