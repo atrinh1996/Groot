@@ -8,7 +8,10 @@
 *)
 
 (* Header *)
-{ open Parser } 
+{ 
+  open Parser 
+  exception Eof
+} 
 
 (* Regular Expressions (optional *)
 let digit = ['0'-'9']
@@ -28,7 +31,7 @@ rule tokenize = parse
   | integer as ival      { INT(int_of_string ival) }
   | "#t"                 { BOOL(true) }
   | "#f"                 { BOOL(false) }
-  | eof                  { EOF }
+  | eof                  { raise Eof }
   and comment = parse
     | ";)"               { tokenize lexbuf }
     | _                  { comment lexbuf }
