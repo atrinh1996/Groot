@@ -23,7 +23,7 @@
 %nonassoc OR
 %nonassoc AND
 %nonassoc LT GT
-%nonassoc EQ NEQ /*CHANGE TO NONASSOC (and make binops nonassoc)*/
+%nonassoc EQ NEQ 
 %nonassoc LEQ GEQ
 %nonassoc PLUS MINUS
 %nonassoc TIMES DIVIDE
@@ -58,16 +58,5 @@ expr:
     | LPAREN MOD expr expr RPAREN            { Binops(Mod, $3, $4) }
     | LPAREN AND expr expr RPAREN            { Binops(And, $3, $4) }
     | LPAREN OR expr expr RPAREN             { Binops(Or, $3, $4) }
-/*  | LPAREN closure (list of expr_opts?) RPAREN   { $2, $3 } */
-
-/* POSSIBLE REORGANIZATION - 
-everything that needs to be enclosed in parens can be a type of closure, so we don't need
-to have super-long expression rules and all the expressions that need to be in parens could
-instead be the more specific "closure" case
-
-closure:
-    | expr
-    | IF expr expr expr 
-*/
 
 /* Trailer */
