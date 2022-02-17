@@ -26,6 +26,7 @@ rule tokenize = parse
   | '-'                  { MINUS }
   | '*'                  { TIMES }
   | '/'                  { DIVIDE }
+  | "mod"                { MOD }
   | "=="                 { EQ }
   | "!="                 { NEQ }
   | "<="                 { LEQ }

@@ -12,7 +12,7 @@
 %{ open Ast %} 
 
 /* Tokens */
-%token LPAREN RPAREN PLUS MINUS TIMES DIVIDE
+%token LPAREN RPAREN PLUS MINUS TIMES DIVIDE MOD
 %token EQ NEQ LT GT LEQ GEQ AND OR
 %token IF
 %token <int>  INT
@@ -55,6 +55,7 @@ expr:
     | LPAREN MINUS expr expr RPAREN          { Binops(Sub, $3, $4) }
     | LPAREN TIMES expr expr RPAREN          { Binops(Mul, $3, $4) }
     | LPAREN DIVIDE expr expr RPAREN         { Binops(Div, $3, $4) }
+    | LPAREN MOD expr expr RPAREN            { Binops(Mod, $3, $4) }
     | LPAREN AND expr expr RPAREN            { Binops(And, $3, $4) }
     | LPAREN OR expr expr RPAREN             { Binops(Or, $3, $4) }
 /*  | LPAREN closure (list of expr_opts?) RPAREN   { $2, $3 } */

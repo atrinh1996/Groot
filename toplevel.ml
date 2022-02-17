@@ -33,6 +33,7 @@ let rec eval expr =
         | Add -> string_of_int ((int_of_string v1) + (int_of_string v2))
         | Mul -> string_of_int ((int_of_string v1) * (int_of_string v2))
         | Div -> string_of_int ((int_of_string v1) / (int_of_string v2)) (*DOESNT HANDLE DIVIDE BY ZERO*)
+        | Mod -> string_of_int ((int_of_string v1) mod (int_of_string v2))
       ) 
 
 
