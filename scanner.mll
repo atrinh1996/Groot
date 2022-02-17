@@ -19,7 +19,7 @@ let integer = ['-']?['0'-'9']+
 rule tokenize = parse
   (* RegEx { action } *)
   | [' ' '\n' '\t' '\r'] { tokenize lexbuf }
-  | "(;"                 { comment lexbuf }                  
+  | "(;"                 { comment lexbuf }
   | '('                  { LPAREN }
   | ')'                  { RPAREN }
   | '-'                  { MINUS }
@@ -30,7 +30,10 @@ rule tokenize = parse
   | "#f"                 { BOOL(false) }
   | "lambda"             { LAMBDA }
   | eof                  { EOF }
-  and comment = parse
-    | ";)"               { tokenize lexbuf }
-    | _                  { comment lexbuf }
+  | _ as char            { raise(Failure("illegal character " 
+                                          ^ Char.escaped char)) }
+
+and comment = parse
+  | ";)"               { tokenize lexbuf }
+  | _                  { comment lexbuf }
       
