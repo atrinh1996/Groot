@@ -27,6 +27,8 @@ let rec eval expr =
         | Gt  -> if ((int_of_string v1) > (int_of_string v2)) then "#t" else "#f"
         | Leq  -> if ((int_of_string v1) <= (int_of_string v2)) then "#t" else "#f"
         | Geq  -> if ((int_of_string v1) >= (int_of_string v2)) then "#t" else "#f"
+        | And  -> if ((String.equal v1 "#t") && (String.equal v2 "#t")) then "#t" else "#f"
+        | Or  -> if ((String.equal v1 "#t") || (String.equal v2 "#t")) then "#t" else "#f"
         | Sub -> string_of_int ((int_of_string v1) - (int_of_string v2))
         | Add -> string_of_int ((int_of_string v1) + (int_of_string v2))
         | Mul -> string_of_int ((int_of_string v1) * (int_of_string v2))

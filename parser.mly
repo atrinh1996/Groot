@@ -13,13 +13,15 @@
 
 /* Tokens */
 %token LPAREN RPAREN PLUS MINUS TIMES DIVIDE
-%token EQ NEQ LT GT LEQ GEQ
+%token EQ NEQ LT GT LEQ GEQ AND OR
 %token IF
 %token <int>  INT
 %token <bool> BOOL
 %token EOF
 
 /* Precedence */
+%nonassoc OR
+%nonassoc AND
 %nonassoc LT GT
 %nonassoc EQ NEQ /*CHANGE TO NONASSOC (and make binops nonassoc)*/
 %nonassoc LEQ GEQ
@@ -40,11 +42,11 @@ literal:
 
 expr:
     | literal                                { $1 }
-    | LPAREN MINUS expr %prec NEG RPAREN                 { Unary(Neg, $3) }
+    | LPAREN MINUS expr %prec NEG RPAREN     { Unary(Neg, $3) }
     | LPAREN expr RPAREN                     { $2 }
-    | LPAREN IF expr expr expr RPAREN        { If($3, $4, $5)}
-    | LPAREN LT expr expr RPAREN             { Binops(Lt, $3, $4)}
-    | LPAREN GT expr expr RPAREN             { Binops(Gt, $3, $4)}
+    | LPAREN IF expr expr expr RPAREN        { If($3, $4, $5) }
+    | LPAREN LT expr expr RPAREN             { Binops(Lt, $3, $4) }
+    | LPAREN GT expr expr RPAREN             { Binops(Gt, $3, $4) }
     | LPAREN EQ expr expr RPAREN             { Binops(Eq, $3, $4) }
     | LPAREN NEQ expr expr RPAREN            { Binops(Neq, $3, $4) }
     | LPAREN LEQ expr expr RPAREN            { Binops(Leq, $3, $4) }
@@ -53,6 +55,8 @@ expr:
     | LPAREN MINUS expr expr RPAREN          { Binops(Sub, $3, $4) }
     | LPAREN TIMES expr expr RPAREN          { Binops(Mul, $3, $4) }
     | LPAREN DIVIDE expr expr RPAREN         { Binops(Div, $3, $4) }
+    | LPAREN AND expr expr RPAREN            { Binops(And, $3, $4) }
+    | LPAREN OR expr expr RPAREN             { Binops(Or, $3, $4) }
 /*  | LPAREN closure (list of expr_opts?) RPAREN   { $2, $3 } */
 
 /* POSSIBLE REORGANIZATION - 
