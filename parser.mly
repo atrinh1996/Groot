@@ -17,7 +17,6 @@
 %token IF
 %token <int>  INT
 %token <bool> BOOL
-%token EOF
 
 /* Precedence */
 %nonassoc OR
@@ -30,8 +29,8 @@
 %nonassoc NEG
 
 /* Declarations */
-%start expr
-%type <Ast.expr> expr
+%start main
+%type <Ast.main> main
 
 %%
 
@@ -53,10 +52,15 @@ expr:
     | LPAREN GEQ expr expr RPAREN            { Binops(Geq, $3, $4) }
     | LPAREN PLUS expr expr RPAREN           { Binops(Add, $3, $4) }
     | LPAREN MINUS expr expr RPAREN          { Binops(Sub, $3, $4) }
+<<<<<<< HEAD
     | LPAREN TIMES expr expr RPAREN          { Binops(Mul, $3, $4) }
     | LPAREN DIVIDE expr expr RPAREN         { Binops(Div, $3, $4) }
     | LPAREN MOD expr expr RPAREN            { Binops(Mod, $3, $4) }
     | LPAREN AND expr expr RPAREN            { Binops(And, $3, $4) }
     | LPAREN OR expr expr RPAREN             { Binops(Or, $3, $4) }
 
+=======
+main:
+    expr                                 { $1 }
+>>>>>>> 39ee01ca74ca8c97aae639e60d9639a98ece47a4
 /* Trailer */

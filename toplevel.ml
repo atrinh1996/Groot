@@ -4,9 +4,11 @@ is supposed to be like clang - a way to feed in files, pipe stuff in, do stuff
  *)
 
 open Ast
+open Scanner
 
 (* Evaluator - currently returns string of evaluated expression*)
 let rec eval expr =
+<<<<<<< HEAD
   match expr with
   | Int(x) -> string_of_int x
   | Unary(op, e1) -> 
@@ -21,7 +23,7 @@ let rec eval expr =
       let v1 = eval e1 in 
       let v2 = eval e2 in
       (match op with
-        | Eq  -> if ((int_of_string v1) == (int_of_string v2)) then "#t" else "#f"
+        | Eq  -> if ((int_of_string v1) = (int_of_string v2)) then "#t" else "#f"
         | Neq  -> if ((int_of_string v1) != (int_of_string v2)) then "#t" else "#f"
         | Lt  -> if ((int_of_string v1) < (int_of_string v2)) then "#t" else "#f"
         | Gt  -> if ((int_of_string v1) > (int_of_string v2)) then "#t" else "#f"
@@ -36,12 +38,18 @@ let rec eval expr =
         | Mod -> string_of_int ((int_of_string v1) mod (int_of_string v2))
       ) 
 
+=======
+>>>>>>> 39ee01ca74ca8c97aae639e60d9639a98ece47a4
 
 (* Temporary code to print what parser evaluates *)
 let () = 
-  let lex_buf = Lexing.from_channel stdin in
-    while true do
-      let expr = Parser.expr Scanner.tokenize lex_buf in
-      let result = eval expr in
-      print_endline result 
-    done
+  try
+    let lex_buf = Lexing.from_channel stdin in
+      while true do
+        let expr = Parser.main Scanner.tokenize lex_buf in
+        let result = eval expr in
+        print_endline result 
+      done
+  with Scanner.Eof ->
+    print_endline "Eof-Error";
+    exit 0
