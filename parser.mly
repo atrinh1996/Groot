@@ -17,6 +17,12 @@
 %token IF
 %token <int>  INT
 %token <bool> BOOL
+<<<<<<< HEAD
+%token <string> ID
+%token EOF
+%token LAMBDA
+=======
+>>>>>>> 7e0d3a838af25332c6108658adc608c573cfcd0f
 
 /* Precedence */
 %nonassoc OR
@@ -33,6 +39,15 @@
 %type <Ast.main> main
 
 %%
+
+formals_opt:
+    /* nothing */ { [] }
+  | formal_list   { $1 }
+
+formal_list:
+    ID                   { [$1] }
+  | ID formal_list { $1 :: $2 }
+
 
 /* Rules */
 literal:
@@ -57,6 +72,7 @@ expr:
     | LPAREN MOD expr expr RPAREN            { Binops(Mod, $3, $4) }
     | LPAREN AND expr expr RPAREN            { Binops(And, $3, $4) }
     | LPAREN OR expr expr RPAREN             { Binops(Or, $3, $4) }
+    | LPAREN LAMBDA formals_opt expr RPAREN  { $4 }
 
 main:
     expr                                     { $1 }
