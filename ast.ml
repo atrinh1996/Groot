@@ -2,7 +2,8 @@
    Functions for printing
 *)
 
-type bin_operator = Add | Sub | Mul | Div | Mod | Eq | Neq | Lt | Gt | Leq | Geq | And | Or
+type bin_operator = Add | Sub | Mul | Div | Mod | Eq | Neq 
+                    | Lt | Gt | Leq | Geq | And | Or
 
 type uni_operator = Neg
 
@@ -19,8 +20,19 @@ type main = expr
 (* Pretty print functions *)
 
 let string_of_binop = function
-      Sub -> "-"
+      Add -> "+"
+    | Sub -> "-"
+    | Mul -> "*"
+    | Div -> "/"
+    | Mod -> "mod"
     | Eq -> "=="
+    | Neq -> "!="
+    | Lt -> "<"
+    | Gt -> ">"
+    | Leq -> "<="
+    | Geq -> "<="
+    | And -> "&&"
+    | Or -> "||"
 
 let string_of_uop = function
     | Neg -> "-"
@@ -39,3 +51,4 @@ let rec string_of_expr = function
     | Lambda(xs, e) -> "(lambda (" ^ String.concat "" xs ^ ") " ^ 
         string_of_expr e ^ ")"
 
+let string_of_main e = string_of_expr e
