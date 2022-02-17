@@ -9,7 +9,10 @@
 */
 
 /* Header */
-%{ open Ast %} 
+%{ 
+    open Ast
+    exception Eof
+%} 
 
 /* Tokens */
 %token LPAREN RPAREN PLUS MINUS TIMES DIVIDE MOD
@@ -72,5 +75,6 @@ expr:
     | LPAREN LAMBDA LPAREN formals_opt RPAREN expr RPAREN  { $6 }
 
 main:
-    expr                                     { $1 }
+    | EOF                                      { raise Eof }
+    | expr                                     { $1 }
 /* Trailer */

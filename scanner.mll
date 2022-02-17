@@ -10,7 +10,7 @@
 (* Header *)
 { 
   open Parser 
-  exception Eof
+  
 } 
 
 (* Regular Expressions (optional *)
@@ -44,7 +44,7 @@ rule tokenize = parse
   | ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']* as lxm { ID(lxm) }
   | "&&"                 { AND }
   | "||"                 { OR }
-  | eof                  { raise Eof }
+  | eof                  { EOF }
   | _ as char            { raise(Failure("illegal character " 
                                           ^ Char.escaped char)) }
 
