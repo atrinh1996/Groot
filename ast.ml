@@ -10,3 +10,4 @@ type expr =
     | Bool  of bool
     | If of expr * expr * expr
     | Binops of bin_operator * expr * expr
+    | Lambda of string list * expr

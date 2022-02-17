@@ -28,6 +28,7 @@ rule tokenize = parse
   | integer as ival      { INT(int_of_string ival) }
   | "#t"                 { BOOL(true) }
   | "#f"                 { BOOL(false) }
+  | "lambda"             { LAMBDA }
   | eof                  { EOF }
   and comment = parse
     | ";)"               { tokenize lexbuf }
