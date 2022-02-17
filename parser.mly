@@ -41,5 +41,5 @@ expr:
     | LPAREN EQ expr expr RPAREN             { Binops(Eq, $3, $4) }
     | LPAREN MINUS expr expr RPAREN          { Binops(Sub, $3, $4) }
 main:
-    expr                                 { $1 }
+    expr                                     { $1 }
 /* Trailer */
