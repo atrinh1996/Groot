@@ -8,7 +8,6 @@ open Scanner
 
 (* Evaluator - currently returns string of evaluated expression*)
 let rec eval expr =
-<<<<<<< HEAD
   match expr with
   | Int(x) -> string_of_int x
   | Unary(op, e1) -> 
@@ -38,8 +37,6 @@ let rec eval expr =
         | Mod -> string_of_int ((int_of_string v1) mod (int_of_string v2))
       ) 
 
-=======
->>>>>>> 39ee01ca74ca8c97aae639e60d9639a98ece47a4
 
 (* Temporary code to print what parser evaluates *)
 let () = 
