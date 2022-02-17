@@ -51,4 +51,4 @@ let rec string_of_expr = function
     | Lambda(xs, e) -> "(lambda (" ^ String.concat "" xs ^ ") " ^ 
         string_of_expr e ^ ")"
 
-let string_of_main e = string_of_expr e
+let string_of_main e = string_of_expr e ^ "\n"
