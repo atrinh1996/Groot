@@ -2,7 +2,7 @@
    Functions for printing
 *)
 
-type bin_operator = Sub | Eq
+type bin_operator = Add | Sub | Mul | Div | Mod | Eq | Neq | Lt | Gt | Leq | Geq | And | Or
 
 type uni_operator = Neg
 
@@ -13,6 +13,8 @@ type expr =
     | If of expr * expr * expr
     | Binops of bin_operator * expr * expr
     | Lambda of string list * expr
+
+type main = expr
 
 (* Pretty print functions *)
 
@@ -36,3 +38,4 @@ let rec string_of_expr = function
                                 ^ string_of_expr e2 ^ ")"
     | Lambda(xs, e) -> "(lambda (" ^ String.concat "" xs ^ ") " ^ 
         string_of_expr e ^ ")"
+

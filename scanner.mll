@@ -8,7 +8,10 @@
 *)
 
 (* Header *)
-{ open Parser } 
+{ 
+  open Parser 
+  exception Eof
+} 
 
 (* Regular Expressions (optional *)
 let digit = ['0'-'9']
@@ -22,15 +25,26 @@ rule tokenize = parse
   | "(;"                 { comment lexbuf }
   | '('                  { LPAREN }
   | ')'                  { RPAREN }
+  | '+'                  { PLUS }
   | '-'                  { MINUS }
-  | ['=']['=']           { EQ }
+  | '*'                  { TIMES }
+  | '/'                  { DIVIDE }
+  | "mod"                { MOD }
+  | "=="                 { EQ }
+  | "!="                 { NEQ }
+  | "<="                 { LEQ }
+  | ">="                 { GEQ }
+  | '<'                  { LT }
+  | '>'                  { GT }
   | "if"                 { IF }
   | integer as ival      { INT(int_of_string ival) }
   | "#t"                 { BOOL(true) }
   | "#f"                 { BOOL(false) }
   | "lambda"             { LAMBDA }
   | ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']* as lxm { ID(lxm) }
-  | eof                  { EOF }
+  | "&&"                 { AND }
+  | "||"                 { OR }
+  | eof                  { raise Eof }
   | _ as char            { raise(Failure("illegal character " 
                                           ^ Char.escaped char)) }
 
