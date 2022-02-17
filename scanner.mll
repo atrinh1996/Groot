@@ -29,7 +29,10 @@ rule tokenize = parse
   | "#t"                 { BOOL(true) }
   | "#f"                 { BOOL(false) }
   | eof                  { EOF }
-  and comment = parse
-    | ";)"               { tokenize lexbuf }
-    | _                  { comment lexbuf }
+  | _ as char            { raise(Failure("illegal character " 
+                                          ^ Char.escaped char)) }
+
+and comment = parse
+  | ";)"               { tokenize lexbuf }
+  | _                  { comment lexbuf }
       

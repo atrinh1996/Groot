@@ -11,16 +11,25 @@ The programming language (g)ROOT seeks to abstract the finer details away from t
     - ocamllex scanner.mll
     
     *produces scanner.ml*
+
 - Compile parser with:
     - ocamlyacc parser.mly
     
     *produces parser.ml*
+
 - Compile toplevel with:
     - ocamlbuild toplevel.native
     - make toplevel.native
 - Run toplevel with:
     - ./toplevel.native
 
+- Compile other toplevel with:
+    - ocamlbuild groot.native
+    - make groot.native
+- Run toplevel with:
+    - ./groot.native
+    - ./groot.native [file.grt]
+    - ./groot.native -a [file.grt]
 
 ## FILES
 - ast.ml: Abstract Syntax Tree file describes syntatic construct.
