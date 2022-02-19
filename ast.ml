@@ -15,7 +15,7 @@ type expr =
     | Binops of bin_operator * expr * expr
     | Lambda of string list * expr
 
-type main = expr
+type main = expr list
 
 (* Pretty print functions *)
 
@@ -51,4 +51,5 @@ let rec string_of_expr = function
     | Lambda(xs, e) -> "(lambda (" ^ String.concat " " xs ^ ") " ^ 
         string_of_expr e ^ ")"
 
-let string_of_main e = string_of_expr e ^ "\n"
+let string_of_main exprs = 
+    String.concat "\n" (List.map string_of_expr exprs) ^ "\n"

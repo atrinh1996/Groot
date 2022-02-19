@@ -19,12 +19,5 @@ let () =
   Arg.parse speclist (fun filename -> channel := open_in filename) usage_msg;
   
   let lexbuf = Lexing.from_channel !channel in
-  (* try 
-    while true do  *)
-      let ast = Parser.main Scanner.tokenize lexbuf in 
-        print_string (Ast.string_of_main ast)
-    (* done *)
-  (* with Scanner.Eof ->
-    print_endline "EOF Reached!";
-    exit 0 *)
-  
+    let ast = Parser.main Scanner.tokenize lexbuf in 
+      print_string (Ast.string_of_main ast)
