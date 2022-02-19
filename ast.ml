@@ -48,7 +48,7 @@ let rec string_of_expr = function
     | Binops(o, e1, e2) -> "("  ^ string_of_binop o ^ " " 
                                 ^ string_of_expr e1 ^ " " 
                                 ^ string_of_expr e2 ^ ")"
-    | Lambda(xs, e) -> "(lambda (" ^ String.concat "" xs ^ ") " ^ 
+    | Lambda(xs, e) -> "(lambda (" ^ String.concat " " xs ^ ") " ^ 
         string_of_expr e ^ ")"
 
 let string_of_main e = string_of_expr e ^ "\n"

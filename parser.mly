@@ -69,7 +69,7 @@ expr:
     | LPAREN MOD expr expr RPAREN            { Binops(Mod, $3, $4) }
     | LPAREN AND expr expr RPAREN            { Binops(And, $3, $4) }
     | LPAREN OR expr expr RPAREN             { Binops(Or, $3, $4) }
-    | LPAREN LAMBDA LPAREN formals_opt RPAREN expr RPAREN  { $6 }
+    | LPAREN LAMBDA LPAREN formals_opt RPAREN expr RPAREN  { Lambda($4, $6) }
 
 main:
     expr                                     { $1 }
