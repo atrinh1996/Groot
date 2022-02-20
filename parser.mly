@@ -53,7 +53,7 @@ literal:
 
 expr:
     | literal                                { $1 }
-    | LPAREN MINUS expr %prec NEG RPAREN     { Unary(Neg, $3) }
+    | LPAREN MINUS expr RPAREN %prec NEG     { Unary(Neg, $3) }
     | LPAREN expr RPAREN                     { $2 }
     | LPAREN IF expr expr expr RPAREN        { If($3, $4, $5) }
     | LPAREN LT expr expr RPAREN             { Binops(Lt, $3, $4) }
@@ -69,8 +69,12 @@ expr:
     | LPAREN MOD expr expr RPAREN            { Binops(Mod, $3, $4) }
     | LPAREN AND expr expr RPAREN            { Binops(And, $3, $4) }
     | LPAREN OR expr expr RPAREN             { Binops(Or, $3, $4) }
-    | LPAREN LAMBDA LPAREN formals_opt RPAREN expr RPAREN  { $6 }
+    | LPAREN LAMBDA LPAREN formals_opt RPAREN expr RPAREN  { Lambda($4, $6) }
 
 main:
-    expr                                     { $1 }
+    expr_list EOF       { List.rev $1 }
+
+expr_list:
+    /* nothing */       { [] }
+    | expr_list expr    { $2 :: $1 }
 /* Trailer */

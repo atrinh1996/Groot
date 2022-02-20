@@ -9,8 +9,7 @@
 
 (* Header *)
 { 
-  open Parser 
-  exception Eof
+  open Parser
 } 
 
 (* Regular Expressions (optional *)
@@ -20,7 +19,6 @@ let integer = ['-']?['0'-'9']+
 
 (* Entry Points *)
 rule tokenize = parse
-  (* RegEx { action } *)
   | [' ' '\n' '\t' '\r'] { tokenize lexbuf }
   | "(;"                 { comment lexbuf }
   | '('                  { LPAREN }
@@ -44,7 +42,7 @@ rule tokenize = parse
   | ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']* as lxm { ID(lxm) }
   | "&&"                 { AND }
   | "||"                 { OR }
-  | eof                  { raise Eof }
+  | eof                  { EOF }
   | _ as char            { raise(Failure("illegal character " 
                                           ^ Char.escaped char)) }
 
