@@ -75,6 +75,6 @@ main:
     expr_list EOF       { List.rev $1 }
 
 expr_list:
-                        { [] }
+    /* nothing */       { [] }
     | expr_list expr    { $2 :: $1 }
 /* Trailer */
