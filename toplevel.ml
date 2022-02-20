@@ -11,9 +11,11 @@ let rec eval expr =
   match expr with
   | Int(x) -> string_of_int x
   | Unary(op, e1) -> 
-      let v1 = (int_of_string (eval e1)) in 
-      let v1 = (-1) * v1
-      in string_of_int v1
+      let v1 = eval e1 in 
+      (match op with
+        | Neg -> let v1 = (-1) * (int_of_string v1) in string_of_int v1
+        | Not -> if (String.equal v1 "#t") then "#f" else "#t"
+      )
   | Bool(b) -> if b then "#t" else "#f"
   | If(cond, e1, e2) -> 
       (let tf = (String.equal (eval cond) "#t") in 
