@@ -28,8 +28,8 @@ The programming language (g)ROOT seeks to abstract the finer details away from t
     - make groot.native
 - Run toplevel with:
     - ./groot.native
-    - ./groot.native [file.grt]
-    - ./groot.native -a [file.grt]
+    - ./groot.native [file.gt]
+    - ./groot.native -a [file.gt]
 
 ## FILES
 - ast.ml: Abstract Syntax Tree file describes syntatic construct.
@@ -63,6 +63,7 @@ The programming language (g)ROOT seeks to abstract the finer details away from t
 
 ## Notes for Us
 - Provided a makefile to make edits and checking compilation easier. 
+    - make groot.native
     - make parser
     - make lexer
     - make toplevel.native
