@@ -13,13 +13,13 @@
 
 /* Tokens */
 %token LPAREN RPAREN PLUS MINUS TIMES DIVIDE MOD
-%token EQ NEQ LT GT LEQ GEQ AND OR
+%token EQ NEQ LT GT LEQ GEQ AND OR NOT
 %token IF
 %token <int>  INT
 %token <bool> BOOL
 %token <string> ID
 %token EOF
-%token LAMBDA
+%token LAMBDA LET
 
 /* Precedence */
 %nonassoc OR
@@ -30,6 +30,8 @@
 %nonassoc PLUS MINUS
 %nonassoc TIMES DIVIDE
 %nonassoc NEG
+%nonassoc NOT
+
 
 /* Declarations */
 %start main
@@ -42,8 +44,8 @@ formals_opt:
   | formal_list   { $1 }
 
 formal_list:
-    ID                   { [$1] }
-  | ID formal_list { $1 :: $2 }
+    ID                  { [$1] }
+  | ID formal_list      { $1 :: $2 }
 
 
 /* Rules */
@@ -53,8 +55,11 @@ literal:
 
 expr:
     | literal                                { $1 }
-    | LPAREN MINUS expr RPAREN %prec NEG     { Unary(Neg, $3) }
+    | ID                                     { Id($1) }
+    | MINUS expr %prec NEG                   { Unary(Neg, $2) }
+    | NOT expr                               { Unary(Not, $2) }
     | LPAREN expr RPAREN                     { $2 }
+    | LPAREN LET ID expr RPAREN              { Let($3, $4)}
     | LPAREN IF expr expr expr RPAREN        { If($3, $4, $5) }
     | LPAREN LT expr expr RPAREN             { Binops(Lt, $3, $4) }
     | LPAREN GT expr expr RPAREN             { Binops(Gt, $3, $4) }
@@ -72,9 +77,9 @@ expr:
     | LPAREN LAMBDA LPAREN formals_opt RPAREN expr RPAREN  { Lambda($4, $6) }
 
 main:
-    expr_list EOF       { List.rev $1 }
+    expr_list EOF       { $1 }
 
 expr_list:
     /* nothing */       { [] }
-    | expr_list expr    { $2 :: $1 }
+    | expr expr_list    { $1 :: $2 }
 /* Trailer */
