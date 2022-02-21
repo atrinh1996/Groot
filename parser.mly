@@ -55,7 +55,7 @@ literal:
 expr:
     | literal                                { $1 }
     | LPAREN MINUS expr RPAREN %prec NEG     { Unary(Neg, $3) }
-    | LPAREN NOT expr RPAREN                 { Unary(Not, $3) }
+    | NOT expr                               { Unary(Not, $2) }
     | LPAREN expr RPAREN                     { $2 }
     | LPAREN IF expr expr expr RPAREN        { If($3, $4, $5) }
     | LPAREN LT expr expr RPAREN             { Binops(Lt, $3, $4) }
