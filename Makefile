@@ -13,8 +13,8 @@ lexer: ast.ml parser.mly scanner.mll
 toplevel.native: toplevel.ml ast.ml parser.mly scanner.mll
 	ocamlbuild toplevel.native
 
-groot.native: ast.ml parser.mly scanner.mll groot.ml
-	ocamlbuild groot.native
+eval.native: ast.ml parser.mly scanner.mll eval.ml
+	ocamlbuild eval.native
 
 clean:
 	ocamlbuild -clean

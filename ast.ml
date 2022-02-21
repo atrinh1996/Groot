@@ -11,6 +11,7 @@ type expr =
     | Int   of int
     | Unary of uni_operator * expr
     | Bool  of bool
+    | Id of string
     | If of expr * expr * expr
     | Binops of bin_operator * expr * expr
     | Lambda of string list * expr
@@ -44,6 +45,7 @@ let rec string_of_expr = function
     | Unary(o, e) -> string_of_uop o ^ string_of_expr e
     | Bool(true) -> "#t"
     | Bool(false) -> "#f"
+    | Id(s) -> s
     | If(e1, e2, e3) -> "(if "  ^ string_of_expr e1 ^ " " 
                                 ^ string_of_expr e2 ^ " " 
                                 ^ string_of_expr e3 ^ ")"
