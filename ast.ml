@@ -5,7 +5,7 @@
 type bin_operator = Add | Sub | Mul | Div | Mod | Eq | Neq 
                     | Lt | Gt | Leq | Geq | And | Or
 
-type uni_operator = Neg
+type uni_operator = Neg | Not
 
 type expr = 
     | Int   of int
@@ -15,6 +15,7 @@ type expr =
     | If of expr * expr * expr
     | Binops of bin_operator * expr * expr
     | Lambda of string list * expr
+    | Let of string * expr
 
 type main = expr list
 
@@ -37,6 +38,7 @@ let string_of_binop = function
 
 let string_of_uop = function
     | Neg -> "-"
+    | Not -> "!"
 
 let rec string_of_expr = function
     | Int(x) -> string_of_int x
@@ -52,6 +54,7 @@ let rec string_of_expr = function
                                 ^ string_of_expr e2 ^ ")"
     | Lambda(xs, e) -> "(lambda (" ^ String.concat " " xs ^ ") " ^ 
         string_of_expr e ^ ")"
+    | Let(id, e) -> "(let " ^ id ^ " " ^ string_of_expr e ^ ")"
 
 let string_of_main exprs = 
     String.concat "\n" (List.map string_of_expr exprs) ^ "\n"

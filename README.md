@@ -39,7 +39,7 @@ The programming language (g)ROOT seeks to abstract the finer details away from t
 
 
 ## Tasks Completed
-- parser recognizes pos and neg ints. toplevel for now prints ints
+- parser recognizes pos and neg ints. 3 (3) -3 (-3) all work
 - We have bools! We had to separately define them because it made sense
 - Parses white space, currently ignores '' ' '\n' '\t' '\r'
 - Recognizes parens ( and ). Will evaluate expr between them, does not print
@@ -47,11 +47,12 @@ The programming language (g)ROOT seeks to abstract the finer details away from t
 - If else implemented! CLeaned up parser, scanner, ast, and toplevel, changed
   Eql to Eq ('==')  
 - Implemented (; comments ;) (winky face)
-- Modified integer in parser so that an error is thrown if a negative integer is
-  not in paraentheses (i.e. (-3) <- good | -3 <- bad)
 - Lambda implemented
 - Finished binops 
 - eof 
+- variable ID
+- let statements
+- unary not "!" operator
 
 ## Notes for Us
 - Provided a makefile to make edits and checking compilation easier. 
