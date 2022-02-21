@@ -3,7 +3,7 @@
 The programming language (g)ROOT seeks to abstract the finer details away from this abstract data type in order to curtail the complexities that coincide with tree implementation.
 
 ## COMPILE & RUN
-- Run with:
+- Run tests with:
     - ./run_tests.sh
 
 *Commands for the group as we are working through the project*
@@ -17,19 +17,15 @@ The programming language (g)ROOT seeks to abstract the finer details away from t
     
     *produces parser.ml*
 
-- Compile toplevel with:
+- **Compile toplevel with one of these**:
     - ocamlbuild toplevel.native
     - make toplevel.native
-- Run toplevel with:
+- **Run toplevel with one of these**:
     - ./toplevel.native
+    - ./toplevel.native [file.gt]
+    - ./toplevel.native -a [file.gt]
 
-- Compile other toplevel with:
-    - ocamlbuild groot.native
-    - make groot.native
-- Run toplevel with:
-    - ./groot.native
-    - ./groot.native [file.gt]
-    - ./groot.native -a [file.gt]
+
 
 ## FILES
 - ast.ml: Abstract Syntax Tree file describes syntatic construct.

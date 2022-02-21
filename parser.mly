@@ -31,6 +31,7 @@
 %nonassoc TIMES DIVIDE
 %nonassoc NEG
 
+
 /* Declarations */
 %start main
 %type <Ast.main> main
@@ -42,8 +43,8 @@ formals_opt:
   | formal_list   { $1 }
 
 formal_list:
-    ID                   { [$1] }
-  | ID formal_list { $1 :: $2 }
+    ID                  { [$1] }
+  | ID formal_list      { $1 :: $2 }
 
 
 /* Rules */
@@ -53,6 +54,7 @@ literal:
 
 expr:
     | literal                                { $1 }
+    | ID                                     { Id($1) }
     | LPAREN MINUS expr RPAREN %prec NEG     { Unary(Neg, $3) }
     | LPAREN expr RPAREN                     { $2 }
     | LPAREN IF expr expr expr RPAREN        { If($3, $4, $5) }
@@ -72,9 +74,9 @@ expr:
     | LPAREN LAMBDA LPAREN formals_opt RPAREN expr RPAREN  { Lambda($4, $6) }
 
 main:
-    expr_list EOF       { List.rev $1 }
+    expr_list EOF       { $1 }
 
 expr_list:
     /* nothing */       { [] }
-    | expr_list expr    { $2 :: $1 }
+    | expr expr_list    { $1 :: $2 }
 /* Trailer */
