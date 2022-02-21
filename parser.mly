@@ -13,7 +13,7 @@
 
 /* Tokens */
 %token LPAREN RPAREN PLUS MINUS TIMES DIVIDE MOD
-%token EQ NEQ LT GT LEQ GEQ AND OR
+%token EQ NEQ LT GT LEQ GEQ AND OR NOT
 %token IF
 %token <int>  INT
 %token <bool> BOOL
@@ -30,6 +30,7 @@
 %nonassoc PLUS MINUS
 %nonassoc TIMES DIVIDE
 %nonassoc NEG
+%nonassoc NOT
 
 /* Declarations */
 %start main
@@ -54,6 +55,7 @@ literal:
 expr:
     | literal                                { $1 }
     | LPAREN MINUS expr RPAREN %prec NEG     { Unary(Neg, $3) }
+    | NOT expr                               { Unary(Not, $2) }
     | LPAREN expr RPAREN                     { $2 }
     | LPAREN IF expr expr expr RPAREN        { If($3, $4, $5) }
     | LPAREN LT expr expr RPAREN             { Binops(Lt, $3, $4) }

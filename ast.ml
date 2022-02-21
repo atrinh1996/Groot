@@ -5,7 +5,7 @@
 type bin_operator = Add | Sub | Mul | Div | Mod | Eq | Neq 
                     | Lt | Gt | Leq | Geq | And | Or
 
-type uni_operator = Neg
+type uni_operator = Neg | Not
 
 type expr = 
     | Int   of int
@@ -36,6 +36,7 @@ let string_of_binop = function
 
 let string_of_uop = function
     | Neg -> "-"
+    | Not -> "!"
 
 let rec string_of_expr = function
     | Int(x) -> string_of_int x
