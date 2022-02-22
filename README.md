@@ -2,20 +2,19 @@
 
 The programming language (g)ROOT seeks to abstract the finer details away from this abstract data type in order to curtail the complexities that coincide with tree implementation.
 
+
+## Contributors
+- Samuel Russo
+- Amy Bui
+- Eliza Encherman
+- Zachary Goldstein
+- Nickolas Gravel
+
+
+
 ## COMPILE & RUN
 - Run tests with:
     - ./run_tests.sh
-
-*Commands for the group as we are working through the project*
-- Compile lexer with:
-    - ocamllex scanner.mll
-    
-    *produces scanner.ml*
-
-- Compile parser with:
-    - ocamlyacc parser.mly
-    
-    *produces parser.ml*
 
 - **Compile toplevel with one of these**:
     - ocamlbuild toplevel.native
@@ -24,10 +23,13 @@ The programming language (g)ROOT seeks to abstract the finer details away from t
     - ./toplevel.native
     - ./toplevel.native [file.gt]
     - ./toplevel.native -a [file.gt]
+    - echo "\<input\>" | toplevel.native
 
 
 
 ## FILES
+- README: this file
+- Makefile: file of rules and commands to run toplevel.
 - ast.ml: Abstract Syntax Tree file describes syntatic construct.
 - parser.mly: instructions to produces a parser from a context-free grammar specification.
 - scanner.mll: lexer file to create a lexical analyzer.
@@ -39,30 +41,57 @@ The programming language (g)ROOT seeks to abstract the finer details away from t
 
 
 ## Tasks Completed
-- parser recognizes pos and neg ints. 3 (3) -3 (-3) all work
-- We have bools! We had to separately define them because it made sense
-- Parses white space, currently ignores '' ' '\n' '\t' '\r'
-- Recognizes parens ( and ). Will evaluate expr between them, does not print
-  the parens.
-- If else implemented! CLeaned up parser, scanner, ast, and toplevel, changed
-  Eql to Eq ('==')  
-- Implemented (; comments ;) (winky face)
-- Lambda implemented
-- Finished binops 
-- eof 
-- variable ID
-- let statements
-- unary not "!" operator
+- AST:
+    - types for:
+        - binary operators
+        - unary operators
+        - expressions
+        - main (program): list of expressions
+        - pretty print
+- Toplevel:
+    - Takes input from stdin or file
+    - Call to AST's string_of_main (pretty print)
+- Scanner/Parser:
+    - Integers: 3, (3). -3, (-3)
+    - Booleans: #t, #f, (#t), (#f)
+    - Variable names (ID): x, y, a, cat, dog, Howie, cs_107
+    - Whilespaces ignored: ' ', '\n', '\t', '\r'
+    - Parentheses: '(' (LPAREN), ')' (RPAREN)
+        - Does not accept "()" as an expression
+    - Comments: (; this is a comment (winky faces) ;)
+    - If: "if"
+        - (if 1 2 3), (if #t 1 0), (if (> x y) (+ 3 x) (== x 4))
 
-## Notes for Us
-- Provided a makefile to make edits and checking compilation easier. 
-    - make groot.native
-    - make parser
-    - make lexer
-    - make toplevel.native
-    - make clean  
-    
-    * make clean before you make toplevel. The stuff from making parser and lexer
-    separately for some reason interferes with ocamlbuild. If files to remove
-    don't exist in top directory, you'll just get file doesn't exist error.
-    Thats okay.*
+    - Lambda: "lambda"
+        - (lambda () #t), (lambda (x) (+ 1 2)), (lambda (x y) (+ x y)) 
+
+    - Let: "let"
+    - Val: "val"
+
+    - Unary operators
+        - Negation: '-'
+            - Works: -3, -(3), (-(+ 3 4)), -(+ 3 4), -#t, -(if 1 2 3), -x
+        - Not: '!'
+            - Works: !#t, !#t, !#t, !3, !(if 1 2 3)
+    - Binary Operators (with examples for arithmetic operators)
+        - Addition: '+'
+            - Works: (+ 3 5), (+ 3 (+ 4 5)), (+ x y), (+ 4 #t) (+ #t #f)
+            - Does not work: + 3 4, (3 + 4)
+        - Subtraction: '-'
+            - Works: (- 3 4), (- 3 (- 4 5)), (- x 4)
+            - Doesn't work: - 3 4, (3 - 4), (- 3 4 (- 5 6))
+        - Multiplication: '\*'
+            - Works: (* #t h), (* (* 4 5) (* 2 1))
+        - Division: '/'
+            - Works: (/ 4 0), (/ 4 2), (/ x y), (/ (+ x y) (* x x))
+            - Does not work: / 3 4, (3 / 4)
+        - Modulus: "mod"
+        - Greater Than: ">"
+        - Less Than: "<"
+        - Greater Than or Equal to: ">="
+        - Less Than or Equal to: "<="
+        - Equal to: "=="
+        - Not Equal to: "!="
+        - And: "&&": (&& #t #f), (&& h x), (&& (if 1 2 3) (lambda () x))
+        - Or: "||": (|| 3 0), (|| 12 42), (|| #f #f)
+
