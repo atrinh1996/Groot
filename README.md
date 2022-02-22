@@ -13,8 +13,6 @@ The programming language (g)ROOT seeks to abstract the finer details away from t
 
 
 ## COMPILE & RUN
-- Run tests with:
-    - ./run_tests.sh
 - **Compile toplevel with one of these**:
     - ocamlbuild toplevel.native 
     - make toplevel.native
@@ -23,6 +21,8 @@ The programming language (g)ROOT seeks to abstract the finer details away from t
     - ./toplevel.native [file.gt]
     - ./toplevel.native -a [file.gt]
     - echo "\<input\>" | toplevel.native
+- Run tests with:
+    - ./run_tests.sh
 
 
 
