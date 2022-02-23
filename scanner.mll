@@ -15,6 +15,8 @@
 (* Regular Expressions (optional *)
 let digit = ['0'-'9']
 let integer = ['-']?['0'-'9']+
+let alpha = ['a'-'z']
+
 
 
 (* Entry Points *)
@@ -35,6 +37,7 @@ rule tokenize = parse
   | '<'                  { LT }
   | '>'                  { GT }
   | "if"                 { IF }
+  | "'"                  { opchar lexbuf }
   | integer as ival      { INT(int_of_string ival) }
   | "#t"                 { BOOL(true) }
   | "#f"                 { BOOL(false) }
@@ -47,8 +50,18 @@ rule tokenize = parse
   | eof                  { EOF }
   | _ as char            { raise(Failure("illegal character " 
                                           ^ Char.escaped char)) }
-
 and comment = parse
   | ";)"               { tokenize lexbuf }
   | _                  { comment lexbuf }
-      
+
+and opchar = parse
+  | _ as c               { clchar c lexbuf  }
+  (* | _ as char          { raise(Failure("illegal character " 
+                                          ^ Char.escaped char)) } *)
+
+and clchar c = parse
+| '''                { CHAR(c) }
+| _ as char          { raise(Failure("illegal character " 
+                                        ^ Char.escaped char)) }
+
+  
