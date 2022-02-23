@@ -1,0 +1,8 @@
+(lambda (x y z) (if (+ x y) (|| x y) (&& x y)))
+(lambda () 4) 
+(lambda (x) 4) 
+(lambda (x) (+ 4 5)) 
+(lambda (x y) (+ 4 5)) 
+(lambda (x y) (+ 1 2)) 
+(lambda (x) 4) 
+(lambda (y x) 9) 
