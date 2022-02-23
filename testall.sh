@@ -101,7 +101,7 @@ Check() {
 	if [ $keep -eq 0 ] ; then
 	    rm -f $genfiles
 	fi
-	echo -e "  \033[92mOK\033[0m"
+	echo -e "  \033[92mI AM GROOT!\033[0m"
 	echo "###### SUCCESS" 1>&2
     else
 	echo "###### FAILED" 1>&2

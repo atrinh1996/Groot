@@ -1,9 +1,4 @@
 
-###### Testing fail-2
-./toplevel.native testfiles/fail-2.gt 2> testfiles/stderr/fail-2.err
-diff -bw testfiles/stderr/fail-2.err testfiles/ref/fail-2.ref > testfiles/diff/fail-2.diff
-###### SUCCESS
-
 ###### Testing test-1
 ./toplevel.native testfiles/test-1.gt > testfiles/stdout/test-1.out
 diff -bw testfiles/stdout/test-1.out testfiles/ref/test-1.ref > testfiles/diff/test-1.diff
@@ -37,4 +32,9 @@ diff -bw testfiles/stdout/test-lambda3.out testfiles/ref/test-lambda3.ref > test
 ###### Testing test-lambda4
 ./toplevel.native testfiles/test-lambda4.gt > testfiles/stdout/test-lambda4.out
 diff -bw testfiles/stdout/test-lambda4.out testfiles/ref/test-lambda4.ref > testfiles/diff/test-lambda4.diff
+###### SUCCESS
+
+###### Testing fail-2
+./toplevel.native testfiles/fail-2.gt 2> testfiles/stderr/fail-2.err
+diff -bw testfiles/stderr/fail-2.err testfiles/ref/fail-2.ref > testfiles/diff/fail-2.diff
 ###### SUCCESS
