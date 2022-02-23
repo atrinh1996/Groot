@@ -35,10 +35,10 @@ Usage() {
 
 SignalError() {
     if [ $error -eq 0 ] ; then
-	echo -en "  \033[31mFAILED: \033[0m"
+	echo -e "  \033[31mI am groot...\033[0m"
 	error=1
     fi
-    echo -e "\033[31m${1}\033[0m"
+    echo -e "    \033[31m${1}\033[0m"
 }
 
 # Compare <outfile> <reffile> <difffile>

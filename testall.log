@@ -244,8 +244,12 @@ diff -b ./testfiles/stderr/fail-if3.err ./testfiles/ref/fail-if3.ref > ./testfil
 diff -b ./testfiles/stderr/fail-if4.err ./testfiles/ref/fail-if4.ref > ./testfiles/diff/fail-if4.diff
 ###### SUCCESS
 
-###### Testing fail-intboolchar
-./toplevel.native ./testfiles/fail-intboolchar.gt 2> ./testfiles/stderr/fail-intboolchar.err
+###### Testing fail-intboolchar1
+./toplevel.native ./testfiles/fail-intboolchar1.gt 2> ./testfiles/stderr/fail-intboolchar1.err
+###### FAILED
+
+###### Testing fail-intboolchar2
+./toplevel.native ./testfiles/fail-intboolchar2.gt 2> ./testfiles/stderr/fail-intboolchar2.err
 ###### FAILED
 
 ###### Testing fail-lambda1
@@ -317,54 +321,6 @@ diff -b ./testfiles/stderr/fail-notequal2.err ./testfiles/ref/fail-notequal2.ref
 diff -b ./testfiles/stderr/fail-notequal3.err ./testfiles/ref/fail-notequal3.ref > ./testfiles/diff/fail-notequal3.diff
 ###### SUCCESS
 
-###### Testing old-fail-2
-./toplevel.native ./testfiles/old-fail-2.gt 2> ./testfiles/stderr/old-fail-2.err
-diff -b ./testfiles/stderr/old-fail-2.err ./testfiles/ref/old-fail-2.ref > ./testfiles/diff/old-fail-2.diff
-FAILED ./testfiles/stderr/old-fail-2.err differs from ./testfiles/ref/old-fail-2.ref
-###### FAILED
-
-###### Testing old-test-1
-./toplevel.native ./testfiles/old-test-1.gt > ./testfiles/stdout/old-test-1.out
-diff -b ./testfiles/stdout/old-test-1.out ./testfiles/ref/old-test-1.ref > ./testfiles/diff/old-test-1.diff
-FAILED ./testfiles/stdout/old-test-1.out differs from ./testfiles/ref/old-test-1.ref
-###### FAILED
-
-###### Testing old-test-if1
-./toplevel.native ./testfiles/old-test-if1.gt > ./testfiles/stdout/old-test-if1.out
-diff -b ./testfiles/stdout/old-test-if1.out ./testfiles/ref/old-test-if1.ref > ./testfiles/diff/old-test-if1.diff
-FAILED ./testfiles/stdout/old-test-if1.out differs from ./testfiles/ref/old-test-if1.ref
-###### FAILED
-
-###### Testing old-test-if2
-./toplevel.native ./testfiles/old-test-if2.gt > ./testfiles/stdout/old-test-if2.out
-diff -b ./testfiles/stdout/old-test-if2.out ./testfiles/ref/old-test-if2.ref > ./testfiles/diff/old-test-if2.diff
-FAILED ./testfiles/stdout/old-test-if2.out differs from ./testfiles/ref/old-test-if2.ref
-###### FAILED
-
-###### Testing old-test-lambda1
-./toplevel.native ./testfiles/old-test-lambda1.gt > ./testfiles/stdout/old-test-lambda1.out
-diff -b ./testfiles/stdout/old-test-lambda1.out ./testfiles/ref/old-test-lambda1.ref > ./testfiles/diff/old-test-lambda1.diff
-FAILED ./testfiles/stdout/old-test-lambda1.out differs from ./testfiles/ref/old-test-lambda1.ref
-###### FAILED
-
-###### Testing old-test-lambda2
-./toplevel.native ./testfiles/old-test-lambda2.gt > ./testfiles/stdout/old-test-lambda2.out
-diff -b ./testfiles/stdout/old-test-lambda2.out ./testfiles/ref/old-test-lambda2.ref > ./testfiles/diff/old-test-lambda2.diff
-FAILED ./testfiles/stdout/old-test-lambda2.out differs from ./testfiles/ref/old-test-lambda2.ref
-###### FAILED
-
-###### Testing old-test-lambda3
-./toplevel.native ./testfiles/old-test-lambda3.gt > ./testfiles/stdout/old-test-lambda3.out
-diff -b ./testfiles/stdout/old-test-lambda3.out ./testfiles/ref/old-test-lambda3.ref > ./testfiles/diff/old-test-lambda3.diff
-FAILED ./testfiles/stdout/old-test-lambda3.out differs from ./testfiles/ref/old-test-lambda3.ref
-###### FAILED
-
-###### Testing old-test-lambda4
-./toplevel.native ./testfiles/old-test-lambda4.gt > ./testfiles/stdout/old-test-lambda4.out
-diff -b ./testfiles/stdout/old-test-lambda4.out ./testfiles/ref/old-test-lambda4.ref > ./testfiles/diff/old-test-lambda4.diff
-FAILED ./testfiles/stdout/old-test-lambda4.out differs from ./testfiles/ref/old-test-lambda4.ref
-###### FAILED
-
 ###### Testing test-AND
 ./toplevel.native ./testfiles/test-AND.gt > ./testfiles/stdout/test-AND.out
 diff -b ./testfiles/stdout/test-AND.out ./testfiles/ref/test-AND.ref > ./testfiles/diff/test-AND.diff
@@ -373,8 +329,7 @@ diff -b ./testfiles/stdout/test-AND.out ./testfiles/ref/test-AND.ref > ./testfil
 ###### Testing test-NOT
 ./toplevel.native ./testfiles/test-NOT.gt > ./testfiles/stdout/test-NOT.out
 diff -b ./testfiles/stdout/test-NOT.out ./testfiles/ref/test-NOT.ref > ./testfiles/diff/test-NOT.diff
-FAILED ./testfiles/stdout/test-NOT.out differs from ./testfiles/ref/test-NOT.ref
-###### FAILED
+###### SUCCESS
 
 ###### Testing test-OR
 ./toplevel.native ./testfiles/test-OR.gt > ./testfiles/stdout/test-OR.out
@@ -391,6 +346,11 @@ diff -b ./testfiles/stdout/test-binop+.out ./testfiles/ref/test-binop+.ref > ./t
 diff -b ./testfiles/stdout/test-binop-.out ./testfiles/ref/test-binop-.ref > ./testfiles/diff/test-binop-.diff
 ###### SUCCESS
 
+###### Testing test-binop-div
+./toplevel.native ./testfiles/test-binop-div.gt > ./testfiles/stdout/test-binop-div.out
+diff -b ./testfiles/stdout/test-binop-div.out ./testfiles/ref/test-binop-div.ref > ./testfiles/diff/test-binop-div.diff
+###### SUCCESS
+
 ###### Testing test-binop-mod
 ./toplevel.native ./testfiles/test-binop-mod.gt > ./testfiles/stdout/test-binop-mod.out
 diff -b ./testfiles/stdout/test-binop-mod.out ./testfiles/ref/test-binop-mod.ref > ./testfiles/diff/test-binop-mod.diff
@@ -401,17 +361,10 @@ diff -b ./testfiles/stdout/test-binop-mod.out ./testfiles/ref/test-binop-mod.ref
 diff -b ./testfiles/stdout/test-binop-mul.out ./testfiles/ref/test-binop-mul.ref > ./testfiles/diff/test-binop-mul.diff
 ###### SUCCESS
 
-###### Testing test-binop_div
-./toplevel.native ./testfiles/test-binop_div.gt > ./testfiles/stdout/test-binop_div.out
-diff -b ./testfiles/stdout/test-binop_div.out ./testfiles/ref/test-binop_div.ref > ./testfiles/diff/test-binop_div.diff
-FAILED ./testfiles/stdout/test-binop_div.out differs from ./testfiles/ref/test-binop_div.ref
-###### FAILED
-
 ###### Testing test-bool-stresstest
 ./toplevel.native ./testfiles/test-bool-stresstest.gt > ./testfiles/stdout/test-bool-stresstest.out
 diff -b ./testfiles/stdout/test-bool-stresstest.out ./testfiles/ref/test-bool-stresstest.ref > ./testfiles/diff/test-bool-stresstest.diff
-FAILED ./testfiles/stdout/test-bool-stresstest.out differs from ./testfiles/ref/test-bool-stresstest.ref
-###### FAILED
+###### SUCCESS
 
 ###### Testing test-boolean
 ./toplevel.native ./testfiles/test-boolean.gt > ./testfiles/stdout/test-boolean.out
@@ -421,8 +374,7 @@ diff -b ./testfiles/stdout/test-boolean.out ./testfiles/ref/test-boolean.ref > .
 ###### Testing test-char
 ./toplevel.native ./testfiles/test-char.gt > ./testfiles/stdout/test-char.out
 diff -b ./testfiles/stdout/test-char.out ./testfiles/ref/test-char.ref > ./testfiles/diff/test-char.diff
-FAILED ./testfiles/stdout/test-char.out differs from ./testfiles/ref/test-char.ref
-###### FAILED
+###### SUCCESS
 
 ###### Testing test-equalto
 ./toplevel.native ./testfiles/test-equalto.gt > ./testfiles/stdout/test-equalto.out
@@ -453,8 +405,7 @@ diff -b ./testfiles/stdout/test-intboolchar.out ./testfiles/ref/test-intboolchar
 ###### Testing test-integers
 ./toplevel.native ./testfiles/test-integers.gt > ./testfiles/stdout/test-integers.out
 diff -b ./testfiles/stdout/test-integers.out ./testfiles/ref/test-integers.ref > ./testfiles/diff/test-integers.diff
-FAILED ./testfiles/stdout/test-integers.out differs from ./testfiles/ref/test-integers.ref
-###### FAILED
+###### SUCCESS
 
 ###### Testing test-lambda
 ./toplevel.native ./testfiles/test-lambda.gt > ./testfiles/stdout/test-lambda.out
