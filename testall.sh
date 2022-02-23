@@ -1,13 +1,18 @@
 #!/bin/bash
 
-# Regression testing script for MicroC
+# Regression testing script for Groot
 # Step through a list of files
-#  Compile, run, and check the output of each expected-to-work test
-#  Compile and check the error of each expected-to-fail test
+#  Run, and check the output of each expected-to-work test
+#  Run and check the error of each expected-to-fail test
 
 # Path to the groot compiler.  Usually "./toplevel.native"
 #   Try "_build/toplevel.native" if ocamlbuild was unable to create a symbolic
 #   link.
+#
+#  Adopted from MicroC testing script
+#   Edited by Nick Gravel - to support testing groot language
+#
+
 GROOT="./toplevel.native"
 #GROOT="_build/toplevel.native"
 
@@ -40,8 +45,8 @@ SignalError() {
 # Compares the outfile with reffile.  Differences, if any, written to difffile
 Compare() {
     genfiles="$genfiles $3"
-    echo diff -bw $1 $2 ">" $3 1>&2
-    diff -bw "$1" "$2" > "$3" 2>&1 || {
+    echo diff -b $1 $2 ">" $3 1>&2
+    diff -b "$1" "$2" > "$3" 2>&1 || {
 	SignalError "$1 differs"
 	echo "FAILED $1 differs from $2" 1>&2
     }
@@ -167,17 +172,17 @@ if [ $# -ge 1 ]
 then
     files=$@
 else
-    files="testfiles/test-*.gt testfiles/fail-*.gt"
+    files="testfiles/test-*.gt testfiles/fail-*.gt"  # Default Test files
 fi
 
 # For each file in the files list
 for file in $files
 do
     case $file in
-	*test-*)
+	*test-*)                                # Check passing tests - update log
 	    Check $file 2>> $globallog
 	    ;;
-	*fail-*)
+	*fail-*)                                # Check failing tests - update log
 	    CheckFail $file 2>> $globallog
 	    ;;
     */*)
