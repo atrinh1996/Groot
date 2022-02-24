@@ -224,6 +224,11 @@ diff -b testfiles/stderr/fail-bool_stresstest.err testfiles/ref/fail-bool_stress
 diff -b testfiles/stderr/fail-char1.err testfiles/ref/fail-char1.ref > testfiles/diff/fail-char1.diff
 ###### SUCCESS
 
+###### Testing fail-char2
+./toplevel.native testfiles/fail-char2.gt 2> testfiles/stderr/fail-char2.err
+diff -b testfiles/stderr/fail-char2.err testfiles/ref/fail-char2.ref > testfiles/diff/fail-char2.diff
+###### SUCCESS
+
 ###### Testing fail-equalto1
 ./toplevel.native testfiles/fail-equalto1.gt 2> testfiles/stderr/fail-equalto1.err
 diff -b testfiles/stderr/fail-equalto1.err testfiles/ref/fail-equalto1.ref > testfiles/diff/fail-equalto1.diff
@@ -287,6 +292,11 @@ diff -b testfiles/stderr/fail-if3.err testfiles/ref/fail-if3.ref > testfiles/dif
 ###### Testing fail-if4
 ./toplevel.native testfiles/fail-if4.gt 2> testfiles/stderr/fail-if4.err
 diff -b testfiles/stderr/fail-if4.err testfiles/ref/fail-if4.ref > testfiles/diff/fail-if4.diff
+###### SUCCESS
+
+###### Testing fail-int1
+./toplevel.native testfiles/fail-int1.gt 2> testfiles/stderr/fail-int1.err
+diff -b testfiles/stderr/fail-int1.err testfiles/ref/fail-int1.ref > testfiles/diff/fail-int1.diff
 ###### SUCCESS
 
 ###### Testing fail-lambda1
