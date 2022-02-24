@@ -9,12 +9,16 @@
 */
 
 /* Header */
-%{ open Ast %} 
+%{ 
+    open Ast
+    exception Eof
+%} 
 
 /* Tokens */
 %token LPAREN RPAREN PLUS MINUS TIMES DIVIDE MOD
 %token EQ NEQ LT GT LEQ GEQ AND OR NOT
 %token IF
+%token <char> CHAR
 %token <int>  INT
 %token <bool> BOOL
 %token <string> ID
@@ -52,6 +56,7 @@ formal_list:
 literal:
     | INT                                    { Int($1) }
     | BOOL                                   { Bool($1) }
+    | CHAR                                   { Char($1) }
 
 expr:
     | literal                                { $1 }
