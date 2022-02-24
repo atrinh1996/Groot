@@ -43,7 +43,7 @@ print the given input (formatted) if the syntax is correct.
 - README: this file
 - Makefile: file of rules and commands to build toplevel.
 - ast.ml: Abstract Syntax Tree file describes syntatic construct and provides way to print the formatted syntax.
-- parser.mly: instructions to produces a parser from a context-free grammar specification.
+- parser.mly: instructions to produce a parser from a context-free grammar specification.
 - scanner.mll: lexer file to create a lexical analyzer.
 - toplevel.ml: main driver file to drive scanner and parser.
 - testall.sh: bash script to run all our tests.
