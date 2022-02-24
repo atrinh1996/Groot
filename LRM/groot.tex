@@ -1,0 +1,356 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{parskip}
+\usepackage{tabularx}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Reduce margin
+%
+% \addtolength{\oddsidemargin}{-.85in}
+% \addtolength{\evensidemargin}{-.85in}
+% \addtolength{\textwidth}{1in}
+
+% \addtolength{\topmargin}{-.85in}
+% \addtolength{\textheight}{1in}
+
+% Page format commands:
+% Override normal article margins,
+% making the margins smaller
+\setlength{\textwidth}{6.5in}
+\setlength{\textheight}{9in}
+\setlength{\oddsidemargin}{0in}
+\setlength{\evensidemargin}{0in}
+\setlength{\topmargin}{-0.5in}
+
+\setlength{\parindent}{0pt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Math Symbols
+\usepackage{mathtools}
+\usepackage{amssymb}
+% \usepackage{epsfig}
+\usepackage{amsmath,amsthm}
+\usepackage{amscd,amsxtra,latexsym}
+
+
+% add floor and ceiling symbol. Usage: \ceil*{}, \floor*{}
+% \DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+% \DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+% multiset \langle ... \rangle
+\def\multiset#1#2{\ensuremath{\left(\kern-.3em\left(\genfrac{}{}{0pt}{}{#1}{#2}\right)\kern-.3em\right)}}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Code Sample Styling
+
+% use \lstinline! (inline text) ! or \begin{lstlisting} text block \end{lstlisting}
+\usepackage{listings}
+
+\usepackage{color}
+\definecolor{light-gray}{gray}{0.97} % shade of grey
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+% \begin{lstlisting}[...] ... \end{lstlisting}
+\lstset{frame=none,
+    language=LISP,
+    aboveskip=3mm,
+    belowskip=3mm,
+    stepnumber=0, % set to 0 if you don't like line nums
+    showstringspaces=false,
+    columns=flexible,
+    basicstyle={\small\ttfamily},
+    numbers=left,
+    numberstyle=\color{black},
+    keywordstyle=\color{blue},
+    commentstyle=\color{dkgreen},
+    stringstyle=\color{mauve},
+    backgroundcolor=\color{light-gray},
+    breaklines=true,
+    breakatwhitespace=false,
+    tabsize=2
+}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{xcolor}
+%% https://tex.stackexchange.com/questions/401750/quick-and-short-command-for-coloring-one-word
+\newcommand\shorthandon{\catcode`@=\active \catcode`^=\active \catcode`*=\active }
+\newcommand\shorthandoff{\catcode`@=12 \catcode`^=7 \catcode`*=12 }
+\shorthandon
+\def@#1@{\textcolor{red}{#1}}%
+\def^#1^{\textcolor{blue}{#1}}%
+\def*#1{\string#1}
+\shorthandoff
+%% useage: \textcolor{red}{text here}
+% \shorthandon
+% This is a @test@ of the ^emergency^ bro*@dcast system.
+% \shorthandoff
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Misc
+\usepackage{graphicx} % graphics
+\usepackage{enumitem} % listing style (bullet lists)
+
+% below helps with trying to get figures in a row
+% \usepackage{caption}
+% \usepackage{subcaption}
+
+% hyperlink styling
+% use \href{} and \url{}, and colors table of contents links
+% use \href{} and \url{}
+% \label{sec:name}
+% \hyperref[label]{text}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue, % was previously black
+    filecolor=magenta,
+    urlcolor=blue,
+    pdftitle={groot LRM}
+}
+\urlstyle{same}
+
+% A command for primes (')
+\newcommand{\p}%
+    {\ensuremath{^{\prime}}}
+
+% a command for double primes ('')
+\newcommand{\pp}%
+    {\ensuremath{^{\prime \prime}}}
+
+% A command for the Kleene star
+\newcommand{\str}%
+    {\ensuremath{^{\star}}}
+
+% a command for the double star
+\newcommand{\sstr}%
+    {\ensuremath{^{\star\star}}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\begin{document}
+\title{(g)ROOT \\ Language Reference Manual}
+\author{Samuel Russo \quad Amy Bui \quad Eliza Encherman \\ Zachary Goldstein \quad Nickolas Gravel}
+\date{\today}
+\maketitle
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Table of Contents
+    \setcounter{tocdepth}{2}
+    \tableofcontents
+    \pagebreak 
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \section{This is a section heading with number}
+    \label{sec:start} % section label, use to link withing file
+                      % \hyperref[sec:start]{text}
+
+    This is a bullet list:
+    \begin{itemize}
+        \item Link to \href{https://www.overleaf.com/learn/latex/Hyperlinks}{Overleaf href}
+        \item url example: \url{https://canvas.tufts.edu/}
+        \item link to aanother labeled section: \hyperref[sec:hello]{Hello World section}
+    \end{itemize}
+
+    This is a enumlist (default 1):
+    \begin{enumerate}
+        \item Inline code: \lstinline!(val x 42)! example.
+        \item \textsc{Hello World}
+        \item \texttt{Hello World}
+        \item \textsf{Hello World}
+        \item This is \textcolor{red}{very Red}
+        \item This is \textcolor{blue}{Bluey}
+    \end{enumerate}
+
+    This is enumlist with alph bullets:
+    \begin{enumerate}[label=\alph*.]
+        \item $x^2 = y$
+        \item x = y
+    \end{enumerate}
+
+
+    %% start on new page
+    \pagebreak
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \section{Hello World}
+    \label{sec:hello}
+
+        \subsection{Hello Subsection example}
+            This is how you include pictures:
+
+            % \begin{figure}[h]
+            %     \centering
+            %     \includegraphics[width=0.7\linewidth]{FILE_PATH}
+            %     % \caption{} %% optional caption
+            %     \label{fig:FILE_NAME}
+            % \end{figure}
+
+            \begin{figure}[h]
+                \centering
+                \includegraphics[width=0.2\linewidth]{images/baby_groot.PNG}
+                \caption{Our little mascot}
+                \label{fig:im_groot}
+            \end{figure}
+
+
+            \subsubsection{Basic Table: This doesn't appeear in contents}
+            \begin{center}
+                \begin{tabular}{|r|c|l|}
+                    \hline
+                    hrow1 & hrow2 & hrow3 \\
+                    \hline
+                    This is & This is & This is\\
+                    right-aligned & centered & left aligned \\
+                    \hline
+                \end{tabular}
+            \end{center}
+
+            \begin{center}
+                \begin{tabular}{l|l|l}
+                    $\leftarrow$ & $\Leftarrow$ & $\langle x + y \rangle$ \\ 
+                    $\rightarrow$ & $\Rightarrow$ & $| x |$ \\ 
+                    $\downarrow$ & $\Downarrow$ & $\| x^2 \|$ \\
+                    $\leftrightarrow$ & $\uparrow$ & \Bigg( \big( cs107 \big)  \Bigg) \\ 
+                    $\epsilon$ & $\rho$ & \Bigg[ \big[ cs107 \big] \Bigg] \\
+                    $\Sigma$ & $\eta$ & \\ 
+                    $\mu$ & \{ \} & \\
+                \end{tabular}
+            \end{center}
+
+        \subsection{Another hello subsection example}
+
+            \subsubsection{Coding environment without line numbers (default)}
+\begin{lstlisting}
+(val add
+    (lambda (x y) 
+        (+ x y)))
+\end{lstlisting}
+
+            \subsubsection{Coding environment with line numbers (this can be made default)}
+\begin{lstlisting}[stepnumber=1]
+(val add
+    (lambda (x y) 
+        (+ x y)))
+\end{lstlisting}
+
+            \subsubsection{Code side-by-side}
+\begin{minipage}[h]{0.5\textwidth}
+\begin{lstlisting}
+(val who 
+    (lambda (i am groot) #t)
+)
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[h]{0.5\textwidth}
+\begin{lstlisting}
+(val were
+    (lambda (senza) (> 3 0))
+)
+\end{lstlisting}
+\end{minipage}
+    \pagebreak
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+    %% LRM OUTLINE STARTS HERE
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \section{Intro}
+    \label{sec:intro}
+
+    \href{https://ocaml.org/manual/language.html}{Ocaml LRM}
+
+    \pagebreak
+    %% End of Introduction %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \section{Lexical Convention}
+    \label{sec:lexcon}
+
+        \subsection{Blanks}
+
+        \subsection{Comments}
+
+        \subsection{Identifiers}
+
+        \subsection{Integer Literals}
+
+        \subsection{Boolean Literals}
+
+        \subsection{Character Literals}
+
+        \subsection{Operators}
+
+        \subsection{Keywords}
+
+    % \pagebreak
+    %% End of Lexical Convention %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \section{Values}
+    \label{sec:values}
+
+        \subsection{Base Values}
+
+        \subsection{Functions}
+
+    % \pagebreak
+    %% End of Values %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \section{Names}
+    \label{sec:names}
+
+        \subsection{Base Values}
+
+        \subsection{Functions}
+
+    % \pagebreak
+    %% End of Names %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \section{Constants}
+    \label{sec:const}
+
+
+    % \pagebreak
+    %% End of Constants %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \section{Expressions}
+    \label{sec:expr}
+
+
+    % \pagebreak
+    %% End of Expressions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\end{document}
