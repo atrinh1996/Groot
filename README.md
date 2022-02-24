@@ -63,8 +63,8 @@ print the given input (formatted) if the syntax is correct.
     - Takes input from stdin or file
     - Call to AST's string_of_main (pretty print)
 - Scanner/Parser:
-    - Integers: 3 (3) -3 (-3)    are all valid
-    - Booleans: #t, #f, (#t), (#f)
+    - Integers: 3, -3   
+    - Booleans: #t, #f
     - Variable names (ID): x, y, a, cat, dog, Howie, cs_107
     - Whilespaces ignored: ' ', '\n', '\t', '\r'
     - Parentheses: '(' (LPAREN), ')' (RPAREN)
@@ -80,7 +80,7 @@ print the given input (formatted) if the syntax is correct.
         - (val x 4), (val func (lambda (x) (+ x 1)))
     - Unary operators
         - Sign negation (Neg): '-'
-            - Valid: -3, -(3), (-(+ 3 4)), -(+ 3 4), -(if 1 2 3), -x
+            - Valid: -3, (-(+ 3 4)), -(+ 3 4), -(if 1 2 3), -x
             - Currently still allows: -#t
         - Boolean negation (Not): '!'
             - Valid: !#t, !(#t), (!#t), !(boolean_expr)
