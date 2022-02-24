@@ -21,20 +21,20 @@ print the given input (formatted) if the syntax is correct.
 
 ## COMPILE & RUN
 - **Compile toplevel with**:
-    - make toplevel.native
+    > make toplevel.native
 - **Run toplevel with one of these**:
     - runs on standard input and prints ast to stdout, use EOF (ctrl+d) to end input
-    >>. /toplevel.native
+    > ./toplevel.native
     - runs on given file, outputs ast to stdout
-    >> ./toplevel.native [file.gt]
+    > ./toplevel.native [file.gt]
     - prints the ast from given file or stdin (default)
-    >> ./toplevel.native -a [file.gt] 
+    > ./toplevel.native -a [file.gt] 
     - not yet implemented, will be compilation
-    >> ./toplevel.native -c [file.gt] 
+    > ./toplevel.native -c [file.gt] 
     - pipes whatever expressions are \<input\> into toplevel.native
-    >> echo "\<input\>" | ./toplevel.native  
+    > echo "\<input\>" | ./toplevel.native  
 - **Run tests with**:
-    - ./testall.sh
+    > ./testall.sh
 
 
 
