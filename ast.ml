@@ -8,6 +8,7 @@ type bin_operator = Add | Sub | Mul | Div | Mod | Eq | Neq
 type uni_operator = Neg | Not
 
 type expr = 
+    | Char of char
     | Int   of int
     | Unary of uni_operator * expr
     | Bool  of bool
@@ -46,6 +47,7 @@ let rec string_of_expr = function
     | Bool(true) -> "#t"
     | Bool(false) -> "#f"
     | Id(s) -> s
+    | Char(y) -> String.make 1 y 
     | If(e1, e2, e3) -> "(if "  ^ string_of_expr e1 ^ " " 
                                 ^ string_of_expr e2 ^ " " 
                                 ^ string_of_expr e3 ^ ")"
