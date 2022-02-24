@@ -1,1 +1,1 @@
-diff: ./testfiles/ref/fail-NOT3.ref: No such file or directory
+diff: testfiles/ref/fail-NOT3.ref: No such file or directory

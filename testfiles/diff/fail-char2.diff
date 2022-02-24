@@ -1,4 +1,4 @@
 1c1
 < Fatal error: exception Failure("illegal character \'")
 ---
-> ('ab')
+> 'a'
