@@ -34,7 +34,11 @@ The programming language (g)ROOT seeks to abstract the finer details away from t
 - toplevel.ml: main driver file to drive scanner and parser.
 - run_test.sh: bash script to run tests.
 - tests/: directory containing tests.
-    - test1 ...
+    - test-if1.gt
+    - test-if2.gt
+    - test-lambda1.gt
+    - test-lambda2.gt
+    - test-lambda3.gt
 
 
 

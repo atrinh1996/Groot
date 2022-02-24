@@ -1,0 +1,4 @@
+1c1
+< Fatal error: exception Failure("illegal character \'")
+---
+> Fatal error: exception Stdlib.Parsing.Parse_error

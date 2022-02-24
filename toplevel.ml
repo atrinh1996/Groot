@@ -7,12 +7,12 @@
 type action = Ast | Compile
 
 let () =
-  let action = ref Compile in
+  let action = ref Ast in
   let set_action a () = action := a in
   let speclist = [
-    ("-a", Arg.Unit (set_action Ast), "Print the AST");
     ("-c", Arg.Unit (set_action Compile),
-      "Check and print the generated LLVM IR (default)");
+      "Check and print the generated LLVM IR");
+    ("-a", Arg.Unit (set_action Ast), "Print the AST");
   ] in  
   let usage_msg = "usage: ./toplevel.native [-a|-c] [file.mc]" in
   let channel = ref stdin in
