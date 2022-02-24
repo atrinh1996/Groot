@@ -35,6 +35,7 @@ print the given input (formatted) if the syntax is correct.
     > echo "\<input\>" | ./toplevel.native  
 - **Run tests with**:
     > ./testall.sh
+    - Note: When tests run with this script, passing tests will output in green text "I AM GROOT". Non-passing tests will oputput "fail..." in red text. 
 
 
 
@@ -83,7 +84,7 @@ print the given input (formatted) if the syntax is correct.
             - Valid: -3, (-(+ 3 4)), -(+ 3 4), -(if 1 2 3), -x
             - Currently still allows: -#t
         - Boolean negation (Not): '!'
-            - Valid: !#t, !(#t), (!#t), !(boolean_expr)
+            - Valid: !#t, !x
             - Currently still allows: !3, !(if 1 2 3)
     - Binary operators (binops):  - + * / mod < > <= => == != && ||
         - Valid syntax, where operands could be int/bool literals, ids, or expressions:  
