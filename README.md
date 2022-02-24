@@ -59,7 +59,7 @@ print the given input (formatted) if the syntax is correct.
         - unary operators
         - expressions
         - main (program): list of expressions
-        - pretty print
+    - printing for each type.
 - Toplevel:
     - Takes input from stdin or file
     - Call to AST's string_of_main (pretty print)
