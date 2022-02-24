@@ -64,6 +64,7 @@ expr:
     | MINUS expr %prec NEG                   { Unary(Neg, $2) }
     | NOT expr                               { Unary(Not, $2) }
     | LPAREN expr RPAREN                     { $2 }
+    | LPAREN ID expr_list RPAREN             { Apply($2, $3) }
     | LPAREN LET ID expr RPAREN              { Let($3, $4)}
     | LPAREN IF expr expr expr RPAREN        { If($3, $4, $5) }
     | LPAREN LT expr expr RPAREN             { Binops(Lt, $3, $4) }

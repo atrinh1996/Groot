@@ -14,10 +14,12 @@ let () =
     ("-c", Arg.Unit (set_action Compile),
       "Check and print the generated LLVM IR (default)");
   ] in  
-  let usage_msg = "usage: ./groot.native [-a|-c] [file.mc]" in
+  let usage_msg = "usage: ./toplevel.native [-a|-c] [file.mc]" in
   let channel = ref stdin in
   Arg.parse speclist (fun filename -> channel := open_in filename) usage_msg;
   
   let lexbuf = Lexing.from_channel !channel in
     let ast = Parser.main Scanner.tokenize lexbuf in 
-      print_string (Ast.string_of_main ast)
+      match !action with
+        Ast     -> print_string (Ast.string_of_main ast)
+      | Compile -> print_string ("Error: Compilation not yet implemented\n")

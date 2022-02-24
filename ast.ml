@@ -17,6 +17,7 @@ type expr =
     | Binops of bin_operator * expr * expr
     | Lambda of string list * expr
     | Let of string * expr
+    | Apply of string * expr list
 
 type main = expr list
 
@@ -57,6 +58,9 @@ let rec string_of_expr = function
     | Lambda(xs, e) -> "(lambda (" ^ String.concat " " xs ^ ") " ^ 
         string_of_expr e ^ ")"
     | Let(id, e) -> "(let " ^ id ^ " " ^ string_of_expr e ^ ")"
+    | Apply(id, es) -> (match es with 
+            | [] -> "(" ^ id ^ ")" 
+            | _ -> "(" ^ id ^ " " ^ String.concat " " (List.map string_of_expr es) ^ ") ")
 
 let string_of_main exprs = 
     String.concat "\n" (List.map string_of_expr exprs) ^ "\n"
