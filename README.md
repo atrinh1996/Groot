@@ -23,15 +23,15 @@ print the given input (formatted) if the syntax is correct.
 - **Compile toplevel with**:
     > make toplevel.native
 - **Run toplevel with one of these**:
-    - runs on standard input and prints ast to stdout, use EOF (ctrl+d) to end input
+    - runs on standard input and prints ast to stdout, use EOF (ctrl+d) to end input:
     > ./toplevel.native
-    - runs on given file, outputs ast to stdout
+    - runs on given file, outputs ast to stdout:
     > ./toplevel.native [file.gt]
-    - prints the ast from given file or stdin (default)
+    - prints the ast from given file or stdin (default):
     > ./toplevel.native -a [file.gt] 
-    - not yet implemented, will be compilation
+    - not yet implemented, will be compilation:
     > ./toplevel.native -c [file.gt] 
-    - pipes whatever expressions are \<input\> into toplevel.native
+    - pipes whatever expressions are \<input\> into toplevel.native:
     > echo "\<input\>" | ./toplevel.native  
 - **Run tests with**:
     > ./testall.sh
