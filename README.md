@@ -43,12 +43,12 @@ print the given input (formatted) if the syntax is correct.
 - README: this file
 - Makefile: file of rules and commands to build toplevel.
 - ast.ml: Abstract Syntax Tree file describes syntatic construct and provides way to print the formatted syntax.
-- parser.mly: instructions to produces a parser from a context-free grammar specification.
+- parser.mly: instructions to produce a parser from a context-free grammar specification.
 - scanner.mll: lexer file to create a lexical analyzer.
 - toplevel.ml: main driver file to drive scanner and parser.
 - testall.sh: bash script to run all our tests.
 - testfiles/: directory containing unit test files and expected outputs.
-    - testfiles/ref: directory with files containing expected outputs of pass and failure tests of the test files in testfiles/ of the same name. Each tests' stdout/stderr can be diff'd againsts it's reference. 
+    - testfiles/ref: directory with files containing expected outputs of pass and failure tests of the test files in testfiles/ of the same name. Each tests' stdout/stderr can be diff'd against its reference. 
 
 
 
@@ -59,7 +59,7 @@ print the given input (formatted) if the syntax is correct.
         - unary operators
         - expressions
         - main (program): list of expressions
-        - pretty print
+    - printing for each type.
 - Toplevel:
     - Takes input from stdin or file
     - Call to AST's string_of_main (pretty print)
