@@ -48,7 +48,7 @@ print the given input (formatted) if the syntax is correct.
 - toplevel.ml: main driver file to drive scanner and parser.
 - testall.sh: bash script to run all our tests.
 - testfiles/: directory containing unit test files and expected outputs.
-    - testfiles/ref: directory with files containing expected outputs of pass and failure tests of the test files in testfiles/ of the same name. Each tests' stdout/stderr can be diff'd againsts it's reference. 
+    - testfiles/ref: directory with files containing expected outputs of pass and failure tests of the test files in testfiles/ of the same name. Each tests' stdout/stderr can be diff'd against its reference. 
 
 
 
