@@ -35,7 +35,7 @@ print the given input (formatted) if the syntax is correct.
     > echo "\<input\>" | ./toplevel.native  
 - **Run tests with**:
     > ./testall.sh
-    - Note: When tests run with this script, passing tests will output in green text "I AM GROOT". Non-passing tests will oputput "fail..." in red text. 
+    - Note: When tests run with this script, passing tests will output in green text "I AM GROOT". Non-passing tests will output "fail..." in red text. 
 
 
 
