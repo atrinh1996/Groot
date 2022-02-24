@@ -19,7 +19,7 @@ print the given input (formatted) if the syntax is correct.
 
 
 
-## COMPILE & RUN
+## Compile & Run
 - **Compile toplevel with**:
     > make toplevel.native
 - **Run toplevel with one of these**:
@@ -34,12 +34,14 @@ print the given input (formatted) if the syntax is correct.
     - pipes whatever expressions are \<input\> into toplevel.native:
     > echo "\<input\>" | ./toplevel.native  
 - **Run tests with**:
-    > ./testall.sh
+    > ./testall.sh [testing_files]
+    - By default, testall will look for testing files in testfiles directory. To use a different directory, run 
+        >./testall.sh directory/*
     - Note: When tests run with this script, passing tests will output in green text "I AM GROOT". Non-passing tests will output "fail..." in red text. 
 
 
 
-## FILES
+## Files
 - README: this file
 - Makefile: file of rules and commands to build toplevel.
 - ast.ml: Abstract Syntax Tree file describes syntatic construct and provides way to print the formatted syntax.
@@ -50,6 +52,12 @@ print the given input (formatted) if the syntax is correct.
 - testfiles/: directory containing unit test files and expected outputs.
     - testfiles/ref: directory with files containing expected outputs of pass and failure tests of the test files in testfiles/ of the same name. Each tests' stdout/stderr can be diff'd against its reference. 
 
+## Testing
+Test cases were designed to check for successful and failure. Testing generally includes checks for
+- Correct use of parentheses
+- Correct numbers of arguments
+Note that at this point, there is no testing for ensure that values are of the correct type. For instance (if 'c' 4 5) and (+ 'x' #t) are considered correct. This is because there's no type checking the code.
+For each keyword/syntactic form, there is testing that it works at the lowest level (eg (4) and (+ 5 6) for integers and the plus sign, respectively) and then testing that the scanner/parser is recursively checking the subexpressions, such as for (+ (- 5 4) 6). Failure cases were intentionally designed to only have one flaw so as to ensure that the user could verify with certainty that the scanner/parser checks that particular issue. 
 
 
 ## Tasks Completed
