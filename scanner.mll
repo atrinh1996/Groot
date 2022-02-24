@@ -43,6 +43,7 @@ rule tokenize = parse
   | "#f"                 { BOOL(false) }
   | "lambda"             { LAMBDA }
   | "let"                { LET }
+  | "val"                { VAL }
   | ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']* as lxm { ID(lxm) }
   | "&&"                 { AND }
   | "||"                 { OR }

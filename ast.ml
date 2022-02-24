@@ -16,7 +16,8 @@ type expr =
     | If of expr * expr * expr
     | Binops of bin_operator * expr * expr
     | Lambda of string list * expr
-    | Let of string * expr
+    | Let of string * expr * expr
+    | Val of string * expr
     | Apply of string * expr list
 
 type main = expr list
@@ -24,7 +25,7 @@ type main = expr list
 (* Pretty print functions *)
 
 let string_of_binop = function
-      Add -> "+"
+    | Add -> "+"
     | Sub -> "-"
     | Mul -> "*"
     | Div -> "/"
@@ -57,7 +58,8 @@ let rec string_of_expr = function
                                 ^ string_of_expr e2 ^ ")"
     | Lambda(xs, e) -> "(lambda (" ^ String.concat " " xs ^ ") " ^ 
         string_of_expr e ^ ")"
-    | Let(id, e) -> "(let " ^ id ^ " " ^ string_of_expr e ^ ")"
+    | Let(id, e1, e2) -> "(let " ^ id ^ " " ^ string_of_expr e1 ^ " " ^ string_of_expr e2 ^ ")"
+    | Val(id, e) -> "(val " ^ id ^ " " ^ string_of_expr e ^ ")"
     | Apply(id, es) -> (match es with 
             | [] -> "(" ^ id ^ ")" 
             | _ -> "(" ^ id ^ " " ^ String.concat " " (List.map string_of_expr es) ^ ") ")
