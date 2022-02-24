@@ -1,8 +1,12 @@
 # gROOT
 
-The programming language (g)ROOT seeks to abstract the finer details away from the tree abstract data type in order to curtail the complexities that coincide with tree implementation. It is a functional programming language based on LISP-style syntax. 
+The programming language (g)ROOT seeks to abstract the finer details away 
+from the tree abstract data type in order to curtail the complexities that 
+coincide with tree implementation. It is a functional programming language 
+based on LISP-style syntax. 
 
-This program drives the parser and lexer for the (g)ROOT language, and will 
+This program drives the parser and lexer for the (g)ROOT language, 
+and will 
 print the given input (formatted) if the syntax is correct. 
 
 
@@ -19,11 +23,17 @@ print the given input (formatted) if the syntax is correct.
 - **Compile toplevel with**:
     - make toplevel.native
 - **Run toplevel with one of these**:
-    - ./toplevel.native                     -- runs on standard input and prints ast to stdout, use EOF (ctrl+d) to end input
-    - ./toplevel.native [file.gt]           -- runs on given file, outputs ast to stdout 
-    - ./toplevel.native -a [file.gt]        -- prints the ast from given file or stdin (default)
-    - ./toplevel.native -c [file.gt]        -- not yet implemented, will be compilation
-    - echo "\<input\>" | ./toplevel.native  -- pipes whatever expressions are \<input\> into toplevel.native
+    - ./toplevel.native
+    (runs on standard input and prints ast to stdout, use EOF (ctrl+d) 
+    to end input)
+    - ./toplevel.native [file.gt]
+    (runs on given file, outputs ast to stdout) 
+    - ./toplevel.native -a [file.gt] 
+    (prints the ast from given file or stdin (default))
+    - ./toplevel.native -c [file.gt] 
+    (not yet implemented, will be compilation)
+    - echo "\<input\>" | ./toplevel.native  
+        (pipes whatever expressions are \<input\> into toplevel.native)
 - **Run tests with**:
     - ./testall.sh
 
