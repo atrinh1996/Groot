@@ -1,0 +1,150 @@
+(; test for integers, should all pass ;)
+780238 (; should succeed ;)
+(780238) (; should succeed ;)
+(08) (; should succeed ;)
+(-8230) (; should succeed ;)
+
+(; basic tests for boolean ;)
+(#t) (; should succeed ;)
+(#f) (; should succeed ;)
+(#test)
+(#false)
+(#nottrue)
+(#sotruebestie)
+#f
+#t
+
+(; basic test for each binary operator ;)
+(+ 32 80) (; should succeed ;)
+(+ 8)
+(+ 8 0 9)
++ 3 4
+
+(- 3 2) (; should succeed ;)
+(- 3 5 8)
+- 3 2
+
+(* 23 79) (; should succeed ;)
+(* #f 79) (; should succeed ;)
+(* 37)
+(* 80 807 638)
+* 23 79
+
+(/ 908 4) (; should succeed ;)
+(/ 0 4) (; should succeed ;)
+(/ 908 0) (; should succeed ;)
+(/ 908 #t) (; should succeed ;)
+(/ 68)
+(/ 80 1120894 638)
+/ 0 4
+
+(mod 38 9) (; should succeed ;)
+(mod 4 5 20)
+(mod 380)
+mod 38 9
+
+(< 6 7) (; should succeed ;)
+(< #t 9023) (; should succeed ;)
+(< 6 7 8)
+(< 6)
+< 6 7
+
+(> 6 7) (; should succeed ;)
+(> 6 test) (; should succeed ;)
+(> 6 7 8)
+(> 6)
+(> #f 209)
+> 6 7
+
+(>= 6 7) (; should succeed ;)
+(>= anameofavar 7) (; should succeed ;)
+(>= 6 #t 8)
+(>= 6)
+(>= 209 #f)
+>= 6 7
+
+(<= 6 7) (; should succeed ;)
+(<= somethin7 7) (; should succeed ;)
+(<= 6 8 #t)
+(<= 6)
+(<= 209 #f)
+<= 6 7
+
+(== 6 7) (; should succeed ;)
+(== 6 (-6)) (; should succeed ;)
+(== 6 6) (; should succeed ;)
+(== abcd 6) (; should succeed ;)
+(== 6 8 #t)
+(== 6)
+(== 209 #f)
+== 6 7
+
+(!= 6 7) (; should succeed ;)
+(!= 6 (-6)) (; should succeed ;)
+(!= 6 6) (; should succeed ;)
+(!= 209 #f) (; should succeed ;)
+(!= avariable anothervariable) (; should succeed ;)
+(!= avariable 7) (; should succeed ;)
+(!= 6 8 #t)
+(!= 6)
+!= 6 7
+
+(&& #t #t) (; should succeed ;)
+(&& 88 #t) (; should succeed ;)
+(&& #t somevar) (; should succeed ;)
+(&& #t #t #t)
+(&& #f #f 9)
+&& #t #t
+
+(|| #t #t) (; should succeed ;)
+(|| 88 #t) (; should succeed ;)
+(|| #t #t #t)
+(|| #f #f 9)
+|| #t #t
+
+(; tests for our one unary operator ;)
+(! (== 6 7)) (; should succeed ;)
+(! (&& #f #f 9))
+! (!= 6 7)
+(! || #t #t)
+
+(; uses many nested binary operators, should pass ;)
+(mod (* (+ 3 (- 4 (-2))) (/ 8 2)) 0) (; should pass ;)
+(mod (* (+ 3 (- +4)) (/ 8 2)) 0)
+
+(; big test for boolean operators and more ;)
+(! (< 59823 (> (&& (* 9 8) (|| #t (!= 5 (<= 59 #f)))) 8))) (; should pass ;)
+(! (< 59823 (> (&& (* 9 8) (#t (!= 5 (<= 59 #f)))) 8)))
+
+(; if tests ;)
+(if 1 2 3) (; should pass ;)
+(if (> 34 2) (+ 2 3) #f) (; should pass ;)
+(if (> 34 2) (+ 2 3) #f #t)
+(if (> 34 2) (+ 3) #f)
+(if (> 34) (+ 2 3) #f)
+(if (> 34 2) (+ 2 3) #frigid)
+
+(lambda (x y z) (if (+ x y) (|| x y) (&& x y))) (; should pass ;)
+(lambda () 4) (; should pass ;)
+(lambda (x) 4) (; should pass ;)
+(lambda (x) (+ 4 5)) (; should pass ;)
+(lambda (x y) (+ 4 5)) (; should pass ;)
+(lambda (x y) (+ 1 2)) (; should pass ;)
+(lambda (x) 4) (; should pass ;)
+(lambda (y x) 9) (; should pass ;)
+
+(lambda (x y z))
+(lambda 4)
+(lambda (x y) (+ 2))
+
+(; char testing — may need more work;)
+('a') (; should pass ;)
+(' ') (; should pass ;)
+
+('ab')
+'a'
+
+(+ 3 ('a')) (; should pass ;)
+(|| #t 'b') (; should pass ;)
+(+ 3 'a')
+(|| #t 'b')
