@@ -5,8 +5,9 @@ from the tree abstract data type in order to curtail the complexities that
 coincide with tree implementation. It is a functional programming language 
 based on LISP-style syntax. 
 
-This program drives the parser and lexer for the (g)ROOT language, 
-and will print the given input (formatted) if the syntax is correct. 
+Currently we have implemented toplevel.native, which drives the parser and
+lexer for the (g)ROOT language, and will print the given input (formatted)
+if the syntax is correct. 
 
 
 ## Contributors
@@ -19,8 +20,13 @@ and will print the given input (formatted) if the syntax is correct.
 
 
 ## Compile & Run
-- **Compile toplevel with**:
+- **Compile with**:
     > make toplevel.native
+    - Compiles toplevel.native
+    > make
+    - Compiles toplevel.native
+    > make clean
+    - Deletes toplevel.native executable and the build file
 - **Run toplevel with one of these**:
     > ./toplevel.native
     - runs on standard input and prints ast to stdout, use EOF (ctrl+d) to end
