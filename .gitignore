@@ -1,6 +1,6 @@
 _build/*
 *.native
 
-.out
-.err
-.diff
+*.out
+*.err
+*.diff
