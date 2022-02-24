@@ -23,7 +23,7 @@
 %token <bool> BOOL
 %token <string> ID
 %token EOF
-%token LAMBDA LET
+%token LAMBDA LET VAL
 
 /* Precedence */
 %nonassoc OR
@@ -44,11 +44,11 @@
 %%
 
 formals_opt:
-    /* nothing */ { [] }
+  | /* nothing */ { [] }
   | formal_list   { $1 }
 
 formal_list:
-    ID                  { [$1] }
+  | ID                  { [$1] }
   | ID formal_list      { $1 :: $2 }
 
 
@@ -64,7 +64,8 @@ expr:
     | MINUS expr %prec NEG                   { Unary(Neg, $2) }
     | NOT expr                               { Unary(Not, $2) }
     | LPAREN ID expr_list RPAREN             { Apply($2, $3) }
-    | LPAREN LET ID expr RPAREN              { Let($3, $4)}
+    | LPAREN LET ID expr expr RPAREN         { Let($3, $4, $5)}
+    | LPAREN VAL ID expr RPAREN              { Val($3, $4) }
     | LPAREN IF expr expr expr RPAREN        { If($3, $4, $5) }
     | LPAREN LT expr expr RPAREN             { Binops(Lt, $3, $4) }
     | LPAREN GT expr expr RPAREN             { Binops(Gt, $3, $4) }
@@ -82,9 +83,9 @@ expr:
     | LPAREN LAMBDA LPAREN formals_opt RPAREN expr RPAREN  { Lambda($4, $6) }
 
 main:
-    expr_list EOF       { $1 }
+    |expr_list EOF       { $1 }
 
 expr_list:
-    /* nothing */       { [] }
-    | expr expr_list    { $1 :: $2 }
+    | /* nothing */      { [] }
+    | expr expr_list     { $1 :: $2 }
 /* Trailer */
