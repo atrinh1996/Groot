@@ -41,8 +41,8 @@ diff -b testfiles/stdout/test-bool-stresstest.out testfiles/ref/test-bool-stress
 
 ###### Testing test-char
 ./toplevel.native testfiles/test-char.gt > testfiles/stdout/test-char.out
-Fatal error: exception Failure("illegal character \'")
-###### FAILED
+diff -b testfiles/stdout/test-char.out testfiles/ref/test-char.ref > testfiles/diff/test-char.diff
+###### SUCCESS
 
 ###### Testing test-equalto
 ./toplevel.native testfiles/test-equalto.gt > testfiles/stdout/test-equalto.out
@@ -52,8 +52,7 @@ diff -b testfiles/stdout/test-equalto.out testfiles/ref/test-equalto.ref > testf
 ###### Testing test-greaterequal
 ./toplevel.native testfiles/test-greaterequal.gt > testfiles/stdout/test-greaterequal.out
 diff -b testfiles/stdout/test-greaterequal.out testfiles/ref/test-greaterequal.ref > testfiles/diff/test-greaterequal.diff
-FAILED testfiles/stdout/test-greaterequal.out differs from testfiles/ref/test-greaterequal.ref
-###### FAILED
+###### SUCCESS
 
 ###### Testing test-greaterthan
 ./toplevel.native testfiles/test-greaterthan.gt > testfiles/stdout/test-greaterthan.out
@@ -67,8 +66,8 @@ diff -b testfiles/stdout/test-if.out testfiles/ref/test-if.ref > testfiles/diff/
 
 ###### Testing test-intboolchar
 ./toplevel.native testfiles/test-intboolchar.gt > testfiles/stdout/test-intboolchar.out
-Fatal error: exception Failure("illegal character \'")
-###### FAILED
+diff -b testfiles/stdout/test-intboolchar.out testfiles/ref/test-intboolchar.ref > testfiles/diff/test-intboolchar.diff
+###### SUCCESS
 
 ###### Testing test-integers
 ./toplevel.native testfiles/test-integers.gt > testfiles/stdout/test-integers.out
@@ -88,6 +87,11 @@ diff -b testfiles/stdout/test-lessequal.out testfiles/ref/test-lessequal.ref > t
 ###### Testing test-lessthan
 ./toplevel.native testfiles/test-lessthan.gt > testfiles/stdout/test-lessthan.out
 diff -b testfiles/stdout/test-lessthan.out testfiles/ref/test-lessthan.ref > testfiles/diff/test-lessthan.diff
+###### SUCCESS
+
+###### Testing test-neg1
+./toplevel.native testfiles/test-neg1.gt > testfiles/stdout/test-neg1.out
+diff -b testfiles/stdout/test-neg1.out testfiles/ref/test-neg1.ref > testfiles/diff/test-neg1.diff
 ###### SUCCESS
 
 ###### Testing test-nestedbinops
@@ -113,108 +117,87 @@ diff -b testfiles/stdout/test-OR.out testfiles/ref/test-OR.ref > testfiles/diff/
 ###### Testing fail-AND1
 ./toplevel.native testfiles/fail-AND1.gt 2> testfiles/stderr/fail-AND1.err
 diff -b testfiles/stderr/fail-AND1.err testfiles/ref/fail-AND1.ref > testfiles/diff/fail-AND1.diff
-FAILED testfiles/stderr/fail-AND1.err differs from testfiles/ref/fail-AND1.ref
-###### FAILED
+###### SUCCESS
 
 ###### Testing fail-AND2
 ./toplevel.native testfiles/fail-AND2.gt 2> testfiles/stderr/fail-AND2.err
 diff -b testfiles/stderr/fail-AND2.err testfiles/ref/fail-AND2.ref > testfiles/diff/fail-AND2.diff
-FAILED testfiles/stderr/fail-AND2.err differs from testfiles/ref/fail-AND2.ref
-###### FAILED
+###### SUCCESS
 
 ###### Testing fail-AND3
 ./toplevel.native testfiles/fail-AND3.gt 2> testfiles/stderr/fail-AND3.err
 diff -b testfiles/stderr/fail-AND3.err testfiles/ref/fail-AND3.ref > testfiles/diff/fail-AND3.diff
-FAILED testfiles/stderr/fail-AND3.err differs from testfiles/ref/fail-AND3.ref
-###### FAILED
+###### SUCCESS
 
 ###### Testing fail-bad_boolean1
 ./toplevel.native testfiles/fail-bad_boolean1.gt 2> testfiles/stderr/fail-bad_boolean1.err
 diff -b testfiles/stderr/fail-bad_boolean1.err testfiles/ref/fail-bad_boolean1.ref > testfiles/diff/fail-bad_boolean1.diff
-FAILED testfiles/stderr/fail-bad_boolean1.err differs from testfiles/ref/fail-bad_boolean1.ref
-###### FAILED
+###### SUCCESS
 
 ###### Testing fail-bad_boolean2
 ./toplevel.native testfiles/fail-bad_boolean2.gt 2> testfiles/stderr/fail-bad_boolean2.err
 diff -b testfiles/stderr/fail-bad_boolean2.err testfiles/ref/fail-bad_boolean2.ref > testfiles/diff/fail-bad_boolean2.diff
-FAILED testfiles/stderr/fail-bad_boolean2.err differs from testfiles/ref/fail-bad_boolean2.ref
-###### FAILED
+###### SUCCESS
 
 ###### Testing fail-bad_boolean3
 ./toplevel.native testfiles/fail-bad_boolean3.gt 2> testfiles/stderr/fail-bad_boolean3.err
 diff -b testfiles/stderr/fail-bad_boolean3.err testfiles/ref/fail-bad_boolean3.ref > testfiles/diff/fail-bad_boolean3.diff
-FAILED testfiles/stderr/fail-bad_boolean3.err differs from testfiles/ref/fail-bad_boolean3.ref
-###### FAILED
+###### SUCCESS
 
 ###### Testing fail-bad_boolean4
 ./toplevel.native testfiles/fail-bad_boolean4.gt 2> testfiles/stderr/fail-bad_boolean4.err
 diff -b testfiles/stderr/fail-bad_boolean4.err testfiles/ref/fail-bad_boolean4.ref > testfiles/diff/fail-bad_boolean4.diff
-FAILED testfiles/stderr/fail-bad_boolean4.err differs from testfiles/ref/fail-bad_boolean4.ref
-###### FAILED
+###### SUCCESS
 
 ###### Testing fail-binop+1
 ./toplevel.native testfiles/fail-binop+1.gt 2> testfiles/stderr/fail-binop+1.err
 diff -b testfiles/stderr/fail-binop+1.err testfiles/ref/fail-binop+1.ref > testfiles/diff/fail-binop+1.diff
-FAILED testfiles/stderr/fail-binop+1.err differs from testfiles/ref/fail-binop+1.ref
-###### FAILED
+###### SUCCESS
 
 ###### Testing fail-binop-1
 ./toplevel.native testfiles/fail-binop-1.gt 2> testfiles/stderr/fail-binop-1.err
 diff -b testfiles/stderr/fail-binop-1.err testfiles/ref/fail-binop-1.ref > testfiles/diff/fail-binop-1.diff
-FAILED testfiles/stderr/fail-binop-1.err differs from testfiles/ref/fail-binop-1.ref
-###### FAILED
+###### SUCCESS
 
 ###### Testing fail-binop+2
 ./toplevel.native testfiles/fail-binop+2.gt 2> testfiles/stderr/fail-binop+2.err
 diff -b testfiles/stderr/fail-binop+2.err testfiles/ref/fail-binop+2.ref > testfiles/diff/fail-binop+2.diff
-FAILED testfiles/stderr/fail-binop+2.err differs from testfiles/ref/fail-binop+2.ref
-###### FAILED
-
-###### Testing fail-binop-2
-./toplevel.native testfiles/fail-binop-2.gt 2> testfiles/stderr/fail-binop-2.err
-###### FAILED
+###### SUCCESS
 
 ###### Testing fail-binop+3
 ./toplevel.native testfiles/fail-binop+3.gt 2> testfiles/stderr/fail-binop+3.err
 diff -b testfiles/stderr/fail-binop+3.err testfiles/ref/fail-binop+3.ref > testfiles/diff/fail-binop+3.diff
-FAILED testfiles/stderr/fail-binop+3.err differs from testfiles/ref/fail-binop+3.ref
-###### FAILED
+###### SUCCESS
 
 ###### Testing fail-binop_div1
 ./toplevel.native testfiles/fail-binop_div1.gt 2> testfiles/stderr/fail-binop_div1.err
 diff -b testfiles/stderr/fail-binop_div1.err testfiles/ref/fail-binop_div1.ref > testfiles/diff/fail-binop_div1.diff
-FAILED testfiles/stderr/fail-binop_div1.err differs from testfiles/ref/fail-binop_div1.ref
-###### FAILED
+###### SUCCESS
 
 ###### Testing fail-binop_div2
 ./toplevel.native testfiles/fail-binop_div2.gt 2> testfiles/stderr/fail-binop_div2.err
 diff -b testfiles/stderr/fail-binop_div2.err testfiles/ref/fail-binop_div2.ref > testfiles/diff/fail-binop_div2.diff
-FAILED testfiles/stderr/fail-binop_div2.err differs from testfiles/ref/fail-binop_div2.ref
-###### FAILED
+###### SUCCESS
 
 ###### Testing fail-binop_div3
 ./toplevel.native testfiles/fail-binop_div3.gt 2> testfiles/stderr/fail-binop_div3.err
 diff -b testfiles/stderr/fail-binop_div3.err testfiles/ref/fail-binop_div3.ref > testfiles/diff/fail-binop_div3.diff
-FAILED testfiles/stderr/fail-binop_div3.err differs from testfiles/ref/fail-binop_div3.ref
-###### FAILED
+###### SUCCESS
 
 ###### Testing fail-binop_mod1
 ./toplevel.native testfiles/fail-binop_mod1.gt 2> testfiles/stderr/fail-binop_mod1.err
 diff -b testfiles/stderr/fail-binop_mod1.err testfiles/ref/fail-binop_mod1.ref > testfiles/diff/fail-binop_mod1.diff
-FAILED testfiles/stderr/fail-binop_mod1.err differs from testfiles/ref/fail-binop_mod1.ref
-###### FAILED
+###### SUCCESS
 
 ###### Testing fail-binop_mod2
 ./toplevel.native testfiles/fail-binop_mod2.gt 2> testfiles/stderr/fail-binop_mod2.err
 diff -b testfiles/stderr/fail-binop_mod2.err testfiles/ref/fail-binop_mod2.ref > testfiles/diff/fail-binop_mod2.diff
-FAILED testfiles/stderr/fail-binop_mod2.err differs from testfiles/ref/fail-binop_mod2.ref
-###### FAILED
+###### SUCCESS
 
 ###### Testing fail-binop_mod3
 ./toplevel.native testfiles/fail-binop_mod3.gt 2> testfiles/stderr/fail-binop_mod3.err
 diff -b testfiles/stderr/fail-binop_mod3.err testfiles/ref/fail-binop_mod3.ref > testfiles/diff/fail-binop_mod3.diff
-FAILED testfiles/stderr/fail-binop_mod3.err differs from testfiles/ref/fail-binop_mod3.ref
-###### FAILED
+###### SUCCESS
 
 ###### Testing fail-binop_mul1
 ./toplevel.native testfiles/fail-binop_mul1.gt 2> testfiles/stderr/fail-binop_mul1.err
@@ -234,20 +217,12 @@ diff -b testfiles/stderr/fail-binop_mul3.err testfiles/ref/fail-binop_mul3.ref >
 ###### Testing fail-bool_stresstest
 ./toplevel.native testfiles/fail-bool_stresstest.gt 2> testfiles/stderr/fail-bool_stresstest.err
 diff -b testfiles/stderr/fail-bool_stresstest.err testfiles/ref/fail-bool_stresstest.ref > testfiles/diff/fail-bool_stresstest.diff
-FAILED testfiles/stderr/fail-bool_stresstest.err differs from testfiles/ref/fail-bool_stresstest.ref
-###### FAILED
+###### SUCCESS
 
 ###### Testing fail-char1
 ./toplevel.native testfiles/fail-char1.gt 2> testfiles/stderr/fail-char1.err
 diff -b testfiles/stderr/fail-char1.err testfiles/ref/fail-char1.ref > testfiles/diff/fail-char1.diff
-FAILED testfiles/stderr/fail-char1.err differs from testfiles/ref/fail-char1.ref
-###### FAILED
-
-###### Testing fail-char2
-./toplevel.native testfiles/fail-char2.gt 2> testfiles/stderr/fail-char2.err
-diff -b testfiles/stderr/fail-char2.err testfiles/ref/fail-char2.ref > testfiles/diff/fail-char2.diff
-FAILED testfiles/stderr/fail-char2.err differs from testfiles/ref/fail-char2.ref
-###### FAILED
+###### SUCCESS
 
 ###### Testing fail-equalto1
 ./toplevel.native testfiles/fail-equalto1.gt 2> testfiles/stderr/fail-equalto1.err
@@ -261,11 +236,7 @@ diff -b testfiles/stderr/fail-equalto2.err testfiles/ref/fail-equalto2.ref > tes
 
 ###### Testing fail-equalto3
 ./toplevel.native testfiles/fail-equalto3.gt 2> testfiles/stderr/fail-equalto3.err
-###### FAILED
-
-###### Testing fail-equalto4
-./toplevel.native testfiles/fail-equalto4.gt 2> testfiles/stderr/fail-equalto4.err
-diff -b testfiles/stderr/fail-equalto4.err testfiles/ref/fail-equalto4.ref > testfiles/diff/fail-equalto4.diff
+diff -b testfiles/stderr/fail-equalto3.err testfiles/ref/fail-equalto3.ref > testfiles/diff/fail-equalto3.diff
 ###### SUCCESS
 
 ###### Testing fail-greaterequal1
@@ -280,11 +251,7 @@ diff -b testfiles/stderr/fail-greaterequal2.err testfiles/ref/fail-greaterequal2
 
 ###### Testing fail-greaterequal3
 ./toplevel.native testfiles/fail-greaterequal3.gt 2> testfiles/stderr/fail-greaterequal3.err
-###### FAILED
-
-###### Testing fail-greaterequal4
-./toplevel.native testfiles/fail-greaterequal4.gt 2> testfiles/stderr/fail-greaterequal4.err
-diff -b testfiles/stderr/fail-greaterequal4.err testfiles/ref/fail-greaterequal4.ref > testfiles/diff/fail-greaterequal4.diff
+diff -b testfiles/stderr/fail-greaterequal3.err testfiles/ref/fail-greaterequal3.ref > testfiles/diff/fail-greaterequal3.diff
 ###### SUCCESS
 
 ###### Testing fail-greaterthan1
@@ -299,11 +266,7 @@ diff -b testfiles/stderr/fail-greaterthan2.err testfiles/ref/fail-greaterthan2.r
 
 ###### Testing fail-greaterthan3
 ./toplevel.native testfiles/fail-greaterthan3.gt 2> testfiles/stderr/fail-greaterthan3.err
-###### FAILED
-
-###### Testing fail-greaterthan4
-./toplevel.native testfiles/fail-greaterthan4.gt 2> testfiles/stderr/fail-greaterthan4.err
-diff -b testfiles/stderr/fail-greaterthan4.err testfiles/ref/fail-greaterthan4.ref > testfiles/diff/fail-greaterthan4.diff
+diff -b testfiles/stderr/fail-greaterthan3.err testfiles/ref/fail-greaterthan3.ref > testfiles/diff/fail-greaterthan3.diff
 ###### SUCCESS
 
 ###### Testing fail-if1
@@ -325,18 +288,6 @@ diff -b testfiles/stderr/fail-if3.err testfiles/ref/fail-if3.ref > testfiles/dif
 ./toplevel.native testfiles/fail-if4.gt 2> testfiles/stderr/fail-if4.err
 diff -b testfiles/stderr/fail-if4.err testfiles/ref/fail-if4.ref > testfiles/diff/fail-if4.diff
 ###### SUCCESS
-
-###### Testing fail-intboolchar1
-./toplevel.native testfiles/fail-intboolchar1.gt 2> testfiles/stderr/fail-intboolchar1.err
-diff -b testfiles/stderr/fail-intboolchar1.err testfiles/ref/fail-intboolchar1.ref > testfiles/diff/fail-intboolchar1.diff
-FAILED testfiles/stderr/fail-intboolchar1.err differs from testfiles/ref/fail-intboolchar1.ref
-###### FAILED
-
-###### Testing fail-intboolchar2
-./toplevel.native testfiles/fail-intboolchar2.gt 2> testfiles/stderr/fail-intboolchar2.err
-diff -b testfiles/stderr/fail-intboolchar2.err testfiles/ref/fail-intboolchar2.ref > testfiles/diff/fail-intboolchar2.diff
-FAILED testfiles/stderr/fail-intboolchar2.err differs from testfiles/ref/fail-intboolchar2.ref
-###### FAILED
 
 ###### Testing fail-lambda1
 ./toplevel.native testfiles/fail-lambda1.gt 2> testfiles/stderr/fail-lambda1.err
@@ -365,11 +316,7 @@ diff -b testfiles/stderr/fail-lessequal2.err testfiles/ref/fail-lessequal2.ref >
 
 ###### Testing fail-lessequal3
 ./toplevel.native testfiles/fail-lessequal3.gt 2> testfiles/stderr/fail-lessequal3.err
-###### FAILED
-
-###### Testing fail-lessequal4
-./toplevel.native testfiles/fail-lessequal4.gt 2> testfiles/stderr/fail-lessequal4.err
-diff -b testfiles/stderr/fail-lessequal4.err testfiles/ref/fail-lessequal4.ref > testfiles/diff/fail-lessequal4.diff
+diff -b testfiles/stderr/fail-lessequal3.err testfiles/ref/fail-lessequal3.ref > testfiles/diff/fail-lessequal3.diff
 ###### SUCCESS
 
 ###### Testing fail-lessthan1
@@ -405,8 +352,7 @@ diff -b testfiles/stderr/fail-NOT2.err testfiles/ref/fail-NOT2.ref > testfiles/d
 ###### Testing fail-NOT3
 ./toplevel.native testfiles/fail-NOT3.gt 2> testfiles/stderr/fail-NOT3.err
 diff -b testfiles/stderr/fail-NOT3.err testfiles/ref/fail-NOT3.ref > testfiles/diff/fail-NOT3.diff
-FAILED testfiles/stderr/fail-NOT3.err differs from testfiles/ref/fail-NOT3.ref
-###### FAILED
+###### SUCCESS
 
 ###### Testing fail-notequal1
 ./toplevel.native testfiles/fail-notequal1.gt 2> testfiles/stderr/fail-notequal1.err

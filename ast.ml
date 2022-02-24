@@ -33,7 +33,7 @@ let string_of_binop = function
     | Lt -> "<"
     | Gt -> ">"
     | Leq -> "<="
-    | Geq -> "<="
+    | Geq -> ">="
     | And -> "&&"
     | Or -> "||"
 
