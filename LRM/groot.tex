@@ -145,211 +145,224 @@
 
 
 \begin{document}
-\title{(g)ROOT \\ Language Reference Manual}
-\author{Samuel Russo \quad Amy Bui \quad Eliza Encherman \\ Zachary Goldstein \quad Nickolas Gravel}
-\date{\today}
-\maketitle
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% TITLE PAGE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % Table of Contents
-    \setcounter{tocdepth}{2}
-    \tableofcontents
-    \pagebreak 
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \section{This is a section heading with number}
-    \label{sec:start} % section label, use to link withing file
-                      % \hyperref[sec:start]{text}
-
-    This is a bullet list:
-    \begin{itemize}
-        \item Link to \href{https://www.overleaf.com/learn/latex/Hyperlinks}{Overleaf href}
-        \item url example: \url{https://canvas.tufts.edu/}
-        \item link to aanother labeled section: \hyperref[sec:hello]{Hello World section}
-    \end{itemize}
-
-    This is a enumlist (default 1):
-    \begin{enumerate}
-        \item Inline code: \lstinline!(val x 42)! example.
-        \item \textsc{Hello World}
-        \item \texttt{Hello World}
-        \item \textsf{Hello World}
-        \item This is \textcolor{red}{very Red}
-        \item This is \textcolor{blue}{Bluey}
-    \end{enumerate}
-
-    This is enumlist with alph bullets:
-    \begin{enumerate}[label=\alph*.]
-        \item $x^2 = y$
-        \item x = y
-    \end{enumerate}
+\begin{titlepage}
+    \title{(g)ROOT \\ Language Reference Manual}
+    \author{Samuel Russo \quad Amy Bui \quad Eliza Encherman \\ Zachary Goldstein \quad Nickolas Gravel}
+    \date{\today}
+    \maketitle
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.35\linewidth]{images/baby_groot.PNG}
+        \label{fig:im_groot_title}
+    \end{figure}
+\end{titlepage}
 
 
-    %% start on new page
-    \pagebreak
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Table of Contents
+\setcounter{tocdepth}{2}
+\tableofcontents
+\pagebreak 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \section{Hello World}
-    \label{sec:hello}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{This is a section heading with number}
+\label{sec:start} % section label, use to link withing file
+                    % \hyperref[sec:start]{text}
 
-        \subsection{Hello Subsection example}
-            This is how you include pictures:
+This is a bullet list:
+\begin{itemize}
+    \item Link to \href{https://www.overleaf.com/learn/latex/Hyperlinks}{Overleaf href}
+    \item url example: \url{https://canvas.tufts.edu/}
+    \item link to aanother labeled section: \hyperref[sec:hello]{Hello World section}
+\end{itemize}
 
-            % \begin{figure}[h]
-            %     \centering
-            %     \includegraphics[width=0.7\linewidth]{FILE_PATH}
-            %     % \caption{} %% optional caption
-            %     \label{fig:FILE_NAME}
-            % \end{figure}
+This is a enumlist (default 1):
+\begin{enumerate}
+    \item Inline code: \lstinline!(val x 42)! example.
+    \item \textsc{Hello World}
+    \item \texttt{Hello World}
+    \item \textsf{Hello World}
+    \item This is \textcolor{red}{very Red}
+    \item This is \textcolor{blue}{Bluey}
+\end{enumerate}
 
-            \begin{figure}[h]
-                \centering
-                \includegraphics[width=0.2\linewidth]{images/baby_groot.PNG}
-                \caption{Our little mascot}
-                \label{fig:im_groot}
-            \end{figure}
+This is enumlist with alph bullets:
+\begin{enumerate}[label=\alph*.]
+    \item $x^2 = y$
+    \item x = y
+\end{enumerate}
 
 
-            \subsubsection{Basic Table: This doesn't appeear in contents}
-            \begin{center}
-                \begin{tabular}{|r|c|l|}
-                    \hline
-                    hrow1 & hrow2 & hrow3 \\
-                    \hline
-                    This is & This is & This is\\
-                    right-aligned & centered & left aligned \\
-                    \hline
-                \end{tabular}
-            \end{center}
+%% start on new page
+\pagebreak
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-            \begin{center}
-                \begin{tabular}{l|l|l}
-                    $\leftarrow$ & $\Leftarrow$ & $\langle x + y \rangle$ \\ 
-                    $\rightarrow$ & $\Rightarrow$ & $| x |$ \\ 
-                    $\downarrow$ & $\Downarrow$ & $\| x^2 \|$ \\
-                    $\leftrightarrow$ & $\uparrow$ & \Bigg( \big( cs107 \big)  \Bigg) \\ 
-                    $\epsilon$ & $\rho$ & \Bigg[ \big[ cs107 \big] \Bigg] \\
-                    $\Sigma$ & $\eta$ & \\ 
-                    $\mu$ & \{ \} & \\
-                \end{tabular}
-            \end{center}
 
-        \subsection{Another hello subsection example}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Hello World}
+\label{sec:hello}
 
-            \subsubsection{Coding environment without line numbers (default)}
+    \subsection{Hello Subsection example}
+        This is how you include pictures:
+
+        % \begin{figure}[h]
+        %     \centering
+        %     \includegraphics[width=0.7\linewidth]{FILE_PATH}
+        %     % \caption{} %% optional caption
+        %     \label{fig:FILE_NAME}
+        % \end{figure}
+
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=0.2\linewidth]{images/baby_groot.PNG}
+            \caption{Our little mascot}
+            \label{fig:im_groot}
+        \end{figure}
+
+
+        \subsubsection{Basic Table: This doesn't appeear in contents}
+        \begin{center}
+            \begin{tabular}{|r|c|l|}
+                \hline
+                hrow1 & hrow2 & hrow3 \\
+                \hline
+                This is & This is & This is\\
+                right-aligned & centered & left aligned \\
+                \hline
+            \end{tabular}
+        \end{center}
+
+        \begin{center}
+            \begin{tabular}{l|l|l}
+                $\leftarrow$ & $\Leftarrow$ & $\langle x + y \rangle$ \\ 
+                $\rightarrow$ & $\Rightarrow$ & $| x |$ \\ 
+                $\downarrow$ & $\Downarrow$ & $\| x^2 \|$ \\
+                $\leftrightarrow$ & $\uparrow$ & \Bigg( \big( cs107 \big)  \Bigg) \\ 
+                $\epsilon$ & $\rho$ & \Bigg[ \big[ cs107 \big] \Bigg] \\
+                $\Sigma$ & $\eta$ & \\ 
+                $\mu$ & \{ \} & \\
+            \end{tabular}
+        \end{center}
+
+    \subsection{Another hello subsection example}
+
+        \subsubsection{Coding environment without line numbers (default)}
 \begin{lstlisting}
 (val add
-    (lambda (x y) 
-        (+ x y)))
+(lambda (x y) 
+    (+ x y)))
 \end{lstlisting}
 
-            \subsubsection{Coding environment with line numbers (this can be made default)}
+        \subsubsection{Coding environment with line numbers (this can be made default)}
 \begin{lstlisting}[stepnumber=1]
 (val add
-    (lambda (x y) 
-        (+ x y)))
+(lambda (x y) 
+    (+ x y)))
 \end{lstlisting}
 
-            \subsubsection{Code side-by-side}
+        \subsubsection{Code side-by-side}
 \begin{minipage}[h]{0.5\textwidth}
 \begin{lstlisting}
 (val who 
-    (lambda (i am groot) #t)
+(lambda (i am groot) #t)
 )
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[h]{0.5\textwidth}
 \begin{lstlisting}
 (val were
-    (lambda (senza) (> 3 0))
+(lambda (senza) (> 3 0))
 )
 \end{lstlisting}
 \end{minipage}
-    \pagebreak
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagebreak
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-    %% LRM OUTLINE STARTS HERE
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \section{Intro}
-    \label{sec:intro}
+%% LRM OUTLINE STARTS HERE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Intro}
+\label{sec:intro}
 
-    \href{https://ocaml.org/manual/language.html}{Ocaml LRM}
+\href{https://ocaml.org/manual/language.html}{Ocaml LRM}
 
-    \pagebreak
-    %% End of Introduction %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \section{Lexical Convention}
-    \label{sec:lexcon}
-
-        \subsection{Blanks}
-
-        \subsection{Comments}
-
-        \subsection{Identifiers}
-
-        \subsection{Integer Literals}
-
-        \subsection{Boolean Literals}
-
-        \subsection{Character Literals}
-
-        \subsection{Operators}
-
-        \subsection{Keywords}
-
-    % \pagebreak
-    %% End of Lexical Convention %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagebreak
+%% End of Introduction %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \section{Values}
-    \label{sec:values}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Lexical Convention}
+\label{sec:lexcon}
 
-        \subsection{Base Values}
+    \subsection{Blanks}
 
-        \subsection{Functions}
+    \subsection{Comments}
 
-    % \pagebreak
-    %% End of Values %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \subsection{Identifiers}
 
+    \subsection{Integer Literals}
 
+    \subsection{Boolean Literals}
 
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \section{Names}
-    \label{sec:names}
+    \subsection{Character Literals}
 
-        \subsection{Base Values}
+    \subsection{Operators}
 
-        \subsection{Functions}
+    \subsection{Keywords}
 
-    % \pagebreak
-    %% End of Names %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-    
-
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \section{Constants}
-    \label{sec:const}
+% \pagebreak
+%% End of Lexical Convention %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-    % \pagebreak
-    %% End of Constants %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Values}
+\label{sec:values}
+
+    \subsection{Base Values}
+
+    \subsection{Functions}
+
+% \pagebreak
+%% End of Values %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \section{Expressions}
-    \label{sec:expr}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Names}
+\label{sec:names}
+
+    \subsection{Base Values}
+
+    \subsection{Functions}
+
+% \pagebreak
+%% End of Names %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-    % \pagebreak
-    %% End of Expressions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Constants}
+\label{sec:const}
+
+
+% \pagebreak
+%% End of Constants %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Expressions}
+\label{sec:expr}
+
+
+% \pagebreak
+%% End of Expressions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 
