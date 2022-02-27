@@ -356,7 +356,7 @@ solving more complex problems.
         Comments are introduced with two adjact characters \texttt{(;} and terminated by two adjacent characters \texttt{;)}. Nested comments are currently not allowed. Multiline comments are allowed.\\
 
 % \hspace{1cm}\begin{minipage}[h]{1\textwidth}
-\cbcolor{green}
+\cbcolor{dkgreen}
 \cbstart
 \begin{lstlisting}
 (; This is a comment. ;)
@@ -436,7 +436,7 @@ solving more complex problems.
         \label{subsec:key}
         The below identifiers are reserved keywords and cannot be used otherwise: \\
 
-\cbcolor{green}
+\cbcolor{dkgreen}
 \cbstart
 \begin{lstlisting}
 if      val         let
@@ -447,7 +447,7 @@ cld     sib         lambda
 
         The following character sequence are also keywords: \\
 
-\cbcolor{green}
+\cbcolor{dkgreen}
 \cbstart
 \begin{lstlisting}
 ==      +       &&      >       '
@@ -500,7 +500,7 @@ cld     sib         lambda
             
             Trees may be conveniently constructed in-place using the following construction syntax:\\
 
-\cbcolor{green}
+\cbcolor{dkgreen}
 \cbstart
 \begin{lstlisting}
 '(value left-tree right-tree)
@@ -509,7 +509,7 @@ cld     sib         lambda
 
 For example:\\
 
-\cbcolor{green}
+\cbcolor{dkgreen}
 \cbstart
 \begin{lstlisting}
 '(0 leaf (1 (2  (3 leaf leaf) (4 (5 (6 (leaf leaf)) leaf))) (7 (8 leaf leaf) (9 (10 leaf leaf) leaf))))
@@ -575,7 +575,7 @@ represents the following tree:
 
         Example:
 
-\cbcolor{green}
+\cbcolor{dkgreen}
 \cbstart
 \begin{lstlisting}
 (foo)
@@ -588,7 +588,7 @@ represents the following tree:
 
         Example:
 
-\cbcolor{green}
+\cbcolor{dkgreen}
 \cbstart
 \begin{lstlisting}
 (lambda () #t)
@@ -601,7 +601,7 @@ represents the following tree:
 
         Example:
 
-\cbcolor{green}
+\cbcolor{dkgreen}
 \cbstart
 \begin{lstlisting}
 (val x 4)
@@ -616,7 +616,7 @@ represents the following tree:
 
         Example:
 
-\cbcolor{green}
+\cbcolor{dkgreen}
 \cbstart
 \begin{lstlisting}
 (let x 4 (+ 2 x))   (; return 6 ;) 
@@ -628,7 +628,7 @@ represents the following tree:
 
         Example:
 
-\cbcolor{green}
+\cbcolor{dkgreen}
 \cbstart
 \begin{lstlisting}
 (let x 4 
@@ -643,7 +643,7 @@ represents the following tree:
         
         Example:
 
-\cbcolor{green}
+\cbcolor{dkgreen}
 \cbstart
 \begin{lstlisting}
 (if #t 1 2)
@@ -657,7 +657,7 @@ represents the following tree:
 
         Example:
 
-\cbcolor{green}
+\cbcolor{dkgreen}
 \cbstart
 \begin{lstlisting}
 -3
@@ -670,7 +670,7 @@ represents the following tree:
 
         Example:
 
-\cbcolor{green}
+\cbcolor{dkgreen}
 \cbstart
 \begin{lstlisting}
 !#t
@@ -846,7 +846,7 @@ represents the following tree:
     \section{Appendix}
     \label{sec:app}
 
-\cbcolor{green}
+\cbcolor{dkgreen}
 \cbstart
 \begin{lstlisting}
 (; We can define standard list functions with our tree data type! Fun! ;)
@@ -900,7 +900,7 @@ represents the following tree:
 
 flattening functions!
 
-\cbcolor{green}
+\cbcolor{dkgreen}
 \cbstart
 \begin{lstlisting}
 (; this function flattens a tree, pre-order ;)
@@ -940,7 +940,7 @@ flattening functions!
 
 Let's create some higher order functions! Yay!
 
-\cbcolor{green}
+\cbcolor{dkgreen}
 \cbstart
 \begin{lstlisting}
 (define (curry   f)   (lambda (x)   (lambda (y) (f x y))))
@@ -972,7 +972,7 @@ function: (flurry func)
 \end{itemize}
 
 
-\cbcolor{green}
+\cbcolor{dkgreen}
 \cbstart
 \begin{lstlisting}
 (define flurry (func)
