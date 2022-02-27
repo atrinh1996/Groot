@@ -2,6 +2,9 @@
 \usepackage[utf8]{inputenc}
 \usepackage{parskip}
 \usepackage{tabularx}
+\usepackage{syntax} % grammar format
+% \usepackage{markdown} % inline mark down
+\usepackage[color, leftbars]{changebar}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Reduce margin
@@ -23,6 +26,9 @@
 \setlength{\topmargin}{-0.5in}
 
 \setlength{\parindent}{0pt}
+
+\setlength{\grammarparsep}{20pt plus 1pt minus 1pt} % increase separation between rules
+\setlength{\grammarindent}{10em} % increase separation between LHS/RHS 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -61,7 +67,7 @@
 
 % \begin{lstlisting}[...] ... \end{lstlisting}
 \lstset{frame=none,
-    language=LISP,
+    % language=LISP,
     aboveskip=3mm,
     belowskip=3mm,
     stepnumber=0, % set to 0 if you don't like line nums
@@ -158,118 +164,140 @@
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \section{This is a section heading with number}
-    \label{sec:start} % section label, use to link withing file
-                      % \hyperref[sec:start]{text}
+    % \section{This is a section heading with number}
+    % \label{sec:start} % section label, use to link withing file
+    %                   % \hyperref[sec:start]{text}
 
-    This is a bullet list:
-    \begin{itemize}
-        \item Link to \href{https://www.overleaf.com/learn/latex/Hyperlinks}{Overleaf href}
-        \item url example: \url{https://canvas.tufts.edu/}
-        \item link to aanother labeled section: \hyperref[sec:hello]{Hello World section}
-    \end{itemize}
+    % This is a bullet list:
+    % \begin{itemize}
+    %     \item Link to \href{https://www.overleaf.com/learn/latex/Hyperlinks}{Overleaf href}
+    %     \item url example: \url{https://canvas.tufts.edu/}
+    %     \item link to aanother labeled section: \hyperref[sec:hello]{Hello World section}
+    % \end{itemize}
 
-    This is a enumlist (default 1):
-    \begin{enumerate}
-        \item Inline code: \lstinline!(val x 42)! example.
-        \item \textsc{Hello World}
-        \item \texttt{Hello World}
-        \item \textsf{Hello World}
-        \item This is \textcolor{red}{very Red}
-        \item This is \textcolor{blue}{Bluey}
-    \end{enumerate}
+    % This is a enumlist (default 1):
+    % \begin{enumerate}
+    %     \item Inline code: \lstinline!(val x 42)! example.
+    %     \item \textsc{Hello World}
+    %     \item \texttt{Hello World}
+    %     \item \textsf{Hello World}
+    %     \item This is \textcolor{red}{very Red}
+    %     \item This is \textcolor{blue}{Bluey}
+    % \end{enumerate}
 
-    This is enumlist with alph bullets:
-    \begin{enumerate}[label=\alph*.]
-        \item $x^2 = y$
-        \item x = y
-    \end{enumerate}
+    % This is enumlist with alph bullets:
+    % \begin{enumerate}[label=\alph*.]
+    %     \item $x^2 = y$
+    %     \item x = y
+    % \end{enumerate}
 
-
-    %% start on new page
-    \pagebreak
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% \subsection{Grammar}
 
 
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \section{Hello World}
-    \label{sec:hello}
-
-        \subsection{Hello Subsection example}
-            This is how you include pictures:
-
-            % \begin{figure}[h]
-            %     \centering
-            %     \includegraphics[width=0.7\linewidth]{FILE_PATH}
-            %     % \caption{} %% optional caption
-            %     \label{fig:FILE_NAME}
-            % \end{figure}
-
-            \begin{figure}[h]
-                \centering
-                \includegraphics[width=0.2\linewidth]{images/baby_groot.PNG}
-                \caption{Our little mascot}
-                \label{fig:im_groot}
-            \end{figure}
+	% \begin{grammar}
+		
+	% 	<statement> ::= <ident> `=' <expr> 
+	% 	\alt `for' <ident> `=' <expr> `to' <expr> `do' <statement> 
+	% 	\alt `{' <stat-list> `}' 
+	% 	\alt <empty> 
+		
+	% 	<stat-list> ::= <statement> `;' <stat-list> | <statement> 
+		
+	% \end{grammar}
 
 
-            \subsubsection{Basic Table: This doesn't appeear in contents}
-            \begin{center}
-                \begin{tabular}{|r|c|l|}
-                    \hline
-                    hrow1 & hrow2 & hrow3 \\
-                    \hline
-                    This is & This is & This is\\
-                    right-aligned & centered & left aligned \\
-                    \hline
-                \end{tabular}
-            \end{center}
+    % %% start on new page
+    % \pagebreak
+    % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-            \begin{center}
-                \begin{tabular}{l|l|l}
-                    $\leftarrow$ & $\Leftarrow$ & $\langle x + y \rangle$ \\ 
-                    $\rightarrow$ & $\Rightarrow$ & $| x |$ \\ 
-                    $\downarrow$ & $\Downarrow$ & $\| x^2 \|$ \\
-                    $\leftrightarrow$ & $\uparrow$ & \Bigg( \big( cs107 \big)  \Bigg) \\ 
-                    $\epsilon$ & $\rho$ & \Bigg[ \big[ cs107 \big] \Bigg] \\
-                    $\Sigma$ & $\eta$ & \\ 
-                    $\mu$ & \{ \} & \\
-                \end{tabular}
-            \end{center}
 
-        \subsection{Another hello subsection example}
+    % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % \section{Hello World}
+%     \label{sec:hello}
 
-            \subsubsection{Coding environment without line numbers (default)}
-\begin{lstlisting}
-(val add
-    (lambda (x y) 
-        (+ x y)))
-\end{lstlisting}
+%         \subsection{Hello Subsection example}
+%             This is how you include pictures:
 
-            \subsubsection{Coding environment with line numbers (this can be made default)}
-\begin{lstlisting}[stepnumber=1]
-(val add
-    (lambda (x y) 
-        (+ x y)))
-\end{lstlisting}
+%             % \begin{figure}[h]
+%             %     \centering
+%             %     \includegraphics[width=0.7\linewidth]{FILE_PATH}
+%             %     % \caption{} %% optional caption
+%             %     \label{fig:FILE_NAME}
+%             % \end{figure}
 
-            \subsubsection{Code side-by-side}
-\begin{minipage}[h]{0.5\textwidth}
-\begin{lstlisting}
-(val who 
-    (lambda (i am groot) #t)
-)
-\end{lstlisting}
-\end{minipage}
-\begin{minipage}[h]{0.5\textwidth}
-\begin{lstlisting}
-(val were
-    (lambda (senza) (> 3 0))
-)
-\end{lstlisting}
-\end{minipage}
-    \pagebreak
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%             % \begin{figure}[h]
+%             %     \centering
+%             %     \includegraphics[width=0.2\linewidth]{/images/baby_groot.PNG}
+%             %     \caption{Our little mascot}
+%             %     \label{fig:im_groot}
+%             % \end{figure}
+            
+%             \begin{figure}[h]
+%             	\centering
+%             	\includegraphics[width=0.2\linewidth]{images/gt}
+%             	\caption{}
+%             	\label{fig:babygroot}
+%             \end{figure}
+            
+
+
+%             \subsubsection{Basic Table: This doesn't appeear in contents}
+%             \begin{center}
+%                 \begin{tabular}{|r|c|l|}
+%                     \hline
+%                     hrow1 & hrow2 & hrow3 \\
+%                     \hline
+%                     This is & This is & This is\\
+%                     right-aligned & centered & left aligned \\
+%                     \hline
+%                 \end{tabular}
+%             \end{center}
+
+%             \begin{center}
+%                 \begin{tabular}{l|l|l}
+%                     $\leftarrow$ & $\Leftarrow$ & $\langle x + y \rangle$ \\ 
+%                     $\rightarrow$ & $\Rightarrow$ & $| x |$ \\ 
+%                     $\downarrow$ & $\Downarrow$ & $\| x^2 \|$ \\
+%                     $\leftrightarrow$ & $\uparrow$ & \Bigg( \big( cs107 \big)  \Bigg) \\ 
+%                     $\epsilon$ & $\rho$ & \Bigg[ \big[ cs107 \big] \Bigg] \\
+%                     $\Sigma$ & $\eta$ & \\ 
+%                     $\mu$ & \{ \} & \\
+%                 \end{tabular}
+%             \end{center}
+
+%         \subsection{Another hello subsection example}
+
+%             \subsubsection{Coding environment without line numbers (default)}
+% \begin{lstlisting}
+% (val add
+%     (lambda (x y) 
+%         (+ x y)))
+% \end{lstlisting}
+
+%             \subsubsection{Coding environment with line numbers (this can be made default)}
+% \begin{lstlisting}[stepnumber=1]
+% (val add
+%     (lambda (x y) 
+%         (+ x y)))
+% \end{lstlisting}
+
+%             \subsubsection{Code side-by-side}
+% \begin{minipage}[h]{0.5\textwidth}
+% \begin{lstlisting}
+% (val who 
+%     (lambda (i am groot) #t)
+% )
+% \end{lstlisting}
+% \end{minipage}
+% \begin{minipage}[h]{0.5\textwidth}
+% \begin{lstlisting}
+% (val were
+%     (lambda (senza) (> 3 0))
+% )
+% \end{lstlisting}
+% \end{minipage}
+%     \pagebreak
+%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
     %% LRM OUTLINE STARTS HERE
@@ -279,6 +307,9 @@
 
     \href{https://ocaml.org/manual/language.html}{Ocaml LRM}
 
+    \subsection{How to read manual}
+    The syntax of the language will be given in BNF-like notation. Non-terminal symbol will be in italic font \emph{like-this}, square brackets [ … ] denote optional components, curly braces \{ … \} denote zero or more repetitions of the enclosed component,  and parenthesis ( … ) denote a grouping.
+
     \pagebreak
     %% End of Introduction %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -286,24 +317,116 @@
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     \section{Lexical Convention}
     \label{sec:lexcon}
+        
+        \subsection{Blanks} %%%
+        The following characters are considered as \textbf{blanks}: space, horizontal tab (`\texttt{\textbackslash t}'), newline character (`\texttt{\textbackslash n}'), and carriage return (`\texttt{\textbackslash r}'). 
 
-        \subsection{Blanks}
+        Blanks separate adjacent identifiers, literals, expressions, and keywords. They are otherwise ignored.
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         \subsection{Comments}
+        Comments are introduced with two adjact characters \texttt{(;} and terminated by two adjacent characters \texttt{;)}. Nested comments are currently not allowed.\\
+
+% \hspace{1cm}\begin{minipage}[h]{1\textwidth}
+\cbcolor{green}
+\cbstart
+\begin{lstlisting}
+(; This is a comment. ;)
+\end{lstlisting}
+\cbend
+% \end{minipage}
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         \subsection{Identifiers}
+        \label{subsec:id}
+        Identifiers are sequences of letters, digits, and underscore characters (`\_'), starting with a letter. Letters consist of the 26 lowercase and 26 uppercase characters from the ASCII set.
+
+        \hspace{1cm}\begin{minipage}[h]{1\textwidth}
+        \begin{grammar}
+            <ident> ::= \texttt{$letter$\ (\ $letter$ | $digit$ | \_ \ )}
+            
+            <letter> ::= \texttt{a...z\ |\ A...Z }
+
+            <digit> ::= \texttt{0...9 }
+        \end{grammar}
+        \end{minipage}
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
         \subsection{Integer Literals}
+        \label{subsec:intlit}
+        An integer literal is a decimal, represented by a sequence of one or more digits, optionally preceded by a minus sign. 
+
+            \hspace{1cm}\begin{minipage}[h]{1\textwidth}
+            \begin{grammar}
+                <integer-literal> ::= \texttt{[-] $digit$ \{ $digit$ \}}
+    
+                <digit> ::= \texttt{0...9 }
+            \end{grammar}
+            \end{minipage}
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         \subsection{Boolean Literals}
+        \label{subsec:boollit}
+        Boolean literals are represented by two adjacent characters; the first is the octothorp character (\texttt{\#}), and it is immediately followed by either the \texttt{t} or the \texttt{f} character. 
+
+            \hspace{1cm}\begin{minipage}[h]{1\textwidth}
+            \begin{grammar}
+                <boolean-literal> ::= \texttt{\# (\ t |\ f\ )}
+            \end{grammar}
+            \end{minipage}
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         \subsection{Character Literals}
+        \label{subsec:charlit}
+        Character literals are a single character enclosed by two \textsf{'} (single-quote) characters.
+
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         \subsection{Operators}
+        \label{subsec:op}
+        All of the following operators are prefix characters or prefixed characters read as single token. Binary operators are expected to be followed by two expressions, unary operatprs are expected to be followed by one expression. 
+
+        \hspace{1cm}\begin{minipage}[h]{1\textwidth}
+            \begin{grammar}
+
+                <operator> ::= (\ $unary-operator$ |\ $binary-operator$\ )
+
+                <unary-operator> ::= \texttt{!}
+
+                <binary-operator> ::= \ \texttt{+\ |\ -\ |\ *\ |\ /\ |\ mod }
+                \alt\texttt{==\ |\ \textless\ |\ \textgreater\ |\ $\leq$ |\ $\geq$\ |\ != }
+                \alt\texttt{\&\&\ |\ \textcolor{red}{||} }
+
+            \end{grammar}
+            \end{minipage}
 
         \subsection{Keywords}
+        \label{subsec:key}
+        The below identifiers are reserved keywords and cannot be used otherwise: \\
 
-    % \pagebreak
+\cbcolor{green}
+\cbstart
+\begin{lstlisting}
+if      val         let
+leaf?   elm         tree
+cld     sib         lambda
+\end{lstlisting}
+\cbend
+
+        The following character sequence are also keywords: \\
+
+\cbcolor{green}
+\cbstart
+\begin{lstlisting}
+==      +       &&      >       '
+!=      -       ||      mod     #t
+<=      *       !       (       #f
+>=      /       <       )
+\end{lstlisting}
+\cbend
+
+    \pagebreak
     %% End of Lexical Convention %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -313,9 +436,23 @@
 
         \subsection{Base Values}
 
-        \subsection{Functions}
+            \subsubsection{Integer numbers}
+            Integer values are integer numbers in range from $-2^{32}$ to $2^{32} - 1$, similar to LLVM's integers, and may support a wider range of integer values on other machines, such as $-2^{64}$ to $2^{64} - 1$ on a 64-bit machine.
 
-    % \pagebreak
+            \subsubsection{Boolean values}
+            Booleans have two values. \texttt{\#t} evaluates to the boolean value \texttt{true}, and \texttt{\#f} evaluates to the boolean value \texttt{false}.
+
+            \subsubsection{Characters}
+            Character values are 8-bit integers between 0 and 255, and follow ASCII standard.
+
+        \subsection{Functions}
+        Functional values are mappings from values to value.
+
+        \subsection{Leaf}
+
+        \subsection{Tree}
+
+    \pagebreak
     %% End of Values %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -347,9 +484,44 @@
     \section{Expressions}
     \label{sec:expr}
 
+        \hspace{1cm}\begin{minipage}[h]{1\textwidth}
+        \begin{grammar}
+
+            <expr> ::= $literal$
+            \alt \hyperref[subsec:id]{$ident$}
+            \alt \hyperref[subsec:op]{\emph{unary-operator}} $expr$
+            \alt (\ \hyperref[subsec:op]{\emph{binary-operator}} $expr$ $expr$)
+            \alt (\ \hyperref[subsec:id]{$ident$} \emph{expr-list}  )
+            \alt (\ \texttt{val} \hyperref[subsec:id]{$ident$} $expr$  )
+            \alt (\ \texttt{let} \hyperref[subsec:id]{$ident$} $expr$ $expr$  )
+            \alt (\ \texttt{if} $expr$ $expr$ $expr$  )
+            \alt (\ \texttt{lambda} (\ \{$argument$\} )\ $expr$ )
+
+            <literal> ::=  \hyperref[subsec:intlit]{\emph{integer-literal}} |  \hyperref[subsec:boollit]{\emph{boolean-literal}} | \hyperref[subsec:charlit]{\emph{character}} | \hyperref[subsec:key]{leaf}
+
+            <argument> ::= $\epsilon$
+            \alt \hyperref[subsec:id]{$ident$} :: $argument$
+            
+
+        \end{grammar}
+        \end{minipage}
+
+        \subsection{}
+
+        \subsection{Lambda Expression}
+
 
     % \pagebreak
     %% End of Expressions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \section{Functions}
+    \label{sec:func}
+
+
+    % \pagebreak
+    %% End of Functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 
