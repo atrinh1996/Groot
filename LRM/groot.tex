@@ -165,7 +165,7 @@
     \pagebreak
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Table of Contents
-    \setcounter{tocdepth}{2}
+    \setcounter{tocdepth}{3}
     \tableofcontents
     \pagebreak 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -353,13 +353,16 @@ solving more complex problems.
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         \subsection{Comments}
-        Comments are introduced with two adjact characters \texttt{(;} and terminated by two adjacent characters \texttt{;)}. Nested comments are currently not allowed.\\
+        Comments are introduced with two adjact characters \texttt{(;} and terminated by two adjacent characters \texttt{;)}. Nested comments are currently not allowed. Multiline comments are allowed.\\
 
 % \hspace{1cm}\begin{minipage}[h]{1\textwidth}
 \cbcolor{green}
 \cbstart
 \begin{lstlisting}
 (; This is a comment. ;)
+
+(; This is a 
+   multi-lined comment. ;)
 \end{lstlisting}
 \cbend
 % \end{minipage}
@@ -413,14 +416,14 @@ solving more complex problems.
 
         \subsection{Operators}
         \label{subsec:op}
-        All of the following operators are prefix characters or prefixed characters read as single token. Binary operators are expected to be followed by two expressions, unary operatprs are expected to be followed by one expression. 
+        All of the following operators are prefix characters or prefixed characters read as single token. Binary operators are expected to be followed by two expressions, unary operators are expected to be followed by one expression. 
 
         \hspace{1cm}\begin{minipage}[h]{1\textwidth}
             \begin{grammar}
 
-                <operator> ::= (\ $unary-operator$ |\ $binary-operator$\ )
+                <operator> ::= (\ \emph{unary-operator} |\ \emph{binary-operator}\ )
 
-                <unary-operator> ::= \texttt{!}
+                <unary-operator> ::= \texttt{!} |\ \texttt{-}
 
                 <binary-operator> ::= \ \texttt{+\ |\ -\ |\ *\ |\ /\ |\ mod }
                 \alt\texttt{==\ |\ \textless\ |\ \textgreater\ |\ $\leq$ |\ $\geq$\ |\ != }
@@ -437,7 +440,7 @@ solving more complex problems.
 \cbstart
 \begin{lstlisting}
 if      val         let
-leaf?   elm         tree
+leaf    elm         tree
 cld     sib         lambda
 \end{lstlisting}
 \cbend
@@ -559,9 +562,133 @@ represents the following tree:
         Expressions are values or parenthetical expressions.
 
         \subsection{Values}
-        see 
+        see \hyperref[sec:values]{Values}.
 
-        \subsection{Lambda Expression}
+
+        
+
+
+        \subsection{Parenthetical expressions} Parenthetical expressions (so called because they are always within parentheses) include function application, lambda expressions, global and local definitions, binary and unary operations, and if-statements.
+
+        \subsubsection{Function application}
+        Function application in (g)ROOT always returns a value, and is written as the function \texttt{ID} followed by a list of zero or more expressions, which are its arguments. The arguments are not separated from the ID by parentheses. (g)ROOT has first-class functions, therefore functions can be passed as arguments.
+
+        Example:
+
+\cbcolor{green}
+\cbstart
+\begin{lstlisting}
+(foo)
+(foo a b)
+\end{lstlisting}
+\cbend
+
+        \subsubsection{Lambda Expression}
+        Lambda expressions are accomplished with the \texttt{lambda} keyword, a parentheses-enclosed list of 0 or more identifiers as formal arguments, followed by the expression that uses those arguments.
+
+        Example:
+
+\cbcolor{green}
+\cbstart
+\begin{lstlisting}
+(lambda () #t)
+(lambda (x) x), 
+(lambda (x y) (+ x y))
+\end{lstlisting}
+\cbend
+
+        \subsubsection{Global definitions} Global definitions are accomplished using the val keyword, followed by an identifier, followed by the expression which is to be bound to that value.
+
+        Example:
+
+\cbcolor{green}
+\cbstart
+\begin{lstlisting}
+(val x 4)
+(val y (+ x 5))
+(val foo (lambda (arg) (* arg arg)))
+\end{lstlisting}
+\cbend
+
+        Calling a global definition with a preexisting identifier will re-bind that identifier to the new value - currently this is always allowed at the top level, though type-checking may be implemented to ensure it is always of the same type as the previous value.
+
+        \subsubsection{Local definitions} Local definitions are accomplished with the \texttt{let} keyword, followed by the identifier and the expression to be bound to it, followed by the expression that local variable will be used in. 
+
+        Example:
+
+\cbcolor{green}
+\cbstart
+\begin{lstlisting}
+(let x 4 (+ 2 x))   (; return 6 ;) 
+(let x 4 x)         (; return 4 ;) 
+\end{lstlisting}
+\cbend
+
+        Variables defined within the let binding are not defined outside of it, while variables globally relative to the let can be accessed within it. Since let bindings are a type of expression, this allows for chained let bindings.  
+
+        Example:
+
+\cbcolor{green}
+\cbstart
+\begin{lstlisting}
+(let x 4 
+    (let y 5 
+        (let z 9 
+            (* x (* y z)))))
+\end{lstlisting}
+\cbend
+
+        \subsubsection{If-expression}
+        If-expressions are currently the only form of control flow in (g)ROOT, and are always formed of the \texttt{if} keyword followed by three expressions (the condition, the true case and the false case). Omission of the false case is a syntax error, and the expressions are not separated by parentheses, brackets, or keywords.
+        
+        Example:
+
+\cbcolor{green}
+\cbstart
+\begin{lstlisting}
+(if #t 1 2)
+(if (< 3 4) 
+    (+ x y) 
+    (- x y))
+\end{lstlisting}
+\cbend
+
+        \subsubsection{Unary operators} Unary operations (used for boolean or signed negation) must not be enclosed in parenthesis - they are accomplished by a unary operator in front of the expression they negate.
+
+        Example:
+
+\cbcolor{green}
+\cbstart
+\begin{lstlisting}
+-3
+-(+ 3 4)
+-(if #t 2 3)
+-x
+\end{lstlisting}
+\cbend
+        
+
+        Example:
+
+\cbcolor{green}
+\cbstart
+\begin{lstlisting}
+!#t
+!x
+!(expr)
+\end{lstlisting}
+\cbend
+
+        \subsubsection{Binary operators} the general use of binary operators is as follows: (\ \hyperref[subsec:op]{\emph{binary-operator}} $expr_1$ $expr_2$)
+
+        The \textbf{arithmetic operator}s (\ \texttt{+\ ,\ -\ ,\ *\ ,\ /\ ,\ mod }) take two expressions that evaluate to \hyperref[sec:values]{integers}. 
+
+        The \textbf{comparator operators} (\ \texttt{==\ ,\ \textless\ ,\ \textgreater\ ,\ $\leq$ ,\ $\geq$\ ,\ != }) take two expressions that both evaluate to either \hyperref[sec:values]{integers} or \hyperref[sec:values]{booleans}.
+
+        The \textbf{boolean operators} (\ \texttt{\&\& ,\ \textcolor{red}{||} }) take two expressions that evaluate to \hyperref[sec:values]{booleans}.
+
+
+
 
 
 \pagebreak
@@ -754,8 +881,8 @@ represents the following tree:
     )
 )
    
-(; attempt 4 ;)
-(; this function flattens a tree, level-order ;)
+(; attempt 4 
+   this function flattens a tree, level-order ;)
 (define (level-flatten tr)
     (if (leaf? tr)
         leaf
@@ -882,8 +1009,8 @@ function: (flurry func)
 
 (; folding functions! ;) 
 
-(; attempt 4 ;) 
-(; this function folds a tree, level-order ;) 
+(; attempt 4 
+   this function folds a tree, level-order ;) 
 (define (level-fold fn base tr)
     (if (leaf? tr)
         base
@@ -920,20 +1047,20 @@ function: (flurry func)
     )
 )
    
-(; once we implement first-class functions, we ;) 
-(; should find that the behaviors of these three ;) 
-(; functions are exactly equivalent to their ;) 
-(; lower-class cousins ;) 
+(; once we implement first-class functions, we 
+   should find that the behaviors of these three
+   functions are exactly equivalent to their
+   lower-class cousins ;) 
 (define (level-fold-flatten tr) (level-fold cons nil tr))
 (define (pre-fold-flatten   tr) (pre-fold   cons nil tr))
 (define (post-fold-flatten  tr) (post-fold  cons nil tr))
 
-(; this function folds a tree, in a more intuitively ;) 
-(; tree-like manner ;) 
-(; fn must take in three params: ;) 
-(; - the current value ;)     
-(; - the sibling accumulator ;)     
-(; - the child accumulator ;)     
+(; this function folds a tree, in a more intuitively 
+   tree-like manner
+   fn must take in three params: 
+   - the current value   
+   - the sibling accumulator
+   - the child accumulator ;)     
 (define (fold fn base tr)
     (if (leaf? tr)
         base
