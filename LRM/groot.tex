@@ -450,7 +450,50 @@ cld     sib         lambda
 
         \subsection{Leaf}
 
-        \subsection{Tree}
+        \subsection{N-Ary Tree Compound Type}
+        A core feature of (g)ROOT is its n-ary tree compound value type. Every tree value consists of three components: an element, it's right-immediate sibling, and it's first child. This allows for the convenient implementation of robust recursive algorithms with an arbitrary branching factor.
+
+        Every tree value in (g)ROOT may be either a full tree instance with an element, sibling, and child, or a leaf. The leaf value in (g)ROOT represents the nullary, or empty, tree.
+
+        The tree type in (g)ROOT is modeled after a left-child right-sibling binary tree, where each node contains a reference to its first child and reference to its next sibling. This allows each node in Groot to have any number of children, while constraining the maximum number of fields per tree instance to three (element, sibling, and child).
+
+        The tree type is very similar in usage to the one-dimensional list type present in many other functional languages, but enforces two additional invariants that empower programmers to shoot themselves in their feet less often.
+
+        \begin{enumerate}
+            \item The element of a tree instance may not be itself a tree. An element may be a value of any other type. This enforces a consistent structure among all trees that could be created in (g)ROOT.
+            
+            \textbf{Note}: it is possible to circumvent this requirement by wrapping a tree instance in a no-args lambda closure. This is a reasonable means of achieving nested data structures as it prevents the accidental creation of nested values; programmers who wrap tree instances in lambda closures likely did not with intention
+
+
+            \item Every tree node must have a single immediate sibling and a single immediate child. This forces programmers to think in a purely recursive manner about their solutions.
+            
+            Trees may be conveniently constructed in-place using the following construction syntax:\\
+
+\cbcolor{green}
+\cbstart
+\begin{lstlisting}
+'(value left-tree right-tree)
+\end{lstlisting}
+\cbend
+
+For example:\\
+
+\cbcolor{green}
+\cbstart
+\begin{lstlisting}
+'(0 leaf (1 (2  (3 leaf leaf) (4 (5 (6 (leaf leaf)) leaf))) (7 (8 leaf leaf) (9 (10 leaf leaf) leaf))))
+\end{lstlisting}
+\cbend
+
+represents the following tree:
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=0.9\linewidth]{images/LRMplanning.PNG}
+        %     % \caption{} %% optional caption
+            \label{fig:tree}
+        \end{figure}
+
+        \end{enumerate}
 
     \pagebreak
     %% End of Values %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -495,12 +538,12 @@ cld     sib         lambda
             \alt (\ \texttt{val} \hyperref[subsec:id]{$ident$} $expr$  )
             \alt (\ \texttt{let} \hyperref[subsec:id]{$ident$} $expr$ $expr$  )
             \alt (\ \texttt{if} $expr$ $expr$ $expr$  )
-            \alt (\ \texttt{lambda} (\ \{$argument$\} )\ $expr$ )
+            \alt (\ \texttt{lambda} (\ \{$arguments$\} )\ $expr$ )
 
             <literal> ::=  \hyperref[subsec:intlit]{\emph{integer-literal}} |  \hyperref[subsec:boollit]{\emph{boolean-literal}} | \hyperref[subsec:charlit]{\emph{character}} | \hyperref[subsec:key]{leaf}
 
-            <argument> ::= $\epsilon$
-            \alt \hyperref[subsec:id]{$ident$} :: $argument$
+            <arguments> ::= $\epsilon$
+            \alt \hyperref[subsec:id]{$ident$} :: $arguments$
             
 
         \end{grammar}
