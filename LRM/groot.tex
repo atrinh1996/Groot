@@ -528,27 +528,6 @@ represents the following tree:
 
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Names}
-\label{sec:names}
-
-    \subsection{Base Values}
-
-    \subsection{Functions}
-
-% \pagebreak
-%% End of Names %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Constants}
-\label{sec:const}
-
-
-% \pagebreak
-%% End of Constants %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -577,7 +556,10 @@ represents the following tree:
         \end{grammar}
         \end{minipage}
 
-        \subsection{Literals}
+        Expressions are values or parenthetical expressions.
+
+        \subsection{Values}
+        see 
 
         \subsection{Lambda Expression}
 
@@ -938,58 +920,54 @@ function: (flurry func)
     )
 )
    
-   (; once we implement first-class functions, we ;) 
-   (; should find that the behaviors of these three ;) 
-   (; functions are exactly equivalent to their ;) 
-   (; lower-class cousins ;) 
-   (define (level-fold-flatten tr) (level-fold cons nil tr))
-   (define (pre-fold-flatten   tr) (pre-fold   cons nil tr))
-   (define (post-fold-flatten  tr) (post-fold  cons nil tr))
+(; once we implement first-class functions, we ;) 
+(; should find that the behaviors of these three ;) 
+(; functions are exactly equivalent to their ;) 
+(; lower-class cousins ;) 
+(define (level-fold-flatten tr) (level-fold cons nil tr))
+(define (pre-fold-flatten   tr) (pre-fold   cons nil tr))
+(define (post-fold-flatten  tr) (post-fold  cons nil tr))
+
+(; this function folds a tree, in a more intuitively ;) 
+(; tree-like manner ;) 
+(; fn must take in three params: ;) 
+(; - the current value ;)     
+(; - the sibling accumulator ;)     
+(; - the child accumulator ;)     
+(define (fold fn base tr)
+    (if (leaf? tr)
+        base
+        (fn
+            (elm tr)
+            (fold fn base (sib tr))
+            (fold fn base (cld tr))
+        )
+    )
+)
    
-   ;; this function folds a tree, in a more intuitively
-   ;; tree-like manner
-   ;; fn must take in three params:
-   ;;     - the current value
-   ;;     - the sibling accumulator
-   ;;     - the child accumulator
-   (define (fold fn base tr)
-       (if (leaf? tr)
-           base
-           (fn
-               (elm tr)
-               (fold fn base (sib tr))
-               (fold fn base (cld tr))
-           )
-       )
-   )
-   
-   
-   ;;
-   ;; some more fun folding functions!
-   ;;
-   (define (node-count tr)
-       (pre-fold (lambda (elem count) (+ 1 count)) 0 tr)
-   )
-   
-   ;; this uses the tree fold to calculate the height!
-   (define (height tr)
-       (fold
-           (lambda (elem clds sibs) (+ 1 (max clds sibs)))
-           0 tr
-       )
-   )
-   
-   (define (height-no-fold tr)
-       (if (leaf? tr)
-           0
-           (max (height (sib tr)) 
-                (+ 1 (height (cld tr)))
-           )
-       )
-   )
    
 
+(; some more fun folding functions! ;) 
+(define (node-count tr)
+    (pre-fold (lambda (elem count) (+ 1 count)) 0 tr)
+)
+   
+(; this uses the tree fold to calculate the height! ;) 
+(define (height tr)
+    (fold
+        (lambda (elem clds sibs) (+ 1 (max clds sibs)))
+        0 tr
+    )
+)
 
+(define (height-no-fold tr)
+    (if (leaf? tr)
+        0
+        (max (height (sib tr)) 
+            (+ 1 (height (cld tr)))
+        )
+    )
+)
 \end{lstlisting}
 \cbend
 
