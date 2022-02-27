@@ -549,12 +549,12 @@ represents the following tree:
         \end{grammar}
         \end{minipage}
 
-        \subsection{}
+        \subsection{Literals}
 
         \subsection{Lambda Expression}
 
 
-% \pagebreak
+\pagebreak
 %% End of Expressions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -562,9 +562,406 @@ represents the following tree:
     \section{Functions}
     \label{sec:func}
 
+        \subsection{Built-In Functions}
+        \textbf{Note}: Throughout this section, the character pair ``tr'' is used as shorthand to represent a tree value, an identifier bound to a tree value.
+
+        There are four built-in functions which are integral to the tree data type:
+        \begin{enumerate}
+            \item \texttt{elm}
+
+            Usage: \texttt{(elm tr)}
+
+            Purpose: returns the element of the provided tree value \texttt{(tr)}
+
+            \item \texttt{sib}
+
+            Usage: \texttt{(sib tr)}
+
+            Purpose: returns the sinbling tree of the provided tree value \texttt{(tr)}
+
+            \item \texttt{cld}
+
+            Usage: \texttt{(cld tr)}
+
+            Purpose: returns the child tree of the provided tree value \texttt{(tr)}
+
+            \item \texttt{tree}
+
+            Usage: \texttt{(tree ELEMENT SIBLING CHILD)}
+
+            Purpose: constructs a tree value containing the value ELEMENT, with sibling SIBLING and child CHILD.
+        \end{enumerate}
+
+        \subsection{Standard Library Functions}
+        \textbf{Note}: Throughout this section, the character pair ``tr'' is used as shorthand to represent a tree value, an identifier bound to a tree value.
+
+        The first set of function introduced in the standard library allow for programmers to use some of their beloved list functions present in other languages:
+        \begin{enumerate}
+            \item \texttt{(cons a b)}
+            
+            Creates a 1-ary tree approximating the functionality of single-dimensional list in other functional languages.
+
+            \item \texttt{(car tr)}
+            
+            Extracts the first value in the pair.
+
+            \item \texttt{(cdr tr)}
+            
+            Extracts the second value in the pair.
+
+            \item \texttt{(null? tr)}
+            
+            A predicate function that evaluates to true iff the pseudo-list is empty.
+
+            \item \texttt{(val nil leaf)}
+            
+            A value \texttt{nil} that mirrors the built-in keyword leaf.
+
+            \item \texttt{(append xs ys)}
+            
+            Append the list of elements in \texttt{ys} to the end of \texttt{xs}.
+
+            \item \texttt{(revapp xs ys)}
+            
+            Append the list of elements in \texttt{ys} to the reverse of \texttt{xs}.
+        \end{enumerate}
+
+        Now some useful tree functions!
+        \begin{enumerate}
+            \item \texttt{(graft oak fir)}
+            
+            Appends a sibling tree \texttt{fir} to some other tree \texttt{oak}. The result of calling this function is a new tree in which \texttt{fir} is the rightmost sibling of \texttt{oak}. This function is extremely useful when re-shaping trees.
+
+            \item \texttt{(level-flatten tr)} 
+            
+            Flattens the provided tree to a 1-ary tree, arranging elements in level-order.
+
+            \item \texttt{(pre-flatten tr)}
+            
+            Flattens the provided tree to a 1-ary tree, arranging elements in pre-order.
+            
+            \item \texttt{(post-flatten tr)}
+            
+            Flattens the provided tree to a 1-ary tree, arranging elements in post-order.
+            
+            \item \texttt{(map f tr)}
+            Maps a function \texttt{f} over every element of the provided tree \texttt{tr}.
+            
+            \item \texttt{(filter p? tr)}
+            
+            Constructs a new tree containing only elements that satisfy the predicate function \texttt{p?}, which must return a boolean value.
+            
+            \item \texttt{(level-fold fn base tr)}
+            
+            Folds a tree, visiting each element in a level-order traversal. Note that the accumulation function \texttt{fn} must take TWO arguments, the first of which is the current element, and second is the rest of the tree.
+            
+            \item \texttt{(pre-fold fn base tr)}
+            
+            Folds a tree, visiting each element in a pre-order traversal. Note that the accumulation function \texttt{fn} must take TWO arguments, the first of which is the current element, and second is the rest of the tree.
+
+            \item \texttt{(post-fold fn base tr)}
+            
+            Folds a tree, visiting each element in a post-order traversal. Note that the accumulation function \texttt{fn} must take TWO arguments, the first of which is the current element, and second is the rest of the tree.
+            
+            \item \texttt{(fold fn base tr)}
+            
+            Folds a tree, in a more intuitively tree-like manner. Note that the accumulation function \texttt{fn} must take THREE arguments: the value of the current node, the sibling accumulator, and the child.accumulator.
+            
+            \item \texttt{(node-count tr)}
+            
+            Evaluates to the number of nodes in the provided tree.
+            
+            \item \texttt{(height tr)}
+            
+            Evaluates to the height of the provided tree.
+
+        \end{enumerate}
+
+        Higher-Order Functions:
+        \begin{enumerate}
+            \item \texttt{(curry f)}
+            
+            Allows for the partial application of a two-argument function.
+            
+            \item \texttt{(uncurry f)}
+            
+            Uncurries a previously curried function such that both of its arguments must be provided at the same time.
+            
+            \item \texttt{(o f g)}
+            
+            Given two single-argument functions, returns a single function which is the composition of \texttt{f} and \texttt{g}.
+            
+            \item \texttt{(flip f)}
+            
+            Given a two argument function, reverses the order in which the arguments are evaluated and passed to the function.
+            
+            \item \texttt{(flurry f)}
+            
+            Given a two argument function, reverses the order in which the arguments are evaluated and passed to the function, and allows for the partial application of that function. This function both flips and curries \texttt{f} (hence the fun name).
+
+        \end{enumerate}
+
+    \pagebreak
+    %% End of Functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \section{Appendix}
+    \label{sec:app}
+
+\cbcolor{green}
+\cbstart
+\begin{lstlisting}
+    (* 
+    * We can define standard list functions with our tree
+    * data type! Fun!
+    *)
+   (define (cons a b) (tree a leaf (tree b leaf leaf)))
+   (define (car   tr) (elm tr))
+   (define (cdr   tr) (cld tr))
+   (define (nil     ) leaf)
+   (define (null? tr) (leaf? tree))
+   
+   ;; a list function!
+   (define append (xs ys)
+       (if (null? xs)
+           ys
+           (cons (car xs) (append (cdr xs) ys))
+       )
+   )
+   
+   ;; another list function!
+   (define revapp (xs ys) ; (reverse xs) followed by ys
+       (if (null? xs)
+           ys
+           (revapp (cdr xs) (cons (car xs) ys))
+       )
+   )
+   
+   
+   
+   ;; appends a sibling tree (fir) to tree (oak)
+   (define (graft oak fir)
+       (if (leaf? oak)
+           fir
+           (tree (elm oak) (graft (sib oak) fir) (cld oak))
+       )
+   )
+   
+   ;; attempt 4
+   ;; this function flattens a tree, level-order
+   (define (level-flatten tr)
+       (if (leaf? tr)
+           leaf
+           (tree
+               (elm tr)
+               leaf
+               (level-flatten (graft (sib tr) (cld tr)))
+           )
+       )
+   )
+   
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;;
+   ;; flattening functions!
+   ;;
+   
+   ;; this function flattens a tree, pre-order
+   (define (pre-flatten tr)
+       (if (leaf? tr)
+           leaf
+           (tree
+               (elm tr)
+               leaf
+               (pre-flatten (graft (cld tr) (sib tr)))
+           )
+       )
+   )
+   
+   
+   ;; this function flattens a tree, post-order
+   (define (post-flatten tr)
+       (if (leaf? tr)
+           leaf
+           (if (leaf? (cld tr))
+               (tree
+                   (elm tr)
+                   leaf
+                   (post-flatten (sib tr)))
+               (post-flatten (graft
+                                 (graft
+                                       (cld tr)
+                                       (tree (elm tr) leaf leaf))
+                                 (sib tr))
+               )
+           )
+       )
+   )
+   
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;;
+   ;; Let's create some higher order functions! Yay!
+   ;;
+   
+   (define (curry   f)   (lambda (x)   (lambda (y) (f x y))))
+   (define (uncurry f)   (lambda (x y) ((f x) y)))
+   (define (o       f g) (lambda (x)   (f (g x))))
+   (define (flip    f)   (lambda (x)   (lambda (y) (f y x))))
+   
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;;
+   ;; function: (flurry func)
+   ;;
+   ;; precondition:
+   ;;   func is a function that takes exactly two args
+   ;;
+   ;; evalutation:
+   ;;   evaluates to a curried form of func, where:
+   ;;       1) the first value passed to the curried function
+   ;;          is treated as the second argument to (func)
+   ;;       2) the second value passed to the curried function
+   ;;          is treated as the first argument to (func)
+   ;;
+   ;; note:
+   ;;   flurry is a contraction of "flip & curry",
+   ;;   and I'm very proud of the wordplay there
+   ;;
+   ;; 
+   ;;
+   
+    (define flurry (func)
+        (curry (lambda (a b) (func b a)))
+    )
+   
+   
+   ;;
+   ;; mapping function!
+   ;;
+   (define (map f tr)
+       (if (leaf? tr)
+           leaf
+           (tree
+               (f (elm tr))
+               (map f (sib tr))
+               (map f (cld tr))
+           )
+       )
+   )
+   
+   ;;
+   ;; filter function!
+   ;;
+   (define filter (p? tr)
+       (if (leaf? tr)
+           leaf
+           (if (p? (elm tr))
+               (tree (elm tr) (filter p? (sib tr)) (filter p? (cld tr)))
+               (filter p? (graft (cld tr) (sib tr)))
+           )
+       )
+   )
+   
+   
+   
+   ;;
+   ;; folding functions!
+   ;;
+   
+   ;; attempt 4
+   ;; this function folds a tree, level-order
+   (define (level-fold fn base tr)
+       (if (leaf? tr)
+           base
+           (fn
+               (elm tr)
+               (level-fold (graft (sib tr) (cld tr)))
+           )
+       )
+   )
+   
+   ;; this function folds a tree, pre-order
+   (define (pre-fold fn base tr)
+       (if (leaf? tr)
+           base
+           (fn
+               (elm tr)
+               (pre-fold (graft (cld tr) (sib tr)))
+           )
+       )
+   )
+   
+   ;; this function folds a tree, post-order
+   (define (post-fold fn base tr)
+       (if (leaf? tr)
+           base
+           (if (leaf? (cld tr))
+               (fn (elm tr) (post-fold (sib tr)))
+               (post-fold (graft
+                              (graft (cld tr) (tree (elm tr) leaf leaf))
+                                 (sib tr)
+                          )
+               )
+           )
+       )
+   )
+   
+   ;; once we implement first-class functions, we
+   ;; should find that the behaviors of these three
+   ;; functions are exactly equivalent to their
+   ;; lower-class cousins
+   (define (level-fold-flatten tr) (level-fold cons nil tr))
+   (define (pre-fold-flatten   tr) (pre-fold   cons nil tr))
+   (define (post-fold-flatten  tr) (post-fold  cons nil tr))
+   
+   ;; this function folds a tree, in a more intuitively
+   ;; tree-like manner
+   ;; fn must take in three params:
+   ;;     - the current value
+   ;;     - the sibling accumulator
+   ;;     - the child accumulator
+   (define (fold fn base tr)
+       (if (leaf? tr)
+           base
+           (fn
+               (elm tr)
+               (fold fn base (sib tr))
+               (fold fn base (cld tr))
+           )
+       )
+   )
+   
+   
+   ;;
+   ;; some more fun folding functions!
+   ;;
+   (define (node-count tr)
+       (pre-fold (lambda (elem count) (+ 1 count)) 0 tr)
+   )
+   
+   ;; this uses the tree fold to calculate the height!
+   (define (height tr)
+       (fold
+           (lambda (elem clds sibs) (+ 1 (max clds sibs)))
+           0 tr
+       )
+   )
+   
+   (define (height-no-fold tr)
+       (if (leaf? tr)
+           0
+           (max (height (sib tr)) 
+                (+ 1 (height (cld tr)))
+           )
+       )
+   )
+   
+
+
+\end{lstlisting}
+\cbend
 
     % \pagebreak
-    %% End of Functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% End of Appendix %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 
