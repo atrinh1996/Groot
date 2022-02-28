@@ -336,7 +336,7 @@ solving more complex problems.
 
 
     \subsection{How to read manual}
-    The syntax of the language will be given in BNF-like notation. Non-terminal symbol will be in italic font \emph{like-this}, square brackets [ … ] denote optional components, curly braces \{ … \} denote zero or more repetitions of the enclosed component,  and parenthesis ( … ) denote a grouping.
+    The syntax of the language will be given in BNF-like notation. Non-terminal symbol will be in italic font \emph{like-this}, square brackets [ … ] denote optional components, curly braces \{ … \} denote zero or more repetitions of the enclosed component,  and parentheses ( … ) denote a grouping.
 
     \pagebreak
     %% End of Introduction %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -434,7 +434,7 @@ solving more complex problems.
 
         \subsection{Keywords}
         \label{subsec:key}
-        The below identifiers are reserved keywords and cannot be used otherwise: \\
+        The below identifiers are reserved keywords and cannot be used except in their capacity as reserve keywords: \\
 
 \cbcolor{dkgreen}
 \cbstart
@@ -493,7 +493,7 @@ cld     sib         lambda
         \begin{enumerate}
             \item The element of a tree instance may not be itself a tree. An element may be a value of any other type. This enforces a consistent structure among all trees that could be created in (g)ROOT.
             
-            \textbf{Note}: it is possible to circumvent this requirement by wrapping a tree instance in a no-args lambda closure. This is a reasonable means of achieving nested data structures as it prevents the accidental creation of nested values; programmers who wrap tree instances in lambda closures likely did not with intention.
+            \textbf{Note}: it is possible to circumvent this requirement by wrapping a tree instance in a no-args lambda closure. This is a reasonable means of achieving nested data structures as it prevents the accidental creation of nested values; programmers who wrap tree instances in lambda closures likely did so with intention.
 
 
             \item Every tree node must have a single immediate sibling and a single immediate child. This forces programmers to think in a purely recursive manner about their solutions.
@@ -592,7 +592,7 @@ represents the following tree:
 \cbstart
 \begin{lstlisting}
 (lambda () #t)
-(lambda (x) x), 
+(lambda (x) x)
 (lambda (x y) (+ x y))
 \end{lstlisting}
 \cbend
@@ -653,7 +653,7 @@ represents the following tree:
 \end{lstlisting}
 \cbend
 
-        \subsubsection{Unary operators} Unary operations (used for boolean or signed negation) must not be enclosed in parenthesis - they are accomplished by a unary operator in front of the expression they negate.
+        \subsubsection{Unary operators} Unary operations (used for boolean or signed negation) must not be enclosed in parentheses. They are accomplished with a unary operator in front of the expression they negate.
 
         Example:
 
@@ -714,7 +714,7 @@ represents the following tree:
 
             Usage: \texttt{(sib tr)}
 
-            Purpose: returns the sinbling tree of the provided tree value \texttt{(tr)}
+            Purpose: returns the sibling tree of the provided tree value \texttt{(tr)}
 
             \item \texttt{cld}
 
@@ -726,7 +726,7 @@ represents the following tree:
 
             Usage: \texttt{(tree ELEMENT SIBLING CHILD)}
 
-            Purpose: constructs a tree value containing the value ELEMENT, with sibling SIBLING and child CHILD.
+            Purpose: constructs a tree value containing the value ELEMENT, with sibling SIBLING and child CHILD
         \end{enumerate}
 
         \subsection{Standard Library Functions}
@@ -968,7 +968,7 @@ function: (flurry func)
             \item the second value passed to the curried function is treated as the first argument to (func).
         \end{enumerate}
 
-    \item note: flurry is a contraction of ``flip \& curry'', and I'm very proud of the wordplay there.
+    \item note: flurry is a contraction of ``flip \& curry'', and we're very proud of the wordplay there.
 \end{itemize}
 
 
