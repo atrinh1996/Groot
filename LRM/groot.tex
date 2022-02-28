@@ -503,7 +503,7 @@ cld     sib         lambda
 \cbcolor{dkgreen}
 \cbstart
 \begin{lstlisting}
-'(value left-tree right-tree)
+'(value sibling-tree child-tree)
 \end{lstlisting}
 \cbend
 
@@ -516,7 +516,7 @@ For example:\\
 \end{lstlisting}
 \cbend
 
-represents the following tree:
+represents the following tree (as drawn in normal binary tree form):
         \begin{figure}[h]
             \centering
             \includegraphics[width=0.9\linewidth]{images/LRMplanning.PNG}
@@ -702,7 +702,7 @@ represents the following tree:
         \subsection{Built-In Functions}
         \textbf{Note}: Throughout this section, the character pair \texttt{tr} is used as shorthand to represent a tree value, an identifier bound to a tree value.
 
-        There are four built-in functions which are integral to the tree data type:
+        There are four built-in functions which are integral to the tree data type. It is a checked-runtime error to call \texttt{elm, sib, cld} on a \texttt{leaf}:
         \begin{enumerate}
             \item \texttt{elm}
 
@@ -721,6 +721,12 @@ represents the following tree:
             Usage: \texttt{(cld tr)}
 
             Purpose: returns the child tree of the provided tree value \texttt{(tr)}
+
+            \item \texttt{leaf?}
+            
+            Usage: \texttt{(leaf? tr)}
+
+            Purpose: Returns boolean val \texttt{\#t} iff \texttt{tr} is a leaf.
 
             \item \texttt{tree}
 
@@ -761,6 +767,8 @@ represents the following tree:
             \item \texttt{(revapp xs ys)}
             
             Append the list of elements in \texttt{ys} to the reverse of \texttt{xs}.
+
+            
         \end{enumerate}
 
         Now some useful tree functions!
