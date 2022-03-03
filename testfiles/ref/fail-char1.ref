@@ -1,1 +1,1 @@
-Fatal error: exception Failure("illegal character b")
+Fatal error: exception Failure("Error: character literal contains more than one token")
