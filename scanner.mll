@@ -10,13 +10,14 @@
 (* Header *)
 { 
   open Parser
-} 
+}
+
 
 (* Regular Expressions (optional *)
 let digit = ['0'-'9']
 let integer = ['-']?['0'-'9']+
 let alpha = ['a'-'z']
-
+let leaf = ("leaf"|"()")
 
 
 (* Entry Points *)
@@ -37,7 +38,9 @@ rule tokenize = parse
   | '<'                  { LT }
   | '>'                  { GT }
   | "if"                 { IF }
-  | "'"                  { opchar lexbuf }
+ (* | "'"                  { opchar lexbuf } *)
+  (* | "'"(_ as c)"'"        { CHAR(c) } *)
+  | "'"                  { apos_handler lexbuf }
   | integer as ival      { INT(int_of_string ival) }
   | "#t"                 { BOOL(true) }
   | "#f"                 { BOOL(false) }
@@ -49,20 +52,62 @@ rule tokenize = parse
   | "||"                 { OR }
   | '!'                  { NOT }
   | eof                  { EOF }
-  | _ as char            { raise(Failure("illegal character " 
-                                          ^ Char.escaped char)) }
+  | _ as c            { raise(Failure("illegal character " 
+                                          ^ Char.escaped c)) }
 and comment = parse
   | ";)"               { tokenize lexbuf }
   | _                  { comment lexbuf }
 
+(* apostrophe handler *)
+and apos_handler = parse
+  | '('[^''']      { tree_builder lexbuf }    
+  | '''            { raise(Failure("Error: empty character literal")) }
+  | '\\'           { escaped_char_handler lexbuf }
+  | _ as c         { char_builder c lexbuf }
+
+and tree_builder = parse
+  (* | ")" { TREE(1, 1) } *)
+
+  (* | _+ { TREE(tokenize "5", tree_builder lexbuf, tree_builder lexbuf)} *)
+  (* | "()" { LEAF } *)
+  | _ { raise(Failure("Unimplemented: in-place tree syntax")) }
+
+and char_builder c = parse
+  | '''   { CHAR(c) }
+  | _ { raise(Failure("Error: character literal contains more than one token")) }
+
+and escaped_char_handler = parse
+  | '\\' { char_builder '\\' lexbuf }
+  | '"'  { char_builder '\"' lexbuf  }
+  | '''  { char_builder '\'' lexbuf  }
+  | 'n'  { char_builder '\n' lexbuf  }
+  | 'r'  { char_builder '\r' lexbuf  }
+  | 't'  { char_builder '\t' lexbuf  }
+  | 'b'  { char_builder '\b' lexbuf  }
+  | ' '  { char_builder '\ ' lexbuf  }
+  | digit (digit | digit digit)? as ord
+         { char_builder (Char.chr (int_of_string ord)) lexbuf }
+  | _    { raise(Failure("Error: unrecognized escape sequence")) }
+ 
+
+
+(*
+let char_handler = function
+  | "_{1}" as c { CHAR(c) }
+  | _  as c { raise(Failure("multiple characters inside char literal" ^ c)) }
+*)
+(* I believe this is to just match with a single character
+ * but better to use pattern matching?
+ *)
+ (*
 and opchar = parse
   | _ as c               { clchar c lexbuf  }
   (* | _ as char          { raise(Failure("illegal character " 
-                                          ^ Char.escaped char)) } *)
-
+                                          ^ Char.escaped char)) } *)*)
+(*
 and clchar c = parse
 | '''                { CHAR(c) }
 | _ as char          { raise(Failure("illegal character " 
                                         ^ Char.escaped char)) }
 
-  
+  *)

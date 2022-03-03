@@ -22,6 +22,8 @@
 %token <int>  INT
 %token <bool> BOOL
 %token <string> ID
+%token <int * int> TREE
+%token LEAF
 %token EOF
 %token LAMBDA LET VAL
 
