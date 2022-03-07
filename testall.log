@@ -262,8 +262,7 @@ diff -b testfiles/stderr/fail-bool_stresstest.err testfiles/ref/fail-bool_stress
 ###### Testing fail-char1
 ./toplevel.native testfiles/fail-char1.gt 2> testfiles/stderr/fail-char1.err
 diff -b testfiles/stderr/fail-char1.err testfiles/ref/fail-char1.ref > testfiles/diff/fail-char1.diff
-FAILED testfiles/stderr/fail-char1.err differs from testfiles/ref/fail-char1.ref
-###### FAILED
+###### SUCCESS
 
 ###### Testing fail-char2
 ./toplevel.native testfiles/fail-char2.gt 2> testfiles/stderr/fail-char2.err
