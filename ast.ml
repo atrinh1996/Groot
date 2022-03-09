@@ -7,6 +7,9 @@
 
 type id = string
 
+(*type primop = Add | Sub | Mul | Div | Mod | Eq | Neq 
+            | Lt  | Gt  | Leq | Geq | And | Or*)
+
 type 'a env = (id * 'a) list
 (* mutuallly recursive expression * value types *)
 type expr = Literal of value
@@ -21,18 +24,49 @@ and value = Char    of char
           | Bool    of bool
           | Root    of tree
           | Closure of id list * expr * (unit -> value env) (* not sure abt this? *)
-          (*| Primitive of value list -> value*)
-
+          (*| Primitive of primop * value list -> value*)
 and tree =  Leaf
           | Branch of value * tree * tree
+
+(* top-level definitions *)
+type defn = Val of id * expr
+          | Expr of expr
+          (*| Define of id * id list * expr*)
+          (* fn name, arg names, body*)
+          (*| Use of id*)
+
+(* short for program, analogous to main *)
+type prog = defn list
+
 
 (* maybe add PRIMITIVE of value list -> value *)
           (* | LETX    of let_kind * (id * exp) list * exp
           and let_kind = LET | LETREC | LETSTAR*)
           (*| FLOAT of float, stretch*)
+
+
+
+
+
+(*let string_of_value = function
+    Char(ch)      -> String.make 1 ch
+  | Int(number)   -> string_of_int number
+  | Bool(boolean) -> string_of_bool boolean
+  | Closure _     -> "<function>" 
+
+let rec string_of_tree = function
+  | Leaf          -> "leaf"
+  | Branch(element, sibling, child) ->
+        "(" ^ (string_of_value element) ^ " "
+            ^ (string_of_tree sibling) ^ " "
+            ^ (string_of_tree child)   ^ ")"
+
+let string_of_program = function
+    _ -> "hello world!\n"*)
+
 (***************************************************************************)
 
-type bin_operator = Add | Sub | Mul | Div | Mod | Eq | Neq 
+(*type bin_operator = Add | Sub | Mul | Div | Mod | Eq | Neq 
                   | Lt  | Gt  | Leq | Geq | And | Or
 
 type uni_operator = Neg | Not
@@ -51,9 +85,9 @@ type expr =
     | Apply of string * expr list
 
 type main = expr list
-
+*)
 (* Pretty print functions *)
-
+(*
 let string_of_binop = function
     | Add -> "+"
     | Sub -> "-"
@@ -96,3 +130,8 @@ let rec string_of_expr = function
 
 let string_of_main exprs = 
     String.concat "\n" (List.map string_of_expr exprs) ^ "\n"
+*)
+
+let string_of_main exprs = 
+    "hello world!"
+
