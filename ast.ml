@@ -2,8 +2,38 @@
    Functions for printing
 *)
 
+
+
+
+type id = string
+
+type 'a env = (id * 'a) list
+(* mutuallly recursive expression * value types *)
+type expr = Literal of value
+          | Var     of id
+          | If      of expr * expr * expr
+          | Apply   of expr * expr list
+          | Let     of (id * expr) list * expr
+          | Lambda  of id list * expr
+and value = Char    of char
+          | Int     of int
+          (*| Float   of float*)
+          | Bool    of bool
+          | Root    of tree
+          | Closure of id list * expr * (unit -> value env) (* not sure abt this? *)
+          (*| Primitive of value list -> value*)
+
+and tree =  Leaf
+          | Branch of value * tree * tree
+
+(* maybe add PRIMITIVE of value list -> value *)
+          (* | LETX    of let_kind * (id * exp) list * exp
+          and let_kind = LET | LETREC | LETSTAR*)
+          (*| FLOAT of float, stretch*)
+(***************************************************************************)
+
 type bin_operator = Add | Sub | Mul | Div | Mod | Eq | Neq 
-                    | Lt | Gt | Leq | Geq | And | Or
+                  | Lt  | Gt  | Leq | Geq | And | Or
 
 type uni_operator = Neg | Not
 
