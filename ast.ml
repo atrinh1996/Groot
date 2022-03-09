@@ -5,42 +5,82 @@
 
 
 
-type id = string
+type ident = string
 
 (*type primop = Add | Sub | Mul | Div | Mod | Eq | Neq 
             | Lt  | Gt  | Leq | Geq | And | Or*)
 
-type 'a env = (id * 'a) list
+type 'a env = (ident * 'a) list
 (* mutuallly recursive expression * value types *)
 type expr = Literal of value
-          | Var     of id
+          | Var     of ident
           | If      of expr * expr * expr
           | Apply   of expr * expr list
-          | Let     of (id * expr) list * expr
-          | Lambda  of id list * expr
+          | Let     of (ident * expr) list * expr
+          | Lambda  of ident list * expr
 and value = Char    of char
           | Int     of int
           (*| Float   of float*)
           | Bool    of bool
           | Root    of tree
-          | Closure of id list * expr * (unit -> value env) (* not sure abt this? *)
+          | Closure of ident list * expr * (unit -> value env) (* not sure abt this? *)
           (*| Primitive of primop * value list -> value*)
 and tree =  Leaf
-          | Branch of value * tree * tree
+          | Branch of expr * tree * tree
 
 (* top-level definitions *)
-type defn = Val of id * expr
+type defn = Val of ident * expr
           | Expr of expr
-          (*| Define of id * id list * expr*)
+          (*| Define of ident * ident list * expr*)
           (* fn name, arg names, body*)
-          (*| Use of id*)
+          (*| Use of ident*)
 
 (* short for program, analogous to main *)
 type prog = defn list
 
 
+(* String of Program *)
+
+
+let rec string_of_expr = function
+    | Literal(lit) -> "[LITERAL of " ^ string_of_value(lit) ^ "]"
+    | Var(v)       -> "[VAR: " ^ v ^ "]"
+    | If(condition, true_branch, false_branch) ->
+        "[IF, " ^
+            "COND: "         ^ (string_of_expr condition)   ^ ", " ^
+            "TRUE-BRANCH: "  ^ (string_of_expr true_branch) ^ ", " ^
+            "FALSE-BRANCH: " ^ (string_of_expr true_branch) ^ "]"
+    | Apply(func, args) ->
+        "[APPLY, " ^
+            "FUNCTION: " ^ string_of_expr func ^ ", " ^
+            "ARGS: [" ^ (String.concat " "(List.map string_of_expr args)) ^ "]]"
+       (*of expr * expr list*)
+    | Let(binds, body) -> "[LET: string_of_let unimplemented]"
+    | Lambda(args, body) ->  "[LAMBDA: string_of_lambda unimplemented]"
+and string_of_value = function
+    | Char(c)     -> "CHAR: " ^ (String.make 1 c)
+    | Int(i)      -> "INT: "  ^ (string_of_int i)
+    | Bool(b)     -> "BOOL: " ^ (if b then "#t" else "#f")
+    | Root(tr)    -> "ROOT: " ^ (string_of_tree tr)
+    | Closure(a,b,c) -> "CLOSURE: string_of_closure unimplemented" 
+and string_of_tree = function
+    | Leaf -> "LEAF"
+    | Branch(e, s, c) ->
+        "[BRANCH, "^
+            "VALUE: "   ^ string_of_expr(e)  ^ ", " ^
+            "SIBLING: " ^ string_of_tree(s)  ^ ", " ^
+            "CHILD: "   ^ string_of_tree(c)  ^ "]"
+
+let rec string_of_defn = function
+    | Val(id, e) -> "[VAL, ID: " ^ id ^ " , EXPR: " ^ string_of_expr e ^ "]"
+    | Expr(e)    -> "[EXPR: " ^ string_of_expr e ^ "]"
+
+let string_of_prog defns = 
+    String.concat "\n" (List.map string_of_defn defns) ^ "\n"
+
+
 (* maybe add PRIMITIVE of value list -> value *)
-          (* | LETX    of let_kind * (id * exp) list * exp
+          (* | LETX    of let_kind * (ident * exp) list * exp
           and let_kind = LET | LETREC | LETSTAR*)
           (*| FLOAT of float, stretch*)
 
@@ -122,16 +162,13 @@ let rec string_of_expr = function
                                 ^ string_of_expr e2 ^ ")"
     | Lambda(xs, e) -> "(lambda (" ^ String.concat " " xs ^ ") " ^ 
         string_of_expr e ^ ")"
-    | Let(id, e1, e2) -> "(let " ^ id ^ " " ^ string_of_expr e1 ^ " " ^ string_of_expr e2 ^ ")"
-    | Val(id, e) -> "(val " ^ id ^ " " ^ string_of_expr e ^ ")"
-    | Apply(id, es) -> (match es with 
-            | [] -> "(" ^ id ^ ")" 
-            | _ -> "(" ^ id ^ " " ^ String.concat " " (List.map string_of_expr es) ^ ") ")
+    | Let(ident, e1, e2) -> "(let " ^ ident ^ " " ^ string_of_expr e1 ^ " " ^ string_of_expr e2 ^ ")"
+    | Val(ident, e) -> "(val " ^ ident ^ " " ^ string_of_expr e ^ ")"
+    | Apply(ident, es) -> (match es with 
+            | [] -> "(" ^ ident ^ ")" 
+            | _ -> "(" ^ ident ^ " " ^ String.concat " " (List.map string_of_expr es) ^ ") ")
 
 let string_of_main exprs = 
     String.concat "\n" (List.map string_of_expr exprs) ^ "\n"
 *)
-
-let string_of_main exprs = 
-    "hello world!"
 

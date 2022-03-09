@@ -36,6 +36,7 @@
 %nonassoc TIMES DIVIDE
 %nonassoc NEG
 %nonassoc NOT
+%nonassoc BRANCH LEAF
 
 
 /* Declarations */
@@ -51,7 +52,7 @@ defn_list:
     | defn defn_list     { $1 :: $2 }
 
 defn: 
-    | LPAREN expr RPAREN                     { Expr($2)    }
+    | expr                                   { Expr($1)    }
     | LPAREN VAL ID expr RPAREN              { Val($3, $4) }
 
 formals_opt:
@@ -73,7 +74,7 @@ value:
 
 tree:
     | LEAF                                   { Leaf }
-    | LPAREN BRANCH value tree tree RPAREN   { Branch($3, $4, $5)}
+    | LPAREN BRANCH expr tree tree RPAREN   { Branch($3, $4, $5)}
 
 expr_list:
     | /* nothing */      { [] }

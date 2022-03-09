@@ -19,6 +19,14 @@ let integer = ['-']?['0'-'9']+
 let alpha = ['a'-'z']
 let leaf = ("leaf"|"()")
 
+(* all visible characters *)
+(* let ident = ['!'-'~']+ *)
+
+(* all visible characters, excluding ()'[]\;{}| *)
+let ident = ['!'-'&' '*'-':' '<'-'Z' '^'-'z' '~']+
+(* let ident = ['a'-'z' 'A'-'Z' '0'-'9' '_']+ *)
+(* ['a'-'z' 'A'-'Z' '0'-'9' '_']* *)
+
 
 (* Entry Points *)
 rule tokenize = parse
@@ -26,6 +34,8 @@ rule tokenize = parse
   | "(;"                 { comment lexbuf }
   | '('                  { LPAREN }
   | ')'                  { RPAREN }
+
+(*
   | '+'                  { PLUS }
   | '-'                  { MINUS }
   | '*'                  { TIMES }
@@ -37,9 +47,14 @@ rule tokenize = parse
   | ">="                 { GEQ }
   | '<'                  { LT }
   | '>'                  { GT }
+*)
+  | "tree"               { BRANCH }
+  | "leaf"               { LEAF }
   | "if"                 { IF }
+
  (* | "'"                  { opchar lexbuf } *)
   (* | "'"(_ as c)"'"        { CHAR(c) } *)
+
   | "'"                  { apos_handler lexbuf }
   | integer as ival      { INT(int_of_string ival) }
   | "#t"                 { BOOL(true) }
@@ -47,10 +62,17 @@ rule tokenize = parse
   | "lambda"             { LAMBDA }
   | "let"                { LET }
   | "val"                { VAL }
+  | ident as id          { ID(id) }
+
+(*
   | ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']* as lxm { ID(lxm) }
+*)
+
+(*
   | "&&"                 { AND }
   | "||"                 { OR }
   | '!'                  { NOT }
+*)
   | eof                  { EOF }
   | _ as c            { raise(Failure("illegal character " 
                                           ^ Char.escaped c)) }

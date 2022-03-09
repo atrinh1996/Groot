@@ -21,5 +21,5 @@ let () =
   let lexbuf = Lexing.from_channel !channel in
     let ast = Parser.prog Scanner.tokenize lexbuf in 
       match !action with
-        Ast     -> print_string (Ast.string_of_main ast)
+        Ast     -> print_string (Ast.string_of_prog ast)
       | Compile -> print_string ("Error: Compilation not yet implemented\n")
