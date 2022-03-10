@@ -1,3 +1,5 @@
+(let ([a 2] [b 3] [plus (lambda (x y) (+ x y))]) (plus a b))
+
 (tree '\255' leaf leaf)
 (tree 1 leaf (tree 2 leaf leaf))
 (foo bar 7)

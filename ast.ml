@@ -2,6 +2,7 @@
    Functions for printing
 *)
 
+(* any identifier *)
 type ident = string
 
 (*type primop = Add | Sub | Mul | Div | Mod | Eq | Neq 
@@ -24,6 +25,8 @@ and value = Char    of char
           (*| Primitive of primop * value list -> value*)
 and tree =  Leaf
           | Branch of expr * tree * tree
+          (* TODO: maybe change "value * tree * tree" *)
+          (* Perhaps in the SAST, this is a value *)
 
 (* top-level definitions *)
 type defn = Val of ident * expr
@@ -34,7 +37,6 @@ type defn = Val of ident * expr
 
 (* short for program, analogous to main *)
 type prog = defn list
-
 
 (* String of Program *)
 
@@ -83,6 +85,10 @@ let rec string_of_defn = function
 let string_of_prog defns = 
     String.concat "\n" (List.map string_of_defn defns) ^ "\n"
 
+(val not (lambda (b) (if b #f #t)))
+(val neg (lambda (x) (- 0 x)))
+
+(not #t) --> #f
 
 (* maybe add PRIMITIVE of value list -> value *)
           (* | LETX    of let_kind * (ident * exp) list * exp

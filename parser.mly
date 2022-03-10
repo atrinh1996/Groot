@@ -76,7 +76,7 @@ value:
 
 tree:
     | LEAF                                   { Leaf }
-    | LPAREN BRANCH expr tree tree RPAREN    { Branch($3, $4, $5)}
+    | LPAREN BRANCH expr tree tree RPAREN    { Branch($3, $4, $5) }
 
 /*
 let_binding:

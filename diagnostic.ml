@@ -1,4 +1,4 @@
-(* exception definition and pretty printing *)
+ exception definition and pretty printing *)
 (* maybe rename module to Diagnostic *)
 
 
@@ -8,9 +8,9 @@
 
 (*let red  s = "\027[0m\027[31m" ^ s ^ "\027[0m"
 let bold s = "\027[0m\027[1"   ^ s ^ "\027[0m"*)
-let red_bold s = "\027[0m\027[5;1;31m" ^ s ^ "\027[0m"
+(*let red_bold s = "\027[0m\027[5;1;31m" ^ s ^ "\027[0m"
 
-let purple_bold s = "\027[0m\027[1;35m" ^ s ^ "\027[0m"
+let purple_bold s = "\027[0m\027[1;35m" ^ s ^ "\027[0m"*)
 
 
 (* Codes and explanations taken from:
@@ -102,4 +102,4 @@ let () =
         | Unimplemented s -> Some ("\027[1;31mUnimplemented:\027[0m " ^ s)
         
         | _ -> None)
-        *)
+        
