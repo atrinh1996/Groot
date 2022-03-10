@@ -21,7 +21,8 @@ and value = Char    of char
           (*| Float   of float*)
           | Bool    of bool
           | Root    of tree
-          | Closure of ident list * expr * (unit -> value env) (* not sure abt this? *)
+          (* | Closure of ident list * expr * (unit -> value env) *)
+          (* not sure abt this? *)
           (*| Primitive of primop * value list -> value*)
 and tree =  Leaf
           | Branch of expr * tree * tree
@@ -69,7 +70,8 @@ and string_of_value = function
     | Int(i)      -> "INT: "  ^ (string_of_int i)
     | Bool(b)     -> "BOOL: " ^ (if b then "#t" else "#f")
     | Root(tr)    -> "ROOT: " ^ (string_of_tree tr)
-    | Closure(a,b,c) -> "CLOSURE: string_of_closure unimplemented" 
+    (*| Closure(a,b,c) -> "CLOSURE: string_of_closure unimplemented" *)
+    (*| Primitive(p, vals) -> "PRIMITIVE: string_of_primitive unimplemented" *)
 and string_of_tree = function
     | Leaf -> "LEAF"
     | Branch(e, s, c) ->
@@ -84,11 +86,6 @@ let rec string_of_defn = function
 
 let string_of_prog defns = 
     String.concat "\n" (List.map string_of_defn defns) ^ "\n"
-
-(val not (lambda (b) (if b #f #t)))
-(val neg (lambda (x) (- 0 x)))
-
-(not #t) --> #f
 
 (* maybe add PRIMITIVE of value list -> value *)
           (* | LETX    of let_kind * (ident * exp) list * exp
