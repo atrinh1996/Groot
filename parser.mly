@@ -11,7 +11,6 @@
 /* Header */
 %{ 
     open Ast
-    exception Eof
 %} 
 
 /* Tokens */

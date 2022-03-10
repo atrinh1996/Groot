@@ -49,7 +49,7 @@ let rec string_of_expr = function
         "[IF, " ^
             "COND: "         ^ (string_of_expr condition)   ^ ", " ^
             "TRUE-BRANCH: "  ^ (string_of_expr true_branch) ^ ", " ^
-            "FALSE-BRANCH: " ^ (string_of_expr true_branch) ^ "]"
+            "FALSE-BRANCH: " ^ (string_of_expr false_branch) ^ "]"
     | Apply(func, args) ->
         "[APPLY, " ^
             "FUNCTION: " ^ string_of_expr func ^ ", " ^
@@ -80,7 +80,7 @@ and string_of_tree = function
             "SIBLING: " ^ string_of_tree(s)  ^ ", " ^
             "CHILD: "   ^ string_of_tree(c)  ^ "]"
 
-let rec string_of_defn = function
+let string_of_defn = function
     | Val(id, e) -> "[VAL, ID: " ^ id ^ " , EXPR: " ^ string_of_expr e ^ "]"
     | Expr(e)    -> "[EXPR: " ^ string_of_expr e ^ "]"
 

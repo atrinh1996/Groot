@@ -2,10 +2,11 @@
 # Inspired by Richard/CS107 who was inspired by one provided by 
 # Stephen Edwards for his Compilers course at Columbia University.
 
-DEPENDS=toplevel.ml ast.ml sast.ml parser.mly scanner.mll diagnostic.ml
-
-toplevel.native: $(DEPENDS)
-	ocamlbuild toplevel.native
+# IMPORTANT Note from Zach:
+#	the _tags file contains arguments that are ingested by ocamlbuild
+#   and alter it's behavior
+toplevel.native: toplevel.ml ast.ml parser.mly scanner.mll
+	OPAMCLI=2.0; opam exec -- ocamlbuild -use-ocamlfind toplevel.native
 
 parser: parser.mly
 	ocamlyacc parser.mly

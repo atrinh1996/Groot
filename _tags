@@ -1,0 +1,23 @@
+# Note from Zach:
+#	I am not precisely sure what this file is used for;
+#   I do know that it feeds arguments into ocamlfind, which
+#   in turn feeds arguments into ocamlopt when ocamlbuild
+#   is doing its thing.
+
+###############################################################################
+# Include the llvm and llvm.analysis packages while compiling
+# true: package(llvm), package(llvm.analysis)
+
+# prettier output when faults are reported
+true: color(always)
+
+###############################################################################
+# Enable almost all compiler warnings
+# instructs ocamlopt to not report an interface missing error (70)
+true : warn(+a-70)
+
+
+# Instruct ocamlbuild to ignore the "printbig.o" file when it's building
+# Note from Zach:
+#   from the microc _tags; this may be of use when we link with C functions
+# "printbig.o": not_hygienic
