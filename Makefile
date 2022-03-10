@@ -2,8 +2,11 @@
 # Inspired by Richard/CS107 who was inspired by one provided by 
 # Stephen Edwards for his Compilers course at Columbia University.
 
+# IMPORTANT Note from Zach:
+#	the _tags file contains arguments that are ingested by ocamlbuild
+#   and alter it's behavior
 toplevel.native: toplevel.ml ast.ml parser.mly scanner.mll
-	ocamlbuild toplevel.native
+	OPAMCLI=2.0; opam exec -- ocamlbuild -use-ocamlfind toplevel.native
 
 parser: parser.mly
 	ocamlyacc parser.mly
