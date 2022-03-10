@@ -50,18 +50,18 @@ let rec string_of_expr = function
     | Apply(func, args) ->
         "[APPLY, " ^
             "FUNCTION: " ^ string_of_expr func ^ ", " ^
-            "ARGS: [" ^ (String.concat " "(List.map string_of_expr args)) ^ "]]"
-       (*of expr * expr list*)
+            "ARGS: [" ^ (String.concat " " (List.map string_of_expr args)) ^ "]]"
     | Let(binds, body)   ->
         let string_of_binding = function
               (id, e) -> "[ID: " ^ id ^ " VALUE: " ^ (string_of_expr e) ^ "]"
-            (*| _ -> raise(Failure("Error: let to string binding conversion"))*)
         in
         "[LET, " ^
             "LOCALS: [" ^ (String.concat " "(List.map string_of_binding binds)) ^ "], " ^
             "BODY: "    ^ (string_of_expr body) ^ "]"
-
-    | Lambda(args, body) ->  "[LAMBDA: string_of_lambda unimplemented]"
+    | Lambda(formals, body) ->
+        "[LAMBDA, " ^
+            "ARGS: [" ^ (String.concat " " formals) ^ "], " ^
+            "BODY: "  ^ (string_of_expr body) ^ "]"
 and string_of_value = function
     | Char(c)     -> "CHAR: " ^ (String.make 1 c)
     | Int(i)      -> "INT: "  ^ (string_of_int i)
