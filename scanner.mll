@@ -34,6 +34,8 @@ rule tokenize = parse
   | "(;"                 { comment lexbuf }
   | '('                  { LPAREN }
   | ')'                  { RPAREN }
+  | '['                  { LSQUARE }
+  | ']'                  { RSQUARE }
 
 (*
   | '+'                  { PLUS }

@@ -2,9 +2,6 @@
    Functions for printing
 *)
 
-
-
-
 type ident = string
 
 (*type primop = Add | Sub | Mul | Div | Mod | Eq | Neq 
@@ -55,7 +52,15 @@ let rec string_of_expr = function
             "FUNCTION: " ^ string_of_expr func ^ ", " ^
             "ARGS: [" ^ (String.concat " "(List.map string_of_expr args)) ^ "]]"
        (*of expr * expr list*)
-    | Let(binds, body) -> "[LET: string_of_let unimplemented]"
+    | Let(binds, body)   ->
+        let string_of_binding = function
+              (id, e) -> "[ID: " ^ id ^ " VALUE: " ^ (string_of_expr e) ^ "]"
+            (*| _ -> raise(Failure("Error: let to string binding conversion"))*)
+        in
+        "[LET, " ^
+            "LOCALS: [" ^ (String.concat " "(List.map string_of_binding binds)) ^ "], " ^
+            "BODY: "    ^ (string_of_expr body) ^ "]"
+
     | Lambda(args, body) ->  "[LAMBDA: string_of_lambda unimplemented]"
 and string_of_value = function
     | Char(c)     -> "CHAR: " ^ (String.make 1 c)

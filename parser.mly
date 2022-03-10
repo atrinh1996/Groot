@@ -15,7 +15,9 @@
 %} 
 
 /* Tokens */
-%token LPAREN RPAREN PLUS MINUS TIMES DIVIDE MOD
+%token LPAREN  RPAREN
+%token LSQUARE RSQUARE
+%token PLUS MINUS TIMES DIVIDE MOD
 %token EQ NEQ LT GT LEQ GEQ AND OR NOT
 %token IF
 %token <char> CHAR
@@ -74,7 +76,15 @@ value:
 
 tree:
     | LEAF                                   { Leaf }
-    | LPAREN BRANCH expr tree tree RPAREN   { Branch($3, $4, $5)}
+    | LPAREN BRANCH expr tree tree RPAREN    { Branch($3, $4, $5)}
+
+
+let_binding:
+    | LSQUARE ID expr RSQUARE                  { ($2, $3) }
+    
+let_binding_list:
+    | /* nothing */      { [] }
+    | let_binding let_binding_list { $1 :: $2 }
 
 expr_list:
     | /* nothing */      { [] }
@@ -88,9 +98,7 @@ expr:
     | NOT expr                               { Unary(Not, $2) }
 */
     | LPAREN expr expr_list RPAREN           { Apply($2, $3) }
-/*
-    | LPAREN LET ID expr expr RPAREN         { Let($3, $4, $5)}
-*/
+    | LPAREN LET LPAREN let_binding_list RPAREN expr RPAREN    { Let($4, $6)}
     | LPAREN IF expr expr expr RPAREN        { If($3, $4, $5) }
 /*
     | LPAREN LT expr expr RPAREN             { Binops(Lt, $3, $4) }
