@@ -46,7 +46,7 @@ let rec string_of_expr = function
         "[IF, " ^
             "COND: "         ^ (string_of_expr condition)   ^ ", " ^
             "TRUE-BRANCH: "  ^ (string_of_expr true_branch) ^ ", " ^
-            "FALSE-BRANCH: " ^ (string_of_expr true_branch) ^ "]"
+            "FALSE-BRANCH: " ^ (string_of_expr false_branch) ^ "]"
     | Apply(func, args) ->
         "[APPLY, " ^
             "FUNCTION: " ^ string_of_expr func ^ ", " ^
@@ -61,13 +61,13 @@ let rec string_of_expr = function
             "LOCALS: [" ^ (String.concat " "(List.map string_of_binding binds)) ^ "], " ^
             "BODY: "    ^ (string_of_expr body) ^ "]"
 
-    | Lambda(args, body) ->  "[LAMBDA: string_of_lambda unimplemented]"
+    | Lambda(_args, _body) ->  "[LAMBDA: string_of_lambda unimplemented]"
 and string_of_value = function
     | Char(c)     -> "CHAR: " ^ (String.make 1 c)
     | Int(i)      -> "INT: "  ^ (string_of_int i)
     | Bool(b)     -> "BOOL: " ^ (if b then "#t" else "#f")
     | Root(tr)    -> "ROOT: " ^ (string_of_tree tr)
-    | Closure(a,b,c) -> "CLOSURE: string_of_closure unimplemented" 
+    | Closure(_a,_b,_c) -> "CLOSURE: string_of_closure unimplemented" 
 and string_of_tree = function
     | Leaf -> "LEAF"
     | Branch(e, s, c) ->
@@ -76,7 +76,7 @@ and string_of_tree = function
             "SIBLING: " ^ string_of_tree(s)  ^ ", " ^
             "CHILD: "   ^ string_of_tree(c)  ^ "]"
 
-let rec string_of_defn = function
+let string_of_defn = function
     | Val(id, e) -> "[VAL, ID: " ^ id ^ " , EXPR: " ^ string_of_expr e ^ "]"
     | Expr(e)    -> "[EXPR: " ^ string_of_expr e ^ "]"
 
