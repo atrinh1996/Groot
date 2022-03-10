@@ -16,27 +16,17 @@ let purple_bold s = "\027[0m\027[1;35m" ^ s ^ "\027[0m"
 (* Codes and explanations taken from:
 	https://stackoverflow.com/questions/4842424/list-of-ansi-color-escape-sequences
  *)
-let reset       = "0" (* all attributes off *)
-let bold        = "1" (* bold or increased intensity	*)
-let faint       = "2" (* faint (decreased intensity) Not widely supported. *)
-let italic      = "3" (* italic. Not widely supported. Sometimes treated as inverse.*)
-let underline   = "4" (* underline text *)	
-let blink       = "5" (* Slow Blink	less than 150 per minute *)
-let reverse = "7"
-(*7	[[reverse video]]	swap foreground and background colors
-8	Conceal	Not widely supported.
-9	Crossed-out	Characters legible, but marked for deletion. Not widely supported.
-10	Primary(default) font	
-11–19	Alternate font	Select alternate font n-10
-20	Fraktur	hardly ever supported
-21	Bold off or Double Underline	Bold off not widely supported; double underline hardly ever supported.
-22	Normal color or intensity	Neither bold nor faint
-23	Not italic, not Fraktur	
-24	Underline off	Not singly or doubly underlined
-25	Blink off	
-27	Inverse off	
-28	Reveal	conceal off
-29	Not crossed out	*)
+
+(* character styling *)
+let reset      = "0" (* all attributes off *)
+let bold       = "1" (* bold or increased intensity *)
+let faint      = "2" (* faint (decreased intensity) Not widely supported. *)
+let italic     = "3" (* italic. Not widely supported. Sometimes treated as inverse.*)
+let underline  = "4" (* underline text *)
+let blink      = "5" (* slow Blink less than 150 per minute *)
+let reverse    = "7" (* swap foreground and background colors *)
+
+(* foreground colors *)
 let fg_black   = "30"
 let fg_red     = "31"
 let fg_green   = "32"
@@ -46,6 +36,7 @@ let fg_magenta = "35"
 let fg_cyan    = "36"
 let fg_white   = "37"
 
+(* background colors *)
 let bg_black   = "40"
 let bg_red     = "41"
 let bg_green   = "42"
@@ -55,29 +46,10 @@ let bg_magenta = "45"
 let bg_cyan    = "46"
 let bg_white   = "47"
 
-(*30–37	Set foreground color	See color table below
-38	Set foreground color	Next arguments are 5;<n> or 2;<r>;<g>;<b>, see below
-39	Default foreground color	implementation defined (according to standard)
-40–47	Set background color	See color table below
-48	Set background color	Next arguments are 5;<n> or 2;<r>;<g>;<b>, see below
-49	Default background color	implementation defined (according to standard)
-51	Framed	
-52	Encircled	
-53	Overlined	
-54	Not framed or encircled	
-55	Not overlined	
-60	ideogram underline	hardly ever supported
-61	ideogram double underline	hardly ever supported
-62	ideogram overline	hardly ever supported
-63	ideogram double overline	hardly ever supported
-64	ideogram stress marking	hardly ever supported
-65	ideogram attributes off	reset the effects of all of 60-64
-90–97	Set bright foreground color	aixterm (not in standard)
-100–107	Set bright background color	aixterm (not in standard)*)
-
 (* preset effects lists for particular message types *)
 let error_fx   = [fg_red;bold]
 let warning_fx = [fg_magenta;bold]
+let note_fx    = [fg_cyan;bold;italic;underline]
 
 let strfx fx str =
 	"\027[" ^ String.concat ";" fx ^ "m" ^ str ^ "\027[0m"
