@@ -2,7 +2,9 @@
 # Inspired by Richard/CS107 who was inspired by one provided by 
 # Stephen Edwards for his Compilers course at Columbia University.
 
-toplevel.native: toplevel.ml ast.ml parser.mly scanner.mll
+DEPENDS=toplevel.ml ast.ml sast.ml parser.mly scanner.mll diagnostic.ml
+
+toplevel.native: $(DEPENDS)
 	ocamlbuild toplevel.native
 
 parser: parser.mly

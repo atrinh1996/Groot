@@ -2,317 +2,311 @@
 ###### Testing test-AND
 ./toplevel.native testfiles/test-AND.gt > testfiles/stdout/test-AND.out
 diff -b testfiles/stdout/test-AND.out testfiles/ref/test-AND.ref > testfiles/diff/test-AND.diff
-###### SUCCESS
+FAILED testfiles/stdout/test-AND.out differs from testfiles/ref/test-AND.ref
+###### FAILED
 
 ###### Testing test-NOT
 ./toplevel.native testfiles/test-NOT.gt > testfiles/stdout/test-NOT.out
 diff -b testfiles/stdout/test-NOT.out testfiles/ref/test-NOT.ref > testfiles/diff/test-NOT.diff
-###### SUCCESS
+FAILED testfiles/stdout/test-NOT.out differs from testfiles/ref/test-NOT.ref
+###### FAILED
 
 ###### Testing test-OR
 ./toplevel.native testfiles/test-OR.gt > testfiles/stdout/test-OR.out
-diff -b testfiles/stdout/test-OR.out testfiles/ref/test-OR.ref > testfiles/diff/test-OR.diff
-###### SUCCESS
+[31;1mLexing Error: [0m(line 1, col 1-2): (|) unrecognized character
+###### FAILED
 
 ###### Testing test-binop+
 ./toplevel.native testfiles/test-binop+.gt > testfiles/stdout/test-binop+.out
 diff -b testfiles/stdout/test-binop+.out testfiles/ref/test-binop+.ref > testfiles/diff/test-binop+.diff
-###### SUCCESS
+FAILED testfiles/stdout/test-binop+.out differs from testfiles/ref/test-binop+.ref
+###### FAILED
 
 ###### Testing test-binop-
 ./toplevel.native testfiles/test-binop-.gt > testfiles/stdout/test-binop-.out
 diff -b testfiles/stdout/test-binop-.out testfiles/ref/test-binop-.ref > testfiles/diff/test-binop-.diff
-###### SUCCESS
+FAILED testfiles/stdout/test-binop-.out differs from testfiles/ref/test-binop-.ref
+###### FAILED
 
 ###### Testing test-binop-div
 ./toplevel.native testfiles/test-binop-div.gt > testfiles/stdout/test-binop-div.out
 diff -b testfiles/stdout/test-binop-div.out testfiles/ref/test-binop-div.ref > testfiles/diff/test-binop-div.diff
-###### SUCCESS
+FAILED testfiles/stdout/test-binop-div.out differs from testfiles/ref/test-binop-div.ref
+###### FAILED
 
 ###### Testing test-binop-mod
 ./toplevel.native testfiles/test-binop-mod.gt > testfiles/stdout/test-binop-mod.out
 diff -b testfiles/stdout/test-binop-mod.out testfiles/ref/test-binop-mod.ref > testfiles/diff/test-binop-mod.diff
-###### SUCCESS
+FAILED testfiles/stdout/test-binop-mod.out differs from testfiles/ref/test-binop-mod.ref
+###### FAILED
 
 ###### Testing test-binop-mul
 ./toplevel.native testfiles/test-binop-mul.gt > testfiles/stdout/test-binop-mul.out
 diff -b testfiles/stdout/test-binop-mul.out testfiles/ref/test-binop-mul.ref > testfiles/diff/test-binop-mul.diff
-###### SUCCESS
+FAILED testfiles/stdout/test-binop-mul.out differs from testfiles/ref/test-binop-mul.ref
+###### FAILED
 
 ###### Testing test-bool-stresstest
 ./toplevel.native testfiles/test-bool-stresstest.gt > testfiles/stdout/test-bool-stresstest.out
-diff -b testfiles/stdout/test-bool-stresstest.out testfiles/ref/test-bool-stresstest.ref > testfiles/diff/test-bool-stresstest.diff
-###### SUCCESS
+[31;1mLexing Error: [0m(line 1, col 27-28): (|) unrecognized character
+###### FAILED
 
 ###### Testing test-boolean
 ./toplevel.native testfiles/test-boolean.gt > testfiles/stdout/test-boolean.out
 diff -b testfiles/stdout/test-boolean.out testfiles/ref/test-boolean.ref > testfiles/diff/test-boolean.diff
-###### SUCCESS
+FAILED testfiles/stdout/test-boolean.out differs from testfiles/ref/test-boolean.ref
+###### FAILED
 
 ###### Testing test-char
 ./toplevel.native testfiles/test-char.gt > testfiles/stdout/test-char.out
 diff -b testfiles/stdout/test-char.out testfiles/ref/test-char.ref > testfiles/diff/test-char.diff
-###### SUCCESS
+FAILED testfiles/stdout/test-char.out differs from testfiles/ref/test-char.ref
+###### FAILED
 
 ###### Testing test-equalto
 ./toplevel.native testfiles/test-equalto.gt > testfiles/stdout/test-equalto.out
 diff -b testfiles/stdout/test-equalto.out testfiles/ref/test-equalto.ref > testfiles/diff/test-equalto.diff
-###### SUCCESS
+FAILED testfiles/stdout/test-equalto.out differs from testfiles/ref/test-equalto.ref
+###### FAILED
 
 ###### Testing test-greaterequal
 ./toplevel.native testfiles/test-greaterequal.gt > testfiles/stdout/test-greaterequal.out
 diff -b testfiles/stdout/test-greaterequal.out testfiles/ref/test-greaterequal.ref > testfiles/diff/test-greaterequal.diff
-###### SUCCESS
+FAILED testfiles/stdout/test-greaterequal.out differs from testfiles/ref/test-greaterequal.ref
+###### FAILED
 
 ###### Testing test-greaterthan
 ./toplevel.native testfiles/test-greaterthan.gt > testfiles/stdout/test-greaterthan.out
 diff -b testfiles/stdout/test-greaterthan.out testfiles/ref/test-greaterthan.ref > testfiles/diff/test-greaterthan.diff
-###### SUCCESS
+FAILED testfiles/stdout/test-greaterthan.out differs from testfiles/ref/test-greaterthan.ref
+###### FAILED
 
 ###### Testing test-if
 ./toplevel.native testfiles/test-if.gt > testfiles/stdout/test-if.out
 diff -b testfiles/stdout/test-if.out testfiles/ref/test-if.ref > testfiles/diff/test-if.diff
-###### SUCCESS
+FAILED testfiles/stdout/test-if.out differs from testfiles/ref/test-if.ref
+###### FAILED
 
 ###### Testing test-intboolchar
 ./toplevel.native testfiles/test-intboolchar.gt > testfiles/stdout/test-intboolchar.out
-diff -b testfiles/stdout/test-intboolchar.out testfiles/ref/test-intboolchar.ref > testfiles/diff/test-intboolchar.diff
-###### SUCCESS
+[31;1mLexing Error: [0m(line 1, col 11-12): (|) unrecognized character
+###### FAILED
 
 ###### Testing test-integers
 ./toplevel.native testfiles/test-integers.gt > testfiles/stdout/test-integers.out
 diff -b testfiles/stdout/test-integers.out testfiles/ref/test-integers.ref > testfiles/diff/test-integers.diff
-###### SUCCESS
+FAILED testfiles/stdout/test-integers.out differs from testfiles/ref/test-integers.ref
+###### FAILED
 
 ###### Testing test-lambda
 ./toplevel.native testfiles/test-lambda.gt > testfiles/stdout/test-lambda.out
-diff -b testfiles/stdout/test-lambda.out testfiles/ref/test-lambda.ref > testfiles/diff/test-lambda.diff
-###### SUCCESS
+[31;1mLexing Error: [0m(line 1, col 29-30): (|) unrecognized character
+###### FAILED
 
 ###### Testing test-lessequal
 ./toplevel.native testfiles/test-lessequal.gt > testfiles/stdout/test-lessequal.out
 diff -b testfiles/stdout/test-lessequal.out testfiles/ref/test-lessequal.ref > testfiles/diff/test-lessequal.diff
-###### SUCCESS
+FAILED testfiles/stdout/test-lessequal.out differs from testfiles/ref/test-lessequal.ref
+###### FAILED
 
 ###### Testing test-lessthan
 ./toplevel.native testfiles/test-lessthan.gt > testfiles/stdout/test-lessthan.out
 diff -b testfiles/stdout/test-lessthan.out testfiles/ref/test-lessthan.ref > testfiles/diff/test-lessthan.diff
-###### SUCCESS
+FAILED testfiles/stdout/test-lessthan.out differs from testfiles/ref/test-lessthan.ref
+###### FAILED
 
 ###### Testing test-let
 ./toplevel.native testfiles/test-let.gt > testfiles/stdout/test-let.out
-diff -b testfiles/stdout/test-let.out testfiles/ref/test-let.ref > testfiles/diff/test-let.diff
-###### SUCCESS
+Fatal error: exception Stdlib.Parsing.Parse_error
+###### FAILED
 
 ###### Testing test-neg1
 ./toplevel.native testfiles/test-neg1.gt > testfiles/stdout/test-neg1.out
 diff -b testfiles/stdout/test-neg1.out testfiles/ref/test-neg1.ref > testfiles/diff/test-neg1.diff
-###### SUCCESS
+FAILED testfiles/stdout/test-neg1.out differs from testfiles/ref/test-neg1.ref
+###### FAILED
 
 ###### Testing test-nestedbinops
 ./toplevel.native testfiles/test-nestedbinops.gt > testfiles/stdout/test-nestedbinops.out
 diff -b testfiles/stdout/test-nestedbinops.out testfiles/ref/test-nestedbinops.ref > testfiles/diff/test-nestedbinops.diff
-###### SUCCESS
+FAILED testfiles/stdout/test-nestedbinops.out differs from testfiles/ref/test-nestedbinops.ref
+###### FAILED
 
 ###### Testing test-notequal
 ./toplevel.native testfiles/test-notequal.gt > testfiles/stdout/test-notequal.out
 diff -b testfiles/stdout/test-notequal.out testfiles/ref/test-notequal.ref > testfiles/diff/test-notequal.diff
-###### SUCCESS
+FAILED testfiles/stdout/test-notequal.out differs from testfiles/ref/test-notequal.ref
+###### FAILED
 
 ###### Testing test-val
 ./toplevel.native testfiles/test-val.gt > testfiles/stdout/test-val.out
 diff -b testfiles/stdout/test-val.out testfiles/ref/test-val.ref > testfiles/diff/test-val.diff
-###### SUCCESS
+FAILED testfiles/stdout/test-val.out differs from testfiles/ref/test-val.ref
+###### FAILED
 
 ###### Testing fail-AND1
 ./toplevel.native testfiles/fail-AND1.gt 2> testfiles/stderr/fail-AND1.err
-diff -b testfiles/stderr/fail-AND1.err testfiles/ref/fail-AND1.ref > testfiles/diff/fail-AND1.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-AND2
 ./toplevel.native testfiles/fail-AND2.gt 2> testfiles/stderr/fail-AND2.err
-diff -b testfiles/stderr/fail-AND2.err testfiles/ref/fail-AND2.ref > testfiles/diff/fail-AND2.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-AND3
 ./toplevel.native testfiles/fail-AND3.gt 2> testfiles/stderr/fail-AND3.err
-diff -b testfiles/stderr/fail-AND3.err testfiles/ref/fail-AND3.ref > testfiles/diff/fail-AND3.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-NOT1
 ./toplevel.native testfiles/fail-NOT1.gt 2> testfiles/stderr/fail-NOT1.err
-diff -b testfiles/stderr/fail-NOT1.err testfiles/ref/fail-NOT1.ref > testfiles/diff/fail-NOT1.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-NOT2
 ./toplevel.native testfiles/fail-NOT2.gt 2> testfiles/stderr/fail-NOT2.err
 diff -b testfiles/stderr/fail-NOT2.err testfiles/ref/fail-NOT2.ref > testfiles/diff/fail-NOT2.diff
-###### SUCCESS
+FAILED testfiles/stderr/fail-NOT2.err differs from testfiles/ref/fail-NOT2.ref
+###### FAILED
 
 ###### Testing fail-NOT3
 ./toplevel.native testfiles/fail-NOT3.gt 2> testfiles/stderr/fail-NOT3.err
 diff -b testfiles/stderr/fail-NOT3.err testfiles/ref/fail-NOT3.ref > testfiles/diff/fail-NOT3.diff
-###### SUCCESS
+FAILED testfiles/stderr/fail-NOT3.err differs from testfiles/ref/fail-NOT3.ref
+###### FAILED
 
 ###### Testing fail-OR1
 ./toplevel.native testfiles/fail-OR1.gt 2> testfiles/stderr/fail-OR1.err
 diff -b testfiles/stderr/fail-OR1.err testfiles/ref/fail-OR1.ref > testfiles/diff/fail-OR1.diff
-###### SUCCESS
+FAILED testfiles/stderr/fail-OR1.err differs from testfiles/ref/fail-OR1.ref
+###### FAILED
 
 ###### Testing fail-OR2
 ./toplevel.native testfiles/fail-OR2.gt 2> testfiles/stderr/fail-OR2.err
 diff -b testfiles/stderr/fail-OR2.err testfiles/ref/fail-OR2.ref > testfiles/diff/fail-OR2.diff
-###### SUCCESS
+FAILED testfiles/stderr/fail-OR2.err differs from testfiles/ref/fail-OR2.ref
+###### FAILED
 
 ###### Testing fail-OR3
 ./toplevel.native testfiles/fail-OR3.gt 2> testfiles/stderr/fail-OR3.err
 diff -b testfiles/stderr/fail-OR3.err testfiles/ref/fail-OR3.ref > testfiles/diff/fail-OR3.diff
-###### SUCCESS
+FAILED testfiles/stderr/fail-OR3.err differs from testfiles/ref/fail-OR3.ref
+###### FAILED
 
 ###### Testing fail-bad_boolean1
 ./toplevel.native testfiles/fail-bad_boolean1.gt 2> testfiles/stderr/fail-bad_boolean1.err
-diff -b testfiles/stderr/fail-bad_boolean1.err testfiles/ref/fail-bad_boolean1.ref > testfiles/diff/fail-bad_boolean1.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-bad_boolean2
 ./toplevel.native testfiles/fail-bad_boolean2.gt 2> testfiles/stderr/fail-bad_boolean2.err
-diff -b testfiles/stderr/fail-bad_boolean2.err testfiles/ref/fail-bad_boolean2.ref > testfiles/diff/fail-bad_boolean2.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-bad_boolean3
 ./toplevel.native testfiles/fail-bad_boolean3.gt 2> testfiles/stderr/fail-bad_boolean3.err
-diff -b testfiles/stderr/fail-bad_boolean3.err testfiles/ref/fail-bad_boolean3.ref > testfiles/diff/fail-bad_boolean3.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-bad_boolean4
 ./toplevel.native testfiles/fail-bad_boolean4.gt 2> testfiles/stderr/fail-bad_boolean4.err
-diff -b testfiles/stderr/fail-bad_boolean4.err testfiles/ref/fail-bad_boolean4.ref > testfiles/diff/fail-bad_boolean4.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-binop+1
 ./toplevel.native testfiles/fail-binop+1.gt 2> testfiles/stderr/fail-binop+1.err
-diff -b testfiles/stderr/fail-binop+1.err testfiles/ref/fail-binop+1.ref > testfiles/diff/fail-binop+1.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-binop+2
 ./toplevel.native testfiles/fail-binop+2.gt 2> testfiles/stderr/fail-binop+2.err
-diff -b testfiles/stderr/fail-binop+2.err testfiles/ref/fail-binop+2.ref > testfiles/diff/fail-binop+2.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-binop+3
 ./toplevel.native testfiles/fail-binop+3.gt 2> testfiles/stderr/fail-binop+3.err
-diff -b testfiles/stderr/fail-binop+3.err testfiles/ref/fail-binop+3.ref > testfiles/diff/fail-binop+3.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-binop-1
 ./toplevel.native testfiles/fail-binop-1.gt 2> testfiles/stderr/fail-binop-1.err
-diff -b testfiles/stderr/fail-binop-1.err testfiles/ref/fail-binop-1.ref > testfiles/diff/fail-binop-1.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-binop_div1
 ./toplevel.native testfiles/fail-binop_div1.gt 2> testfiles/stderr/fail-binop_div1.err
-diff -b testfiles/stderr/fail-binop_div1.err testfiles/ref/fail-binop_div1.ref > testfiles/diff/fail-binop_div1.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-binop_div2
 ./toplevel.native testfiles/fail-binop_div2.gt 2> testfiles/stderr/fail-binop_div2.err
-diff -b testfiles/stderr/fail-binop_div2.err testfiles/ref/fail-binop_div2.ref > testfiles/diff/fail-binop_div2.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-binop_div3
 ./toplevel.native testfiles/fail-binop_div3.gt 2> testfiles/stderr/fail-binop_div3.err
-diff -b testfiles/stderr/fail-binop_div3.err testfiles/ref/fail-binop_div3.ref > testfiles/diff/fail-binop_div3.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-binop_mod1
 ./toplevel.native testfiles/fail-binop_mod1.gt 2> testfiles/stderr/fail-binop_mod1.err
-diff -b testfiles/stderr/fail-binop_mod1.err testfiles/ref/fail-binop_mod1.ref > testfiles/diff/fail-binop_mod1.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-binop_mod2
 ./toplevel.native testfiles/fail-binop_mod2.gt 2> testfiles/stderr/fail-binop_mod2.err
-diff -b testfiles/stderr/fail-binop_mod2.err testfiles/ref/fail-binop_mod2.ref > testfiles/diff/fail-binop_mod2.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-binop_mod3
 ./toplevel.native testfiles/fail-binop_mod3.gt 2> testfiles/stderr/fail-binop_mod3.err
-diff -b testfiles/stderr/fail-binop_mod3.err testfiles/ref/fail-binop_mod3.ref > testfiles/diff/fail-binop_mod3.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-binop_mul1
 ./toplevel.native testfiles/fail-binop_mul1.gt 2> testfiles/stderr/fail-binop_mul1.err
-diff -b testfiles/stderr/fail-binop_mul1.err testfiles/ref/fail-binop_mul1.ref > testfiles/diff/fail-binop_mul1.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-binop_mul2
 ./toplevel.native testfiles/fail-binop_mul2.gt 2> testfiles/stderr/fail-binop_mul2.err
-diff -b testfiles/stderr/fail-binop_mul2.err testfiles/ref/fail-binop_mul2.ref > testfiles/diff/fail-binop_mul2.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-binop_mul3
 ./toplevel.native testfiles/fail-binop_mul3.gt 2> testfiles/stderr/fail-binop_mul3.err
-diff -b testfiles/stderr/fail-binop_mul3.err testfiles/ref/fail-binop_mul3.ref > testfiles/diff/fail-binop_mul3.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-bool_stresstest
 ./toplevel.native testfiles/fail-bool_stresstest.gt 2> testfiles/stderr/fail-bool_stresstest.err
-diff -b testfiles/stderr/fail-bool_stresstest.err testfiles/ref/fail-bool_stresstest.ref > testfiles/diff/fail-bool_stresstest.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-char1
 ./toplevel.native testfiles/fail-char1.gt 2> testfiles/stderr/fail-char1.err
 diff -b testfiles/stderr/fail-char1.err testfiles/ref/fail-char1.ref > testfiles/diff/fail-char1.diff
-###### SUCCESS
+FAILED testfiles/stderr/fail-char1.err differs from testfiles/ref/fail-char1.ref
+###### FAILED
 
 ###### Testing fail-char2
 ./toplevel.native testfiles/fail-char2.gt 2> testfiles/stderr/fail-char2.err
-diff -b testfiles/stderr/fail-char2.err testfiles/ref/fail-char2.ref > testfiles/diff/fail-char2.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-equalto1
 ./toplevel.native testfiles/fail-equalto1.gt 2> testfiles/stderr/fail-equalto1.err
-diff -b testfiles/stderr/fail-equalto1.err testfiles/ref/fail-equalto1.ref > testfiles/diff/fail-equalto1.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-equalto2
 ./toplevel.native testfiles/fail-equalto2.gt 2> testfiles/stderr/fail-equalto2.err
-diff -b testfiles/stderr/fail-equalto2.err testfiles/ref/fail-equalto2.ref > testfiles/diff/fail-equalto2.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-equalto3
 ./toplevel.native testfiles/fail-equalto3.gt 2> testfiles/stderr/fail-equalto3.err
-diff -b testfiles/stderr/fail-equalto3.err testfiles/ref/fail-equalto3.ref > testfiles/diff/fail-equalto3.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-greaterequal1
 ./toplevel.native testfiles/fail-greaterequal1.gt 2> testfiles/stderr/fail-greaterequal1.err
-diff -b testfiles/stderr/fail-greaterequal1.err testfiles/ref/fail-greaterequal1.ref > testfiles/diff/fail-greaterequal1.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-greaterequal2
 ./toplevel.native testfiles/fail-greaterequal2.gt 2> testfiles/stderr/fail-greaterequal2.err
-diff -b testfiles/stderr/fail-greaterequal2.err testfiles/ref/fail-greaterequal2.ref > testfiles/diff/fail-greaterequal2.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-greaterequal3
 ./toplevel.native testfiles/fail-greaterequal3.gt 2> testfiles/stderr/fail-greaterequal3.err
-diff -b testfiles/stderr/fail-greaterequal3.err testfiles/ref/fail-greaterequal3.ref > testfiles/diff/fail-greaterequal3.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-greaterthan1
 ./toplevel.native testfiles/fail-greaterthan1.gt 2> testfiles/stderr/fail-greaterthan1.err
-diff -b testfiles/stderr/fail-greaterthan1.err testfiles/ref/fail-greaterthan1.ref > testfiles/diff/fail-greaterthan1.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-greaterthan2
 ./toplevel.native testfiles/fail-greaterthan2.gt 2> testfiles/stderr/fail-greaterthan2.err
-diff -b testfiles/stderr/fail-greaterthan2.err testfiles/ref/fail-greaterthan2.ref > testfiles/diff/fail-greaterthan2.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-greaterthan3
 ./toplevel.native testfiles/fail-greaterthan3.gt 2> testfiles/stderr/fail-greaterthan3.err
-diff -b testfiles/stderr/fail-greaterthan3.err testfiles/ref/fail-greaterthan3.ref > testfiles/diff/fail-greaterthan3.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-if1
 ./toplevel.native testfiles/fail-if1.gt 2> testfiles/stderr/fail-if1.err
@@ -321,23 +315,19 @@ diff -b testfiles/stderr/fail-if1.err testfiles/ref/fail-if1.ref > testfiles/dif
 
 ###### Testing fail-if2
 ./toplevel.native testfiles/fail-if2.gt 2> testfiles/stderr/fail-if2.err
-diff -b testfiles/stderr/fail-if2.err testfiles/ref/fail-if2.ref > testfiles/diff/fail-if2.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-if3
 ./toplevel.native testfiles/fail-if3.gt 2> testfiles/stderr/fail-if3.err
-diff -b testfiles/stderr/fail-if3.err testfiles/ref/fail-if3.ref > testfiles/diff/fail-if3.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-if4
 ./toplevel.native testfiles/fail-if4.gt 2> testfiles/stderr/fail-if4.err
-diff -b testfiles/stderr/fail-if4.err testfiles/ref/fail-if4.ref > testfiles/diff/fail-if4.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-int1
 ./toplevel.native testfiles/fail-int1.gt 2> testfiles/stderr/fail-int1.err
-diff -b testfiles/stderr/fail-int1.err testfiles/ref/fail-int1.ref > testfiles/diff/fail-int1.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-lambda1
 ./toplevel.native testfiles/fail-lambda1.gt 2> testfiles/stderr/fail-lambda1.err
@@ -351,38 +341,31 @@ diff -b testfiles/stderr/fail-lambda2.err testfiles/ref/fail-lambda2.ref > testf
 
 ###### Testing fail-lambda3
 ./toplevel.native testfiles/fail-lambda3.gt 2> testfiles/stderr/fail-lambda3.err
-diff -b testfiles/stderr/fail-lambda3.err testfiles/ref/fail-lambda3.ref > testfiles/diff/fail-lambda3.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-lessequal1
 ./toplevel.native testfiles/fail-lessequal1.gt 2> testfiles/stderr/fail-lessequal1.err
-diff -b testfiles/stderr/fail-lessequal1.err testfiles/ref/fail-lessequal1.ref > testfiles/diff/fail-lessequal1.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-lessequal2
 ./toplevel.native testfiles/fail-lessequal2.gt 2> testfiles/stderr/fail-lessequal2.err
-diff -b testfiles/stderr/fail-lessequal2.err testfiles/ref/fail-lessequal2.ref > testfiles/diff/fail-lessequal2.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-lessequal3
 ./toplevel.native testfiles/fail-lessequal3.gt 2> testfiles/stderr/fail-lessequal3.err
-diff -b testfiles/stderr/fail-lessequal3.err testfiles/ref/fail-lessequal3.ref > testfiles/diff/fail-lessequal3.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-lessthan1
 ./toplevel.native testfiles/fail-lessthan1.gt 2> testfiles/stderr/fail-lessthan1.err
-diff -b testfiles/stderr/fail-lessthan1.err testfiles/ref/fail-lessthan1.ref > testfiles/diff/fail-lessthan1.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-lessthan2
 ./toplevel.native testfiles/fail-lessthan2.gt 2> testfiles/stderr/fail-lessthan2.err
-diff -b testfiles/stderr/fail-lessthan2.err testfiles/ref/fail-lessthan2.ref > testfiles/diff/fail-lessthan2.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-lessthan3
 ./toplevel.native testfiles/fail-lessthan3.gt 2> testfiles/stderr/fail-lessthan3.err
-diff -b testfiles/stderr/fail-lessthan3.err testfiles/ref/fail-lessthan3.ref > testfiles/diff/fail-lessthan3.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-let1
 ./toplevel.native testfiles/fail-let1.gt 2> testfiles/stderr/fail-let1.err
@@ -396,23 +379,19 @@ diff -b testfiles/stderr/fail-let2.err testfiles/ref/fail-let2.ref > testfiles/d
 
 ###### Testing fail-nestedbinops
 ./toplevel.native testfiles/fail-nestedbinops.gt 2> testfiles/stderr/fail-nestedbinops.err
-diff -b testfiles/stderr/fail-nestedbinops.err testfiles/ref/fail-nestedbinops.ref > testfiles/diff/fail-nestedbinops.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-notequal1
 ./toplevel.native testfiles/fail-notequal1.gt 2> testfiles/stderr/fail-notequal1.err
-diff -b testfiles/stderr/fail-notequal1.err testfiles/ref/fail-notequal1.ref > testfiles/diff/fail-notequal1.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-notequal2
 ./toplevel.native testfiles/fail-notequal2.gt 2> testfiles/stderr/fail-notequal2.err
-diff -b testfiles/stderr/fail-notequal2.err testfiles/ref/fail-notequal2.ref > testfiles/diff/fail-notequal2.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-notequal3
 ./toplevel.native testfiles/fail-notequal3.gt 2> testfiles/stderr/fail-notequal3.err
-diff -b testfiles/stderr/fail-notequal3.err testfiles/ref/fail-notequal3.ref > testfiles/diff/fail-notequal3.diff
-###### SUCCESS
+###### FAILED
 
 ###### Testing fail-val1
 ./toplevel.native testfiles/fail-val1.gt 2> testfiles/stderr/fail-val1.err
