@@ -2,6 +2,7 @@
    Functions for printing
 *)
 
+(* any identifier *)
 type ident = string
 
 (*type primop = Add | Sub | Mul | Div | Mod | Eq | Neq 
@@ -20,10 +21,13 @@ and value = Char    of char
           (*| Float   of float*)
           | Bool    of bool
           | Root    of tree
-          | Closure of ident list * expr * (unit -> value env) (* not sure abt this? *)
+          (* | Closure of ident list * expr * (unit -> value env) *)
+          (* not sure abt this? *)
           (*| Primitive of primop * value list -> value*)
 and tree =  Leaf
           | Branch of expr * tree * tree
+          (* TODO: maybe change "value * tree * tree" *)
+          (* Perhaps in the SAST, this is a value *)
 
 (* top-level definitions *)
 type defn = Val of ident * expr
@@ -34,7 +38,6 @@ type defn = Val of ident * expr
 
 (* short for program, analogous to main *)
 type prog = defn list
-
 
 (* String of Program *)
 
@@ -50,24 +53,25 @@ let rec string_of_expr = function
     | Apply(func, args) ->
         "[APPLY, " ^
             "FUNCTION: " ^ string_of_expr func ^ ", " ^
-            "ARGS: [" ^ (String.concat " "(List.map string_of_expr args)) ^ "]]"
-       (*of expr * expr list*)
+            "ARGS: [" ^ (String.concat " " (List.map string_of_expr args)) ^ "]]"
     | Let(binds, body)   ->
         let string_of_binding = function
               (id, e) -> "[ID: " ^ id ^ " VALUE: " ^ (string_of_expr e) ^ "]"
-            (*| _ -> raise(Failure("Error: let to string binding conversion"))*)
         in
         "[LET, " ^
             "LOCALS: [" ^ (String.concat " "(List.map string_of_binding binds)) ^ "], " ^
             "BODY: "    ^ (string_of_expr body) ^ "]"
-
-    | Lambda(_args, _body) ->  "[LAMBDA: string_of_lambda unimplemented]"
+    | Lambda(formals, body) ->
+        "[LAMBDA, " ^
+            "ARGS: [" ^ (String.concat " " formals) ^ "], " ^
+            "BODY: "  ^ (string_of_expr body) ^ "]"
 and string_of_value = function
     | Char(c)     -> "CHAR: " ^ (String.make 1 c)
     | Int(i)      -> "INT: "  ^ (string_of_int i)
     | Bool(b)     -> "BOOL: " ^ (if b then "#t" else "#f")
     | Root(tr)    -> "ROOT: " ^ (string_of_tree tr)
-    | Closure(_a,_b,_c) -> "CLOSURE: string_of_closure unimplemented" 
+    (*| Closure(a,b,c) -> "CLOSURE: string_of_closure unimplemented" *)
+    (*| Primitive(p, vals) -> "PRIMITIVE: string_of_primitive unimplemented" *)
 and string_of_tree = function
     | Leaf -> "LEAF"
     | Branch(e, s, c) ->
@@ -82,7 +86,6 @@ let string_of_defn = function
 
 let string_of_prog defns = 
     String.concat "\n" (List.map string_of_defn defns) ^ "\n"
-
 
 (* maybe add PRIMITIVE of value list -> value *)
           (* | LETX    of let_kind * (ident * exp) list * exp

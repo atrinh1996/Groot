@@ -19,4 +19,5 @@ and svalue = SChar    of char
            | SClosure of ident list * sexpr * (unit -> value env) (* not sure abt this? *)
           (*| Primitive of primop * value list -> value*)
 and stree =  SLeaf
-           | SBranch of sexpr * tree * tree
+           | SBranch of svalue * tree * tree
+           (* NOTE: the sastSBranch  does not store sexpr, not directly analogous to AST Branch *)

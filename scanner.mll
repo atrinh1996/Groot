@@ -18,6 +18,11 @@ let digit = ['0'-'9']
 let integer = ['-']?['0'-'9']+
 let alpha = ['a'-'z']
 let leaf = ("leaf"|"()")
+let chrcode = digit+
+(* digit (digit | digit digit)? as ord *)
+
+(* digit | digit digit | ['0'-'2'] digit digit *)
+
 
 (* all visible characters *)
 (* let ident = ['!'-'~']+ *)
@@ -76,8 +81,12 @@ rule tokenize = parse
   | '!'                  { NOT }
 *)
   | eof                  { EOF }
+  | _                    { Diagnostic.error(Diagnostic.lex_error "unrecognized character" lexbuf) }
+
+  (*
   | _ as c            { raise(Failure("illegal character " 
                                           ^ Char.escaped c)) }
+*)
 and comment = parse
   | ";)"               { tokenize lexbuf }
   | _                  { comment lexbuf }
@@ -85,7 +94,7 @@ and comment = parse
 (* apostrophe handler *)
 and apos_handler = parse
   | '('[^''']      { tree_builder lexbuf }    
-  | '''            { raise(Failure("Error: empty character literal")) }
+  | '''            { Diagnostic.error(Diagnostic.lex_error "empty character literal" lexbuf) }
   | '\\'           { escaped_char_handler lexbuf }
   | _ as c         { char_builder c lexbuf }
 
@@ -93,12 +102,12 @@ and tree_builder = parse
   (* | ")" { TREE(1, 1) } *)
 
   (* | _+ { TREE(tokenize "5", tree_builder lexbuf, tree_builder lexbuf)} *)
-  (* | "()" { LEAF } *)
-  | _ { raise(Failure("Unimplemented: in-place tree syntax")) }
+  (* | "()" { LEAF } *) 
+  | _ { Diagnostic.error(Diagnostic.Unimplemented "in-place tree syntax") }
 
 and char_builder c = parse
-  | '''   { CHAR(c) }
-  | _ { raise(Failure("Error: character literal contains more than one token")) }
+  | '''   { CHAR(c) } 
+  | _ { Diagnostic.error(Diagnostic.lex_error "character literal contains more than one token" lexbuf) }
 
 and escaped_char_handler = parse
   | '\\' { char_builder '\\' lexbuf }
@@ -109,9 +118,12 @@ and escaped_char_handler = parse
   | 't'  { char_builder '\t' lexbuf  }
   | 'b'  { char_builder '\b' lexbuf  }
   | ' '  { char_builder '\ ' lexbuf  }
-  | digit (digit | digit digit)? as ord
-         { char_builder (Char.chr (int_of_string ord)) lexbuf }
-  | _    { raise(Failure("Error: unrecognized escape sequence")) }
+  | chrcode as ord
+         { print_string ord; if int_of_string ord > 255
+           then Diagnostic.error(Diagnostic.lex_error "invalid escape sequence ASCII value" lexbuf)
+           else char_builder (Char.chr (int_of_string ord)) lexbuf }
+  | _    { Diagnostic.error(Diagnostic.lex_error "unrecognized escape sequence" lexbuf) }
+
  
 
 

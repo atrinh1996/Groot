@@ -75,15 +75,24 @@ value:
 
 tree:
     | LEAF                                   { Leaf }
-    | LPAREN BRANCH expr tree tree RPAREN    { Branch($3, $4, $5)}
+    | LPAREN BRANCH expr tree tree RPAREN    { Branch($3, $4, $5) }
 
-
+/*
 let_binding:
-    | LSQUARE ID expr RSQUARE                  { ($2, $3) }
+    | LSQUARE ID expr RSQUARE                { ($2, $3) }
+    | LSQUARE RSQUARE                        { raise(Failure("asdf")) }
+    */
     
 let_binding_list:
     | /* nothing */      { [] }
+    | LSQUARE RSQUARE let_binding_list
+        { Diagnostic.warning(Diagnostic.parse_warning "empty let binding" 1); $3 } /* NON FATAL */
+    | LSQUARE expr RSQUARE let_binding_list
+        { Diagnostic.error(Diagnostic.parse_error "let binding must contain id and value" 2) } /* FATAL */
+    | LSQUARE ID expr RSQUARE let_binding_list { ($2, $3) :: $5 }
+    /*
     | let_binding let_binding_list { $1 :: $2 }
+    */
 
 expr_list:
     | /* nothing */      { [] }
