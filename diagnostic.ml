@@ -1,4 +1,4 @@
- exception definition and pretty printing *)
+(* exception definition and pretty printing *)
 (* maybe rename module to Diagnostic *)
 
 
@@ -102,4 +102,4 @@ let () =
         | Unimplemented s -> Some ("\027[1;31mUnimplemented:\027[0m " ^ s)
         
         | _ -> None)
-        
+*)
