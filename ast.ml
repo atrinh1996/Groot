@@ -5,6 +5,8 @@
 (* any identifier *)
 type ident = string
 
+type typ = Int | Char | Bool
+
 (*type primop = Add | Sub | Mul | Div | Mod | Eq | Neq 
             | Lt  | Gt  | Leq | Geq | And | Or*)
 
@@ -30,7 +32,8 @@ and tree =  Leaf
           (* Perhaps in the SAST, this is a value *)
 
 (* top-level definitions *)
-type defn = Val of ident * expr
+type defn = 
+          | Val of ident * expr
           | Expr of expr
           (*| Define of ident * ident list * expr*)
           (* fn name, arg names, body*)
