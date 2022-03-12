@@ -1,6 +1,14 @@
-(* Adapted from MicroC's codegen *)
 
-(* make LLVM and AST modules, open sast, make stringmap module *)
+
+module L = Llvm
+module A = Ast
+open Sast 
+
+module StringMap = Map.Make(String)
+
+(* translate sdefns - Given an SAST called sdefns, the function returns 
+   and LLVM module (llmodule type), which is the code generated from 
+   the SAST. Throws exception if something is wrong. *)
 
 (* make context, add types to it, then convert groot types to LLVM types*)
 

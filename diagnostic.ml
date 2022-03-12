@@ -69,7 +69,7 @@ exception ParsingWarning of string
 (* Courtesy of:
 	https://stackoverflow.com/questions/14046392/verbose-error-with-ocamlyacc
 *)
-let pos_fault msg (start: Lexing.position) (finish: Lexing.position)  = 
+let pos_fault msg (start : Lexing.position) (finish : Lexing.position)  = 
     Printf.sprintf "(line %d, col %d-%d): %s" start.pos_lnum 
           (start.pos_cnum - start.pos_bol) (finish.pos_cnum - finish.pos_bol) msg
 

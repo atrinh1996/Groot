@@ -23,6 +23,8 @@ type sdefn =
 
 type sexpr = Ast.typ * Sast.sx
 
+type typ = Integer | Character | Boolean
+
 *)
 
 let semantic_check (defns) =
@@ -32,18 +34,45 @@ let semantic_check (defns) =
 
 
 (*add names to symbol table, allow retrieval*)
+(* let symbols = StringMap.empty in *)
 
 
 (*handle type-checking for evaluation - make sure the expression returns the
 	correct type, build local symbol table and do local type checking*)
 
+	(* Lookup what Ast.typ value that the key name s maps to. *)
+	(* let typeof_identifier s = 
+		Requires creation of symbols table
+		   code for try: StringMap.find s symbols
+		try StringMap.find s symbols
+		with Not_found -> raise (Failure ("undeclared identifier" ^ s))
+	in *)
 
+	(* Returns the Sast.sexpr (Ast.typ, Sast.sx) version of the given Ast.expr *)
+	let rec expr = function
+                                (* Problem - I force the Ast.typ to be Integer *)
+		| Literal(lit)          -> (Integer, SLiteral(value lit))
+    | Var(_)                -> raise (Failure ("TODO - expr to sexpr of Var"))
+    | If(_, _, _)           -> raise (Failure ("TODO - expr to sexpr of If"))
+    | Apply(_, _)           -> raise (Failure ("TODO - expr to sexpr of Apply"))
+    | Let(_, _)             -> raise (Failure ("TODO - expr to sexpr of Let"))
+    | Lambda(_, _)          -> raise (Failure ("TODO - expr to sexpr of Lambda"))
+  (* Returns the Sast.svalue version fo the given Ast.value *)
+  and value = function 
+  	| Char(_)     -> raise (Failure ("TODO - value to svalue of Char"))
+    | Int(i)      -> SInt i
+    | Bool(_)     -> raise (Failure ("TODO - value to svalue of Bool"))
+    | Root(_)     -> raise (Failure ("TODO - value to svalue of Root"))
+  in
 
-
-
+  (* For the given Ast.defn, returns an Sast.sdefn*)
 	let check_defn d = match d with
-		| Val (name, e) -> raise (Failure ("TODO - check_defn in Val"))
-		| Expr (e)      -> raise (Failure ("TODO - check_defn in Expr"))
+		| Val (name, e) -> 
+				(* let t = typeof_identifier name in  *)
+				let e' = expr e in 
+				SVal(name, e')
+		| Expr (_)      -> raise (Failure ("TODO - check_defn in Expr"))
+
 in List.map check_defn defns 
 
 (* Probably will map a check-function over the defns (defn list : defs) *)
