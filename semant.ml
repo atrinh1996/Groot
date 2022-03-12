@@ -36,7 +36,6 @@ type typ = Integer | Character | Boolean
 *)
 
 let semantic_check (defns) =
-
 	let fresh =
   		let k = ref 0 in
     		fun () -> incr k; XType !k
@@ -72,6 +71,7 @@ let semantic_check (defns) =
 		
 			(* | _ -> raise (Failure ("missing case for type checking")) *)
 in
+			
 
 (*handle type-checking for evaluation - make sure the expression returns the
 	correct type, build local symbol table and do local type checking*)
