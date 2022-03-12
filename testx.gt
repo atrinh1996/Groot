@@ -1,1 +1,13 @@
-(val x 1)
+(; (val x 1) ;)
+
+(if #t 1 0)
+
+(tree 0 leaf leaf)
+
+(tree 0 leaf (tree 1 leaf leaf))
+
+(tree #f leaf leaf)
+
+(tree 't' leaf leaf)
+
+(tree 't' leaf (tree 5 leaf leaf))

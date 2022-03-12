@@ -2,7 +2,7 @@
 
 open Ast
 
-type sexpr = typ * sx
+type sexpr = gtype * sx
 
 and     sx = SLiteral of svalue
            | SVar     of ident

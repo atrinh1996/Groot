@@ -5,7 +5,12 @@
 (* any identifier *)
 type ident = string
 
-type typ = Int | Char | Bool
+type gtype = 
+    | IType 
+    | CType 
+    | BType 
+    | TType
+    | XType of int
 
 (*type primop = Add | Sub | Mul | Div | Mod | Eq | Neq 
             | Lt  | Gt  | Leq | Geq | And | Or*)
