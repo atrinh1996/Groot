@@ -6,7 +6,7 @@
 
 ###############################################################################
 # Include the llvm and llvm.analysis packages while compiling
-# true: package(llvm), package(llvm.analysis)
+true: package(llvm), package(llvm.analysis)
 
 # prettier output when faults are reported
 true: color(always)

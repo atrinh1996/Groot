@@ -1,0 +1,42 @@
+CONSTANTS 
+
+Rule: env |- i : int -| {}
+Rule: env |- c : char -| {}
+Rule: env |- b : bool -| {}
+
+
+NAMES 
+
+Rule: env |- n : env(n) -| {}
+
+Examples:
+
+{x : int} |- x : int -| {}
+{} |- x (would fail)
+{} |- ( + )
+
+IF
+
+env |- if e1 then e2 else e3 : `t -| C1, C2, C3, C
+    if fresh `t
+    and env |- e1 : t1 -| C1
+    and env |- e2 : t2 -| C2
+    and env |- e3 : t1 -| C3
+    and C = {t1 = bool, `t = t2, `t = t3}
+
+Examples:
+{} |- of true then 0 else 1 : `a (type of if expression)
+(type of if expression is type of if and else branches)
+
+ANON FUNCS
+
+env |- fun x -> e : 't1 -> t2 -| C
+  if fresh 't1 ('t1 = type of arg of func)
+  and env, x : 't1 |- e : t2 -| C
+
+FUNCTION APPLICATION
+
+env |- e1 e2 : 't -| C1, C2, t1 = t2 -> 't
+  if fresh 't
+  and env |- e1 : t1 -| C1
+  and env |- e2 : t2 -| C2

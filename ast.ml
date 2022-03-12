@@ -5,7 +5,13 @@
 (* any identifier *)
 type ident = string
 
-type typ = Integer | Character | Boolean
+
+type gtype = 
+    | IType 
+    | CType 
+    | BType 
+    | TType
+    | XType of int
 
 (*type primop = Add | Sub | Mul | Div | Mod | Eq | Neq 
             | Lt  | Gt  | Leq | Geq | And | Or*)
@@ -48,9 +54,11 @@ type prog = defn list
 
 (* toString for Ast.typ *)
 let string_of_typ = function
-      Integer -> "int"
-    | Character -> "char"
-    | Boolean -> "bool"
+      IType -> "int"
+    | CType -> "char"
+    | BType -> "bool"
+    | TType -> "TREE"
+    | XType i -> "typPARAM"
 
 (* toString for Ast.expr *)
 let rec string_of_expr = function
