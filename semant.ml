@@ -27,12 +27,15 @@ type sexpr = Ast.typ * Sast.sx
 
 let semantic_check (defns) =
 	
+(* check global bindings - are they of a void type, do they duplicate another,
+		previously checked binding?*)
 
 
+(*add names to symbol table, allow retrieval*)
 
 
-
-
+(*handle type-checking for evaluation - make sure the expression returns the
+	correct type, build local symbol table and do local type checking*)
 
 
 
