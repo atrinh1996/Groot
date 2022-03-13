@@ -12,12 +12,12 @@ module StringMap = Map.Make(String)
 
 (* type TConsts = {typ : } *)
 
-type grootType = 
+(* type grootType = 
 				| BoolType 
 				| CharType
 				| IntType
 				| TreeType
-
+ *)
 (* Takes an Ast (defn list) and will return an Sast (sdefn list) *)
 (* 
 
@@ -103,12 +103,10 @@ in *)
 
   (* For the given Ast.defn, returns an Sast.sdefn*)
 	let check_defn d = match d with
-
 		| Val (name, e) -> 
 				let e' = expr e in 
 				SVal(name, e')
 		| Expr (_)      -> raise (Failure ("TODO - check_defn in Expr"))
-
 (* 		| Val (name, e) -> generate_constraints e 
 		| Expr (e)      -> generate_constraints e
  *)
