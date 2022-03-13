@@ -55,7 +55,7 @@ let semantic_check defns =
 								let e, c1 = generate_constraints e in
 									let t1, c2 = tree_check t1 in 
 										let t2, c3 = tree_check t2 in 
-											let alpha = fresh () in (TTree, [(alpha, e); (TTree, t1); (TTree, t2)] @ c1 @ c2 @ c3)
+											let tau = fresh () in (TTree, [(tau, e); (TTree, t1); (TTree, t2)] @ c1 @ c2 @ c3)
 							in branch_check e t1 t2
 					in tree_check r
 			in literal_check v
