@@ -11,7 +11,7 @@
 type action = 
 	  Ast 
 	| Sast 
-	(* | LLVM_IR *)
+	| LLVM_IR
 (* | Compile *)
 
 let () =
@@ -20,7 +20,7 @@ let () =
 	let speclist = [
 		("-a", Arg.Unit (set_action Ast), "Print the AST (default)");
     	("-s", Arg.Unit (set_action Sast), "Print the SAST");
-    	(* ("-l", Arg.Unit (set_action LLVM_IR), "Print the generated LLVM IR"); *)
+    	("-l", Arg.Unit (set_action LLVM_IR), "Print the generated LLVM IR");
     	(* ("-c", Arg.Unit (set_action Compile),
 			"Check and print the generated LLVM IR"); *)
 	] in
@@ -55,7 +55,7 @@ let () =
 					     Here is the RHS code: 
 					     print_string (Llvm.string_of_llmodule (Codegen.translate sast)) 
 					  *)
-					(* | LLVM_IR -> Diagnostic.error(Diagnostic.Unimplemented "CODEGEN translate") *)
+					| LLVM_IR -> print_string (Llvm.string_of_llmodule (Codegen.translate sast))
 
 					  (* action - print the llvm module. See above. *)
 					(* | Compile -> let the_module = Codegen.translate sast in 

@@ -1,4 +1,21 @@
+(*
+    Notes:
 
+    sdefn is contains sexr:
+        type sdefn = 
+          | SVal of ident * sexpr
+          | SExpr of sexpr
+
+    sexpr: 
+        type sexpr = gtype * sx
+        and sx = 
+           SLiteral of svalue
+         | SVar     of ident
+         | SIf      of sexpr * sexpr * sexpr
+         | SApply   of sexpr * sexpr list
+         | SLet     of (ident * sexpr) list * sexpr
+         | SLambda  of ident list * sexpr
+*)
 
 module L = Llvm
 module A = Ast
@@ -32,27 +49,24 @@ let translate sdefns =
         (* | A.TType *)
         (* | A.XType of int *)
         | _         -> void_tmp
+    in 
 
 
 
+    (* Declare each toplevel val variable, i.e. (val x 1). 
+       Remember its value in a map.
+       global_vars_map is a StringMap mapping key (string name) 
+       to value (llvalue)  *)
+    let global_vars_map : L.llvalue StringMap.t = 
+        let global_var map sdef = 
+            match sdef with
+                  SVal(_, _) -> raise (Failure ("TODO - codegen SVal global_vars"))
+                | SExpr(_) -> raise (Failure ("TODO - codegen SExpr global_vars"))
+        in List.fold_left global_var StringMap.empty sdefns
+    in 
 
-    
+
+
 
     (* Return an llmodule *)
     the_module
-
-
-
-
-(*declare globals and add them to the stringmap*)
-
-
-(*when declaring functions: define arguments and return types, make ocaml functions to 
-	fill in body, construct locals and allocate on the stack, check and return local and global values*)
-
-
-(*expression stuff - construct code for it and return its value*)
-
-(*simple expressions - very straightforward*)
-
-(*block expressions are much more complicated - see 174-267 in microc's codegen*)
