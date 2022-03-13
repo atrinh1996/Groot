@@ -16,6 +16,19 @@ parser: parser.mly
 lexer: ast.ml parser.mly scanner.mll
 	ocamllex scanner.mll
 
+# Compile and run hello.gt
+toLLVM: 
+	./toplevel.native -c hello.gt > hello.ll 
+
+toAssem: 
+	llc -relocation-model=pic hello.ll > hello.s 
+
+toExe:
+	cc -o hello.exe hello.s
+
+toRun:
+	./hello.exe 
+
 clean:
 	ocamlbuild -clean
 	rm -rf parser.ml parser.mli scanner.ml toplevel.native groot.native
