@@ -36,12 +36,12 @@ type typ = Integer | Character | Boolean
 *)
 
 let semantic_check (defns) =
-	let fresh =
+	(* let fresh =
   		let k = ref 0 in
     		fun () -> incr k; XType !k
-		in
+		in *)
 
-	let rec generate_constraints expr = match expr with
+	(* let rec generate_constraints expr = match expr with
 		| Literal v -> 
 			let literal_check v = match v with
 				| Char _ -> (CType, [])
@@ -70,7 +70,7 @@ let semantic_check (defns) =
 			in if_check e1 e2 e3
 		
 			(* | _ -> raise (Failure ("missing case for type checking")) *)
-in
+in *)
 			
 
 (*handle type-checking for evaluation - make sure the expression returns the
@@ -103,15 +103,15 @@ in
 
   (* For the given Ast.defn, returns an Sast.sdefn*)
 	let check_defn d = match d with
-(*
+
 		| Val (name, e) -> 
 				let e' = expr e in 
 				SVal(name, e')
 		| Expr (_)      -> raise (Failure ("TODO - check_defn in Expr"))
-*)
-		| Val (name, e) -> generate_constraints e 
-		| Expr (e)      -> generate_constraints e
 
+(* 		| Val (name, e) -> generate_constraints e 
+		| Expr (e)      -> generate_constraints e
+ *)
 
 in List.map check_defn defns 
 

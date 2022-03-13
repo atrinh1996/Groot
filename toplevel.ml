@@ -37,18 +37,18 @@ let () =
 			(* All other action needs to generate an SAST, store in variable sast *)
 			| _ -> 
 				let sast = Semant.semantic_check ast in
-					  print_string "TODO: Finish Semant.semantic_check"
-					(* match !action with  *)
+					  (* print_string "TODO: Finish Semant.semantic_check" *)
+					match !action with 
 				(* in sast *)
 					  (* This option doesn't do anything, just need it to satisfy 
 					     the pattern matching for type action. *)
-						(* Ast -> () *)
+						Ast -> ()
 					  (* action - prints the SAST using sast.
 					     Here is the RHS code: 
 					     print_string (Sast.string_of_sprog sast) 
 					  *)
 					  (* Diagnostic.error(Diagnostic.Unimplemented "SAST printing") *)
-					(* | Sast -> print_string (Sast.string_of_sprog sast) *)
+					| Sast -> print_string (Sast.string_of_sprog sast)
 
 					  (* action - print the llvm module. Codegen.translate produces the llmodule
 					     from the given SAST called sast and then Llvm.string_of_llmodule converts it to string.

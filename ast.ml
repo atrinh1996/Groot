@@ -58,7 +58,7 @@ let string_of_typ = function
     | CType -> "char"
     | BType -> "bool"
     | TType -> "TREE"
-    | XType i -> "typPARAM"
+    | XType _ -> "typPARAM"
 
 (* toString for Ast.expr *)
 let rec string_of_expr = function
