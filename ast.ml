@@ -7,11 +7,11 @@ type ident = string
 
 
 type gtype = 
-    | IType 
-    | CType 
-    | BType 
-    | TType
-    | XType of int
+    | TInt 
+    | TChar 
+    | TBool 
+    | TTree
+    | TVar of int
 
 (*type primop = Add | Sub | Mul | Div | Mod | Eq | Neq 
             | Lt  | Gt  | Leq | Geq | And | Or*)
@@ -54,11 +54,11 @@ type prog = defn list
 
 (* toString for Ast.typ *)
 let string_of_typ = function
-      IType -> "int"
-    | CType -> "char"
-    | BType -> "bool"
-    | TType -> "TREE"
-    | XType i -> "typPARAM"
+      TInt -> "int"
+    | TChar -> "char"
+    | TBool -> "bool"
+    | TTree -> "TREE"
+    | TVar i -> "typPARAM"
 
 (* toString for Ast.expr *)
 let rec string_of_expr = function
