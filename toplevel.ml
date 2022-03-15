@@ -19,7 +19,7 @@ let () =
 	let set_action a () = action := a in
 	let speclist = [
 		("-a", Arg.Unit (set_action Ast), "Print the AST (default)");
-    	("-s", Arg.Unit (set_action Sast), "Print the SAST");
+    ("-s", Arg.Unit (set_action Sast), "Print the SAST");
     	(* ("-l", Arg.Unit (set_action LLVM_IR), "Print the generated LLVM IR"); *)
     	(* ("-c", Arg.Unit (set_action Compile),
 			"Check and print the generated LLVM IR"); *)
@@ -33,7 +33,7 @@ let () =
 	let ast = Parser.prog Scanner.tokenize lexbuf in 
 		match !action with
 			(* Default action - print the AST using ast *)
-			  Ast     -> print_string (Ast.string_of_prog ast)
+			| Ast     -> print_string (Ast.string_of_prog ast)
 			(* All other action needs to generate an SAST, store in variable sast *)
 			| _ -> 
 				let sast = Semant.semantic_check ast in

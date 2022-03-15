@@ -12,11 +12,13 @@ module StringMap = Map.Make(String)
 
 (* type TConsts = {typ : } *)
 
-type grootType = 
-				| BoolType 
-				| CharType
-				| IntType
-				| TreeType
+(* Copied types from AST -- is this necessary? *)
+(* type grootType = 
+	| TInt 
+	| TChar 
+	| TBool 
+	| TTree
+	| TVar of int *)
 
 (* Takes an Ast (defn list) and will return an Sast (sdefn list) *)
 (* 

@@ -1,6 +1,6 @@
 (; (val x 1) ;)
 
-(if #t 1 0)
+(if #t 1 'a')
 
 (tree 0 leaf leaf)
 

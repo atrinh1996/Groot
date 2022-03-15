@@ -54,7 +54,7 @@ type prog = defn list
 
 (* toString for Ast.typ *)
 let string_of_typ = function
-      TInt -> "int"
+    | TInt -> "int"
     | TChar -> "char"
     | TBool -> "bool"
     | TTree -> "TREE"
