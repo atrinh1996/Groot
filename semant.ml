@@ -60,7 +60,6 @@ let semantic_check defns =
 					in tree_check r
 			in literal_check v
 		| If (e1, e2, e3) ->
-			(* TODO is there a more OCamlese way to match in assignment, like x, y = generate_constraint e1 *)
 			let if_check e1 e2 e3 =
 				let t1, c1 = generate_constraints e1 in
 					let	t2, c2 = generate_constraints e2 in
