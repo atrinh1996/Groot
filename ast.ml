@@ -5,14 +5,6 @@
 (* any identifier *)
 type ident = string
 
-
-type gtype = 
-    | TInt 
-    | TChar 
-    | TBool 
-    | TTree
-    | TVar of int
-
 (*type primop = Add | Sub | Mul | Div | Mod | Eq | Neq 
             | Lt  | Gt  | Leq | Geq | And | Or*)
 

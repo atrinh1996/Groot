@@ -10,15 +10,14 @@ open Sast
 
 module StringMap = Map.Make(String)
 
-(* type TConsts = {typ : } *)
+type gtype = 
+    | TInt 
+    | TChar 
+    | TBool 
+    | TTree
+    | TVar of int
 
-(* Copied types from AST -- is this necessary? *)
-(* type grootType = 
-	| TInt 
-	| TChar 
-	| TBool 
-	| TTree
-	| TVar of int *)
+(* type TConsts = {typ : } *)
 
 (* Takes an Ast (defn list) and will return an Sast (sdefn list) *)
 (* 
@@ -37,7 +36,30 @@ type typ = Integer | Character | Boolean
 
 *)
 
+(* Notes with Mert *)
+(*
+
+(let [x 3] z) <- will parse
+???? z 
+(let [x y] z)
+---
+(define foo () 3)  '() -> int
+(foo 1 2 3 4 5) int * int * int * int * int -> int
+
+*)
+
+(* type texper = Var of grootType * ident | Let of (ident * grootType * texpr) list * texpr | .. *)
+
+(* type Gamma = grootType StringMap *)
+
+(* let infer_types defns : (Gamma) = StringMap.empty *)
+(* End Notes with Mert *)
+
 let semantic_check defns =
+	(* let irast = check_non_type_stuff defns in -- Note *)
+	(* let type_bindings = infer_types irast in -- Note *)
+	(* let typed_ast = apply_types irast type_bindings in
+	typed_ast;; -- Note *)
 	let fresh =
   		let k = ref 0 in
     		fun () -> incr k; TVar !k
