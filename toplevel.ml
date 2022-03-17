@@ -36,7 +36,7 @@ let () =
 			| Ast     -> print_string (Ast.string_of_prog ast)
 			(* All other action needs to generate an SAST, store in variable sast *)
 			| _ -> 
-				let sast = Semant.semantic_check ast in
+				let sast = Tinfer.semantic_check ast in
 					  print_string "TODO: Finish Semant.semantic_check"
 					(* match !action with  *)
 				(* in sast *)

@@ -1,6 +1,6 @@
 (* Semantically-checked Abstract Syntax Tree and functions for printing it *)
 
-open Ast
+open Tinfer
 
 type sexpr = gtype * sx
 and sx = 

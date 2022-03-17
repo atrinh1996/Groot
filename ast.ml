@@ -2,12 +2,12 @@
    Functions for printing
 *)
 
-type gtype = 
+(* type gtype = 
     | TInt 
     | TChar 
     | TBool 
     | TTree
-    | TVar of int
+    | TVar of int *)
 
 (* any identifier *)
 type ident = string
@@ -16,7 +16,7 @@ type ident = string
             | Lt  | Gt  | Leq | Geq | And | Or*)
 
 type 'a env = (ident * 'a) list
-(* mutuallly recursive expression * value types *)
+(* mutually recursive expression * value types *)
 type expr = Literal of value
           | Var     of ident
           | If      of expr * expr * expr
@@ -52,13 +52,13 @@ type prog = defn list
 (* Pretty printing functions *)
 
 (* toString for Ast.typ *)
-let string_of_typ = function
+(* let string_of_typ = function
     | TInt -> "int"
     | TChar -> "char"
     | TBool -> "bool"
     | TTree -> "TREE"
     | TVar i -> "typPARAM"
-
+ *)
 (* toString for Ast.expr *)
 let rec string_of_expr = function
     | Literal(lit) -> string_of_value lit
