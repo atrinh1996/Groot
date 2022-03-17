@@ -1,7 +1,8 @@
 (* 
             llgtype.ml
 
-    Declares context 
+    Creates a context and puts types in it to use in the LLVM code. 
+    Converts Ast.gtypes to LLCE types
  *)
 module L = Llvm
 module A = Ast
@@ -16,7 +17,7 @@ let i8_ty       = L.i8_type   context
 let i1_ty       = L.i1_type   context 
 
 (* REMOVE VOID later *)
-let void_tmp    = L.void_type context
+let void_ty    = L.void_type context
 
 (* "tree_struct" will appear as the struct name in llvm code *)
 let tree_struct_ty = L.named_struct_type context "tree_struct"
@@ -39,5 +40,5 @@ let ltype_of_gtype = function
   (* What is the size of a tree and xtype? *)
   | A.TType   -> tree_struct_ty
   (* | A.XType of int *)
-  | _         -> void_tmp
+  | _         -> void_ty
 

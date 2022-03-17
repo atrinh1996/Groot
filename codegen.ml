@@ -15,6 +15,12 @@
          | SApply   of sexpr * sexpr list
          | SLet     of (ident * sexpr) list * sexpr
          | SLambda  of ident list * sexpr
+
+
+    Format specifiers
+      ints      %d 
+      char      %c --> will use %s 
+      string    %s (bool: #t and #f)
 *)
 
 (* module L = Llvm *)
@@ -35,67 +41,9 @@ module StringMap = Map.Make(String)
  *)
 let translate sdefns = 
 
-  (* let context = L.global_context () in   *)
-
-  (* Add types to the context to use in the LLVM code *)
-  (* let i32_ty      = L.i32_type  context  *)
-  (* and i8_ty       = L.i8_type   context  *)
-  (* and i1_ty       = L.i1_type   context  *)
-  (* REMOVE VOID later *)
-  (* and void_tmp    = L.void_type context in  *)
-  (* val struct_type : llcontext -> lltype array -> lltype
-      struct_type context tys returns the structure type in 
-      the context context containing in the types 
-      in the array tys.  
-
-     val pointer_type : lltype -> lltype
-      pointer_type ty returns the pointer type referencing 
-      objects of type ty in the default address space (0).
-
-    val named_struct_type : llcontext -> string -> lltype
-      named_struct_type context name returns the named structure 
-      type name in the context context. 
-    
-    https://stackoverflow.com/questions/66912702/define-new-type-in-llvm-ir-using-ocaml-bindings
-
-    *)
-  (* and struct_ty   = L.struct_type context [| i32_ty  |] *)
-  (* "tree_struct" will appear as the struct name in llvm code *)
-  (* let tree_struct_ty = L.named_struct_type context "tree_struct" in
-  let tree_struct_ptr_ty = L.pointer_type tree_struct_ty in 
-    L.struct_set_body 
-      tree_struct_ty 
-      [| 
-          i32_ty; 
-          tree_struct_ptr_ty; 
-          tree_struct_ptr_ty 
-      |]
-      false
-  ; *)
-
   (* Create an LLVM module (container into which we'll 
      generate actual code) *)
   let the_module = L.create_module context "gROOT" in 
-
-  (* Convert gROOT types to LLVM types *)
-  (* let ltype_of_gtype = function
-        A.IType   -> i32_ty
-      | A.CType   -> i8_ty 
-      | A.BType   -> i1_ty
-      What is the size of a tree and xtype?
-      | A.TType   -> tree_struct_ty
-      (* | A.XType of int *)
-      | _         -> void_tmp
-  in  *)
-
-  (* To test struct type
-      Comment these lines in, run.
-      Should make the code defining the struct appear in the llvm code. *)
-  (* let main_t = L.function_type void_tmp [| tree_struct_ty |] in
-  let _main = L.declare_function "main" main_t the_module in *)
-
-
-  (* Llvm.print_module "./main.ll" the_module *)
 
 
 
@@ -131,7 +79,77 @@ let translate sdefns =
   in 
 
 
+  
 
+
+  (* DECLARE a print function (std::printf in C lib) *)
+  let printf_ty : L.lltype = 
+      L.var_arg_function_type i32_ty [| L.pointer_type i8_ty |] in
+  let printf_func : L.llvalue = 
+     L.declare_function "printf" printf_ty the_module in
+
+
+
+ (* To test struct type
+    Comment these lines in, run.
+    Should make the code defining the struct appear in the llvm code. *)
+  (* let main_ty = L.function_type void_ty [| tree_struct_ty |] in
+  let the_main = L.define_function "the_main" main_ty the_module in *)
+
+  (* To test a simple codegen. Gives an void main, no args. *)
+  let main_ty = L.function_type void_ty [|  |] in
+  let the_main = L.define_function "the_main" main_ty the_module in
+
+
+  (* create a builder for the whole program, start it in main block *)
+  let builder = L.builder_at_end context (L.entry_block the_main) in
+
+
+  (* Format strings to use with printf for our literals *)
+  let int_format_str  = L.build_global_stringptr "%d\n" "fmt" builder
+  and char_format_str = L.build_global_stringptr "%s\n" "fmt" builder
+  and bool_format_str = L.build_global_stringptr "%s\n" "fmt" builder in 
+
+
+  (* Construct constants code for literal values.
+     Function takes a Sast.svalue, and returls the constructed 
+     llvalue  *)
+  let const_val v = 
+    match v with 
+        SChar c -> L.const_string context (String.make 1 c)
+      | SInt  i -> L.const_int i32_ty i 
+      (* HAS to be an i1 lltype for the br instructions *)
+      | SBool b -> L.const_int i1_ty (if b then 1 else 0)
+      | SRoot _ -> raise (Failure ("TODO - codegen SRoot Literal"))
+  in
+
+  (* Construct code for expression 
+     Function takes a Sast.sexpr, and constructs the llvm where 
+     builder is located; returns the llvalue representation of code*)
+  let rec build_expr ((t, e) : sexpr) = 
+    match e with 
+       SLiteral v   -> const_val v
+     | SVar     id  -> raise (Failure ("TODO - codegen SVar lookup"))
+     | SIf (condition, then_exp, else_exp) -> 
+            raise (Failure ("TODO - codegen SIF merge-then-else"))
+     | SApply (f, args) -> 
+            raise (Failure ("TODO - codegen SAPPLY prints + general"))
+     (* L.const_string context (if b then "#t" else "#f") *)
+     | SLet (binds, e) -> raise (Failure ("TODO - codegen SLET"))
+     | SLambda (formals, e) -> raise (Failure ("TODO - codegen SLambda"))
+  in 
+
+
+  (* Construct the code for a definition *)
+  let build_defn sdef = 
+    match sdef with 
+        SVal (id, e) -> raise (Failure ("TODO - codegen SVal"))
+      | SExpr e -> build_expr e
+  in 
+
+
+
+  (* List.iter build_defn sdefns; *)
 
   (* Return an llmodule *)
   the_module
