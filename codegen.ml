@@ -46,42 +46,6 @@ let translate sdefns =
   let the_module = L.create_module context "gROOT" in 
 
 
-
-  (* Declare each toplevel val variable, i.e. (val x 1). 
-     Remember its value in a map.
-     global_vars_map is a StringMap mapping key (string name) 
-     to value (llvalue)  *)
-  (* let global_vars_map : L.llvalue StringMap.t = 
-    let global_var map sdef = 
-      match sdef with
-          (* sexp is an Sast.sx type. What the the llvm version of sx *)
-          SVal(name, (t, sexp)) -> 
-          (* 
-            in (val x 1), v should be 1
-            in (val x (if #t #f #t)), v should be #t or the if??
-            in (val add1 (lambda (n) (+ n 1))), v should be the lambda
-
-            DO I NEED A CODE CONSTRUCTOR for exprs???
-          *)
-            (* let v = eval  in  *)
-            let init = match t with 
-                A.IType   -> L.const_int (ltype_of_gtype t) 0
-              | A.CType   -> L.const_int (ltype_of_gtype t) 0
-              | A.BType   -> L.const_int (ltype_of_gtype t) 0
-              (* What is the size of a tree and xtype? *)
-              (* | A.TType *)
-              (* | A.XType of int *)
-              | _         -> L.const_int (ltype_of_gtype t) 0
-            (* Map Val Variable "name" to llvalue that represents ?????? *)
-            in StringMap.add name (L.define_global name init the_module) map 
-        | SExpr(_) -> raise (Failure ("TODO - codegen SExpr global_vars"))
-    in List.fold_left global_var StringMap.empty sdefns
-  in  *)
-
-
-  
-
-
   (* DECLARE a print function (std::printf in C lib) *)
   let printf_ty : L.lltype = 
       L.var_arg_function_type i32_ty [| L.pointer_type i8_ty |] in
@@ -93,13 +57,13 @@ let translate sdefns =
  (* To test struct type
     Comment these lines in, run.
     Should make the code defining the struct appear in the llvm code. *)
-  let main_ty = L.function_type void_ty [| tree_struct_ty |] in
-  let the_main = L.define_function "main" main_ty the_module in
+ (*  let main_ty = L.function_type void_ty [| tree_struct_ty |] in
+  let the_main = L.define_function "main" main_ty the_module in *)
 
   (* To test a simple codegen. Gives an void main, no args. *)
-  (* let main_ty = L.function_type void_ty [|  |] in
+  let main_ty = L.function_type void_ty [|  |] in
   let the_main = L.define_function "main" main_ty the_module in
- *)
+
 
   (* create a builder for the whole program, start it in main block *)
   let builder = L.builder_at_end context (L.entry_block the_main) in
@@ -147,13 +111,13 @@ let translate sdefns =
     match sdef with 
         SVal (id, e) -> raise (Failure ("TODO - codegen SVal"))
       | SExpr e -> build_expr e
-      (* build_expr e *)
   in 
 
 
-
+  (* Iterate over the sdefns list to construct the code for them *)
   let _ = List.map build_defn sdefns in
 
+  (* Every function definition needs to end in a ret *)
   let _ = L.build_ret_void builder in
 
   (* Return an llmodule *)
