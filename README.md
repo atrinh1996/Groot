@@ -87,6 +87,7 @@ if the syntax is correct.
 
 - codegen.ml: module that generates llvm code from the sast of the (g)ROOT code.
 - llgtypes.ml: module that defines what Llvm types equate to which (g)ROOT type.
+- test-print.gt: file used to test print 5 from codegen -> executable
 
 
 ## Testing
