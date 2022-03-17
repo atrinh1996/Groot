@@ -96,7 +96,7 @@ let translate sdefns =
      | SVar     id  -> raise (Failure ("TODO - codegen SVar lookup"))
      | SIf (condition, then_exp, else_exp) -> 
             raise (Failure ("TODO - codegen SIF merge-then-else"))
-     | SApply ((Void, SVar "printi"), [args]) -> 
+     | SApply ("printi", [args]) -> 
           L.build_call printf_func [| int_format_str ; (build_expr args) |] "printi" builder
      | SApply (f, args) -> 
             raise (Failure ("TODO - codegen SAPPLY general"))

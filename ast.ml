@@ -23,7 +23,7 @@ type 'a env = (ident * 'a) list
 type expr = Literal of value
           | Var     of ident
           | If      of expr * expr * expr
-          | Apply   of expr * expr list
+          | Apply   of ident * expr list
           | Let     of (ident * expr) list * expr
           | Lambda  of ident list * expr
 and value = Char    of char
@@ -79,8 +79,8 @@ let rec string_of_expr = function
         "(if "  ^ string_of_expr condition ^ " " 
                 ^ string_of_expr true_branch ^ " " 
                 ^ string_of_expr false_branch ^ ")"
-    | Apply(func, args) ->
-        "(" ^ string_of_expr func ^ " " 
+    | Apply(f, args) ->
+        "(" ^ f ^ " " 
             ^ String.concat " " (List.map string_of_expr args) ^ ")"
     | Let(binds, body)   ->
         let string_of_binding = function

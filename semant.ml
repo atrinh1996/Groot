@@ -113,20 +113,21 @@ in *)
     | Var(_)                -> raise (Failure ("TODO - expr to sexpr of Var"))
     | If(_, _, _)           -> raise (Failure ("TODO - expr to sexpr of If"))
     | Apply(fname, args)        -> 
-        match fname with  
-            Var s -> let fd = find_func s in 
-                     let formals_length = List.length fd.formals in 
-                     let param_length = List.length args in 
-                     if param_length != formals_length 
-                        then raise (Failure ("expected number of args, but got different number"))
-                     else 
-                        let check_call e = 
-                          let (et, e') = expr e in (et, e')
-                        in
-                     let args' = List.map check_call args
-                     in (fd.rettyp, SApply ((fd.rettyp, SVar s), args'))
+        (* match fname with   *)
+            (* Var s ->  *)
+            let fd = find_func fname in 
+             let formals_length = List.length fd.formals in 
+             let param_length = List.length args in 
+             if param_length != formals_length 
+                then raise (Failure ("expected number of args, but got different number"))
+             else 
+                let check_call e = 
+                  let (et, e') = expr e in (et, e')
+                in
+             let args' = List.map check_call args
+             in (fd.rettyp, SApply (fname, args'))
 
-          | _ -> raise (Failure ("Applying non-name in application"))
+          (* | _ -> raise (Failure ("Applying non-name in application")) *)
     | Let(_, _)             -> raise (Failure ("TODO - expr to sexpr of Let"))
     | Lambda(_, _)          -> raise (Failure ("TODO - expr to sexpr of Lambda"))
   (* Returns the Sast.svalue version fo the given Ast.value *)

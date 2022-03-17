@@ -7,7 +7,7 @@ and sx =
    SLiteral of svalue
  | SVar     of ident
  | SIf      of sexpr * sexpr * sexpr
- | SApply   of sexpr * sexpr list
+ | SApply   of ident * sexpr list
  | SLet     of (ident * sexpr) list * sexpr
  | SLambda  of ident list * sexpr
 and svalue = 
@@ -44,8 +44,8 @@ and string_of_sx = function
       "(if "  ^ string_of_sexpr se1 ^ " " 
               ^ string_of_sexpr se2 ^ " " 
               ^ string_of_sexpr se3 ^ ")"
-  | SApply(func, args) -> 
-      "(" ^ string_of_sexpr func ^ " " 
+  | SApply(f, args) -> 
+      "(" ^ f ^ " " 
           ^ String.concat " " (List.map string_of_sexpr args) ^ ")"
   | SLet(binds, body) -> 
       let string_of_binding (id, e) = 
