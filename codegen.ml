@@ -51,7 +51,7 @@ let translate sdefns =
      Remember its value in a map.
      global_vars_map is a StringMap mapping key (string name) 
      to value (llvalue)  *)
-  let global_vars_map : L.llvalue StringMap.t = 
+  (* let global_vars_map : L.llvalue StringMap.t = 
     let global_var map sdef = 
       match sdef with
           (* sexp is an Sast.sx type. What the the llvm version of sx *)
@@ -76,7 +76,7 @@ let translate sdefns =
             in StringMap.add name (L.define_global name init the_module) map 
         | SExpr(_) -> raise (Failure ("TODO - codegen SExpr global_vars"))
     in List.fold_left global_var StringMap.empty sdefns
-  in 
+  in  *)
 
 
   
@@ -98,7 +98,7 @@ let translate sdefns =
 
   (* To test a simple codegen. Gives an void main, no args. *)
   let main_ty = L.function_type void_ty [|  |] in
-  let the_main = L.define_function "the_main" main_ty the_module in
+  let the_main = L.define_function "main" main_ty the_module in
 
 
   (* create a builder for the whole program, start it in main block *)
@@ -132,8 +132,10 @@ let translate sdefns =
      | SVar     id  -> raise (Failure ("TODO - codegen SVar lookup"))
      | SIf (condition, then_exp, else_exp) -> 
             raise (Failure ("TODO - codegen SIF merge-then-else"))
+     | SApply ((Void, SVar "printi"), [args]) -> 
+          L.build_call printf_func [| int_format_str ; (build_expr args) |] "printi" builder
      | SApply (f, args) -> 
-            raise (Failure ("TODO - codegen SAPPLY prints + general"))
+            raise (Failure ("TODO - codegen SAPPLY general"))
      (* L.const_string context (if b then "#t" else "#f") *)
      | SLet (binds, e) -> raise (Failure ("TODO - codegen SLET"))
      | SLambda (formals, e) -> raise (Failure ("TODO - codegen SLambda"))
@@ -145,11 +147,12 @@ let translate sdefns =
     match sdef with 
         SVal (id, e) -> raise (Failure ("TODO - codegen SVal"))
       | SExpr e -> build_expr e
+      (* build_expr e *)
   in 
 
 
 
-  (* List.iter build_defn sdefns; *)
+  let _ = List.map build_defn sdefns in
 
   (* Return an llmodule *)
   the_module

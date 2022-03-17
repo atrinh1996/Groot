@@ -84,13 +84,49 @@ in *)
 		with Not_found -> raise (Failure ("undeclared identifier" ^ s))
 	in *)
 
+  (* Collection function declarations for built in prints *)
+  let built_in_decls =  
+    let add_bind map (name, ty) =  
+      StringMap.add 
+        name 
+        { rettyp = Void;
+          fname = name;
+          formals = [(ty, "x")];
+          locals = [];
+          body = [] } 
+        map 
+    in List.fold_left add_bind StringMap.empty [ ("printi", IType ); 
+                                                 ("printc", CType); 
+                                                 ("printb", BType) ]
+  in
+
+  (* Returns a function from out symbol table *)
+  let find_func fname = 
+    try StringMap.find fname built_in_decls
+    with Not_found -> raise (Failure ("unrecognized function " ^ fname))
+  in
+
 	(* Returns the Sast.sexpr (Ast.typ, Sast.sx) version of the given Ast.expr *)
 	let rec expr = function
                                 (* Problem - I force the Ast.typ to be Integer *)
 		| Literal(lit)          -> (IType, SLiteral(value lit))
     | Var(_)                -> raise (Failure ("TODO - expr to sexpr of Var"))
     | If(_, _, _)           -> raise (Failure ("TODO - expr to sexpr of If"))
-    | Apply(_, _)           -> raise (Failure ("TODO - expr to sexpr of Apply"))
+    | Apply(fname, args)        -> 
+        match fname with  
+            Var s -> let fd = find_func s in 
+                     let formals_length = List.length fd.formals in 
+                     let param_length = List.length args in 
+                     if param_length != formals_length 
+                        then raise (Failure ("expected number of args, but got different number"))
+                     else 
+                        let check_call e = 
+                          let (et, e') = expr e in (et, e')
+                        in
+                     let args' = List.map check_call args
+                     in (fd.rettyp, SApply ((fd.rettyp, SVar s), args'))
+
+          | _ -> raise (Failure ("Applying non-name in application"))
     | Let(_, _)             -> raise (Failure ("TODO - expr to sexpr of Let"))
     | Lambda(_, _)          -> raise (Failure ("TODO - expr to sexpr of Lambda"))
   (* Returns the Sast.svalue version fo the given Ast.value *)
@@ -106,7 +142,7 @@ in *)
 		| Val (name, e) -> 
 				let e' = expr e in 
 				SVal(name, e')
-		| Expr (_)      -> raise (Failure ("TODO - check_defn in Expr"))
+		| Expr e      -> SExpr (expr e)
 (* 		| Val (name, e) -> generate_constraints e 
 		| Expr (e)      -> generate_constraints e
  *)

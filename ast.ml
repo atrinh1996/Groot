@@ -12,6 +12,8 @@ type gtype =
     | BType 
     | TType
     | XType of int
+    | Void
+
 
 (*type primop = Add | Sub | Mul | Div | Mod | Eq | Neq 
             | Lt  | Gt  | Leq | Geq | And | Or*)
@@ -44,6 +46,15 @@ type defn =
           (*| Define of ident * ident list * expr*)
           (* fn name, arg names, body*)
           (*| Use of ident*)
+
+type fdecl = 
+{ rettyp : gtype;
+  fname : string;
+  formals : (gtype * string) list;
+  locals : (gtype * string) list;
+  body : expr list 
+} 
+
 
 (* short for program, analogous to main *)
 type prog = defn list
