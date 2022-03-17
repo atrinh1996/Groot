@@ -64,7 +64,7 @@ let semantic_check defns =
     		fun () -> incr k; TVar !k
 		in
 
-	let rec generate_constraints env expr = match expr with
+	let rec generate_constraints expr = match expr with
 		| Literal v -> 
 			let literal_check v = match v with
 				| Char _ -> (TChar, [])
@@ -89,7 +89,7 @@ let semantic_check defns =
 						let t3, c3 = generate_constraints e3 in
 							let tau = fresh () in (tau, [(TBool, t1); (tau, t2); (tau, t3)] @ c1 @ c2 @ c3)
 			in if_check e1 e2 e3
-    | Var (_) -> []
+    | Var (_) -> (fresh (), [])
     | Apply (_, _) -> raise (Failure ("missing case for type checking"))
     | Let (_, _) -> raise (Failure ("missing case for type checking"))
     | Lambda (_,_) -> raise (Failure ("missing case for type checking"))
@@ -132,8 +132,8 @@ let semantic_check defns =
 				SVal(name, e')
 		| Expr (_)      -> raise (Failure ("TODO - check_defn in Expr"))
 *)
-		| Val (_, e) -> StringMap.add (*Once we get a val we add to string Map for late use*)
-		| Expr (e)   -> generate_constraints StringMap.empty e
+		| Val (_, e) -> generate_constraints e 
+		| Expr (e)   -> generate_constraints e
 in List.map check_defn defns 
 
 (* Probably will map a check-function over the defns (defn list : defs) *)
