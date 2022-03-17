@@ -55,7 +55,9 @@ let () =
 					     Here is the RHS code: 
 					     print_string (Llvm.string_of_llmodule (Codegen.translate sast)) 
 					  *)
-					| LLVM_IR -> print_string (Llvm.string_of_llmodule (Codegen.translate sast))
+					| LLVM_IR -> 
+					(* Codegen.translate sast *)
+					print_string (Llvm.string_of_llmodule (Codegen.translate sast))
 
 					  (* action - print the llvm module. See above. *)
 					(* | Compile -> let the_module = Codegen.translate sast in 

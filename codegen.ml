@@ -1,7 +1,7 @@
 (*
     Notes:
 
-    sdefn is contains sexr:
+    sdefn contains sexr:
         type sdefn = 
           | SVal of ident * sexpr
           | SExpr of sexpr
@@ -17,40 +17,85 @@
          | SLambda  of ident list * sexpr
 *)
 
-module L = Llvm
-module A = Ast
+(* module L = Llvm *)
+(* module A = Ast *)
+open Llgtype
 open Sast 
+
 
 module StringMap = Map.Make(String)
 
 (* translate sdefns - Given an SAST called sdefns, the function returns 
-   and LLVM module (llmodule type), which is the code generated from 
-   the SAST. Throws exception if something is wrong. *)
+   an LLVM module (llmodule type), which is the code generated from 
+   the SAST. Throws exception if something is wrong. 
+  
+  Note: An sdefn is an SVal or an SExpr, 
+  ie (id, (Ast.gtyp, Sast.sx)) or (Ast,gtyp, Sast.sx).
+  Remember: we are dealing with a list of sdefn's 
+ *)
 let translate sdefns = 
 
-  let context = L.global_context () in  
+  (* let context = L.global_context () in   *)
 
   (* Add types to the context to use in the LLVM code *)
-  let i32_ty      = L.i32_type  context 
-  and i8_ty       = L.i8_type   context 
-  and i1_ty       = L.i1_type   context 
+  (* let i32_ty      = L.i32_type  context  *)
+  (* and i8_ty       = L.i8_type   context  *)
+  (* and i1_ty       = L.i1_type   context  *)
   (* REMOVE VOID later *)
-  and void_tmp    = L.void_type context
+  (* and void_tmp    = L.void_type context in  *)
+  (* val struct_type : llcontext -> lltype array -> lltype
+      struct_type context tys returns the structure type in 
+      the context context containing in the types 
+      in the array tys.  
+
+     val pointer_type : lltype -> lltype
+      pointer_type ty returns the pointer type referencing 
+      objects of type ty in the default address space (0).
+
+    val named_struct_type : llcontext -> string -> lltype
+      named_struct_type context name returns the named structure 
+      type name in the context context. 
+    
+    https://stackoverflow.com/questions/66912702/define-new-type-in-llvm-ir-using-ocaml-bindings
+
+    *)
+  (* and struct_ty   = L.struct_type context [| i32_ty  |] *)
+  (* "tree_struct" will appear as the struct name in llvm code *)
+  (* let tree_struct_ty = L.named_struct_type context "tree_struct" in
+  let tree_struct_ptr_ty = L.pointer_type tree_struct_ty in 
+    L.struct_set_body 
+      tree_struct_ty 
+      [| 
+          i32_ty; 
+          tree_struct_ptr_ty; 
+          tree_struct_ptr_ty 
+      |]
+      false
+  ; *)
 
   (* Create an LLVM module (container into which we'll 
      generate actual code) *)
-  and the_module = L.create_module context "gROOT" in 
+  let the_module = L.create_module context "gROOT" in 
 
   (* Convert gROOT types to LLVM types *)
-  let ltype_of_gtype = function
+  (* let ltype_of_gtype = function
         A.IType   -> i32_ty
       | A.CType   -> i8_ty 
       | A.BType   -> i1_ty
-      (* What is the size of a tree and xtype? *)
-      (* | A.TType *)
+      What is the size of a tree and xtype?
+      | A.TType   -> tree_struct_ty
       (* | A.XType of int *)
       | _         -> void_tmp
-  in 
+  in  *)
+
+  (* To test struct type
+      Comment these lines in, run.
+      Should make the code defining the struct appear in the llvm code. *)
+  (* let main_t = L.function_type void_tmp [| tree_struct_ty |] in
+  let _main = L.declare_function "main" main_t the_module in *)
+
+
+  (* Llvm.print_module "./main.ll" the_module *)
 
 
 

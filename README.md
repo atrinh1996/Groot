@@ -85,6 +85,10 @@ if the syntax is correct.
       and failure tests of the test files in testfiles/ of the same name. Each
       tests' stdout/stderr can be diff'd against its reference. 
 
+- codegen.ml: module that generates llvm code from the sast of the (g)ROOT code.
+- llgtypes.ml: module that defines what Llvm types equate to which (g)ROOT type.
+
+
 ## Testing
 Test cases were designed to check for successful and failure. Testing generally
 includes checks for:
