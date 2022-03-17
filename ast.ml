@@ -2,6 +2,13 @@
    Functions for printing
 *)
 
+type gtype = 
+    | TInt 
+    | TChar 
+    | TBool 
+    | TTree
+    | TVar of int
+
 (* any identifier *)
 type ident = string
 
