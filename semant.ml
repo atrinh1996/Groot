@@ -128,10 +128,13 @@ in *)
              if param_length != formals_length 
                 then raise (Failure ("expected number of args, but got different number"))
              else 
-                let check_call e = 
-                  let (et, e') = expr e in (et, e')
+                let check_call (ft, _) e = 
+                  let (et, e') = expr e in 
+                  if et = ft then (et, e') else raise 
+                  (Failure ("illegal argument found " ^ string_of_typ et 
+                    ^ " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e))
                 in
-             let args' = List.map check_call args
+             let args' = List.map2 check_call fd.formals args
              in (fd.rettyp, SApply (fname, args'))
 
           (* | _ -> raise (Failure ("Applying non-name in application")) *)
