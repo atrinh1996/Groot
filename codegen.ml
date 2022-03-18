@@ -116,8 +116,8 @@ let translate sdefns =
      | SApply ("printi", [arg]) -> 
           L.build_call printf_func [| int_format_str ; (build_expr arg) |] "printi" builder
      | SApply ("printc", [arg]) -> 
-        L.build_call printf_func [| char_format_str ; (build_expr arg) |] "printc" builder
-        (* L.build_call puts_func [| build_expr arg |] "printc" builder *)
+        (* L.build_call printf_func [| char_format_str ; (build_expr arg) |] "printc" builder *)
+        L.build_call puts_func [| build_expr arg |] "printc" builder
      | SApply (f, args) -> 
             raise (Failure ("TODO - codegen SAPPLY general"))
      (* L.const_string context (if b then "#t" else "#f") *)
