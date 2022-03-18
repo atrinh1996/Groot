@@ -94,7 +94,7 @@ let rec string_of_expr = function
 
 (* toString for Ast.value *)
 and string_of_value = function
-    | Char(c)     -> String.make 1 c
+    | Char(c)     -> "'" ^ String.make 1 c ^ "'"
     | Int(i)      -> string_of_int i
     | Bool(b)     -> if b then "#t" else "#f"
     | Root(tr)    -> string_of_tree tr

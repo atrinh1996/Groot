@@ -109,7 +109,14 @@ in *)
 	(* Returns the Sast.sexpr (Ast.typ, Sast.sx) version of the given Ast.expr *)
 	let rec expr = function
                                 (* Problem - I force the Ast.typ to be Integer *)
-		| Literal(lit)          -> (IType, SLiteral(value lit))
+		| Literal(lit)          -> (* (IType, SLiteral(value lit)) *)
+      let s = value lit in 
+        ((match s with 
+            SInt _ -> IType
+          | SChar _ -> CType
+          | SBool _ -> BType
+          | SRoot _ -> TType)
+        , SLiteral s)
     | Var(_)                -> raise (Failure ("TODO - expr to sexpr of Var"))
     | If(_, _, _)           -> raise (Failure ("TODO - expr to sexpr of If"))
     | Apply(fname, args)        -> 
@@ -132,7 +139,7 @@ in *)
     | Lambda(_, _)          -> raise (Failure ("TODO - expr to sexpr of Lambda"))
   (* Returns the Sast.svalue version fo the given Ast.value *)
   and value = function 
-  	| Char(_)     -> raise (Failure ("TODO - value to svalue of Char"))
+  	| Char(c)     -> SChar c
     | Int(i)      -> SInt i
     | Bool(_)     -> raise (Failure ("TODO - value to svalue of Bool"))
     | Root(_)     -> raise (Failure ("TODO - value to svalue of Root"))

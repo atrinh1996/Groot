@@ -89,6 +89,9 @@ if the syntax is correct.
 - llgtypes.ml: module that defines what Llvm types equate to which (g)ROOT type.
 - test-print.gt: file used to test print 5 from codegen -> executable
 
+## Acknowledgements 
+- Print String codegen method of Mingjie Lao and Jiaying Song's PartialC [2021](http://www.cs.columbia.edu/~sedwards/classes/2021/4115-spring/reports/PartialC.pdf)
+
 
 ## Testing
 Test cases were designed to check for successful and failure. Testing generally

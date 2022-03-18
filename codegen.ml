@@ -48,9 +48,14 @@ let translate sdefns =
 
   (* DECLARE a print function (std::printf in C lib) *)
   let printf_ty : L.lltype = 
-      L.var_arg_function_type i32_ty [| L.pointer_type i8_ty |] in
+      L.var_arg_function_type int_ty [| L.pointer_type char_ty |] in
   let printf_func : L.llvalue = 
      L.declare_function "printf" printf_ty the_module in
+
+  let puts_ty : L.lltype = 
+      L.function_type int_ty [| L.pointer_type char_ty |] in
+  let puts_func : L.llvalue = 
+     L.declare_function "puts" puts_ty the_module in
 
 
 
@@ -72,7 +77,12 @@ let translate sdefns =
   (* Format strings to use with printf for our literals *)
   let int_format_str  = L.build_global_stringptr "%d\n" "fmt" builder
   and char_format_str = L.build_global_stringptr "%s\n" "fmt" builder
-  and bool_format_str = L.build_global_stringptr "%s\n" "fmt" builder in 
+  and bool_format_str = L.build_global_stringptr "%s\n" "fmt" builder 
+  (* and hello           = L.build_global_stringptr "Hello, world!\n" "hello" builder *)
+  in 
+
+  (* let zero = L.const_int i32_ty 0 in *)
+  (* let hello_w = L.build_in_bounds_gep hello [| zero |] "" builder in *)
 
 
   (* Construct constants code for literal values.
@@ -80,10 +90,17 @@ let translate sdefns =
      llvalue  *)
   let const_val v = 
     match v with 
-        SChar c -> L.const_string context (String.make 1 c)
-      | SInt  i -> L.const_int i32_ty i 
+        (* create the "string" constant in the code for the char *)
+        SChar c -> (* L.const_string context (String.make 1 c) *)
+            let spc = L.build_alloca char_ptr_ty "spc" builder in 
+            let globalChar = L.build_global_string (String.make 1 c) "globalChar" builder in 
+            let newStr = L.build_bitcast globalChar char_ptr_ty "newStr" builder in 
+            let loc = L.build_gep spc [| zero |] "loc" builder in 
+            let _ = L.build_store newStr loc builder in 
+            L.build_load spc "character_ptr" builder
+      | SInt  i -> L.const_int int_ty i 
       (* HAS to be an i1 lltype for the br instructions *)
-      | SBool b -> L.const_int i1_ty (if b then 1 else 0)
+      | SBool b -> L.const_int bool_ty (if b then 1 else 0)
       | SRoot _ -> raise (Failure ("TODO - codegen SRoot Literal"))
   in
 
@@ -96,8 +113,11 @@ let translate sdefns =
      | SVar     id  -> raise (Failure ("TODO - codegen SVar lookup"))
      | SIf (condition, then_exp, else_exp) -> 
             raise (Failure ("TODO - codegen SIF merge-then-else"))
-     | SApply ("printi", [args]) -> 
-          L.build_call printf_func [| int_format_str ; (build_expr args) |] "printi" builder
+     | SApply ("printi", [arg]) -> 
+          L.build_call printf_func [| int_format_str ; (build_expr arg) |] "printi" builder
+     | SApply ("printc", [arg]) -> 
+        L.build_call printf_func [| char_format_str ; (build_expr arg) |] "printc" builder
+        (* L.build_call puts_func [| build_expr arg |] "printc" builder *)
      | SApply (f, args) -> 
             raise (Failure ("TODO - codegen SAPPLY general"))
      (* L.const_string context (if b then "#t" else "#f") *)
