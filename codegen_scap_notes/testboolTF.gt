@@ -1,0 +1,2 @@
+(printb #t)
+(printb #f)

@@ -75,14 +75,19 @@ let translate sdefns =
 
 
   (* Format strings to use with printf for our literals *)
-  let int_format_str  = L.build_global_stringptr "%d\n" "fmt" builder
-  and char_format_str = L.build_global_stringptr "%s\n" "fmt" builder
-  and bool_format_str = L.build_global_stringptr "%s\n" "fmt" builder 
-  (* and hello           = L.build_global_stringptr "Hello, world!\n" "hello" builder *)
+  let int_format_str  = L.build_global_stringptr "%d\n" "fmt"   builder
+  and char_format_str = L.build_global_stringptr "%s\n" "fmt"   builder
+  and bool_format_str = L.build_global_stringptr "%s\n" "fmt"   builder 
+
+  (* string constants for printing booleans *)
+  and boolT           = L.build_global_stringptr "#t"   "boolT" builder
+  and boolF           = L.build_global_stringptr "#f"   "boolF" builder
   in 
 
-  (* let zero = L.const_int i32_ty 0 in *)
-  (* let hello_w = L.build_in_bounds_gep hello [| zero |] "" builder in *)
+
+  let zero = L.const_int int_ty 0 in
+  let print_true = L.build_in_bounds_gep boolT [| zero |] "" builder in
+  let print_false = L.build_in_bounds_gep boolF [| zero |] "" builder in
 
 
   (* Construct constants code for literal values.
@@ -118,9 +123,11 @@ let translate sdefns =
      | SApply ("printc", [arg]) -> 
         (* L.build_call printf_func [| char_format_str ; (build_expr arg) |] "printc" builder *)
         L.build_call puts_func [| build_expr arg |] "printc" builder
+     | SApply ("printb", [arg]) -> 
+        let bool_stringptr = if build_expr arg = (L.const_int bool_ty 1) then print_true else print_false
+        in L.build_call puts_func [| bool_stringptr |] "printb" builder
      | SApply (f, args) -> 
-            raise (Failure ("TODO - codegen SAPPLY general"))
-     (* L.const_string context (if b then "#t" else "#f") *)
+        raise (Failure ("TODO - codegen SAPPLY general"))
      | SLet (binds, e) -> raise (Failure ("TODO - codegen SLET"))
      | SLambda (formals, e) -> raise (Failure ("TODO - codegen SLambda"))
   in 

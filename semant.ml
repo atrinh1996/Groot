@@ -144,7 +144,7 @@ in *)
   and value = function 
   	| Char(c)     -> SChar c
     | Int(i)      -> SInt i
-    | Bool(_)     -> raise (Failure ("TODO - value to svalue of Bool"))
+    | Bool(b)     -> SBool b (* raise (Failure ("TODO - value to svalue of Bool") *)
     | Root(_)     -> raise (Failure ("TODO - value to svalue of Root"))
   in
 

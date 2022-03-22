@@ -12,7 +12,7 @@ type action =
 	  Ast 
 	| Sast 
 	| LLVM_IR
-(* | Compile *)
+ | Compile 
 
 let () =
 	let action = ref Ast in
@@ -21,8 +21,7 @@ let () =
 		("-a", Arg.Unit (set_action Ast), "Print the AST (default)");
     	("-s", Arg.Unit (set_action Sast), "Print the SAST");
     	("-l", Arg.Unit (set_action LLVM_IR), "Print the generated LLVM IR");
-    	(* ("-c", Arg.Unit (set_action Compile),
-			"Check and print the generated LLVM IR"); *)
+    	("-c", Arg.Unit (set_action Compile), "Check and print the generated LLVM IR");
 	] in
 
 	let usage_msg = "usage: ./toplevel.native [-a|-s] [file.gt]" in
@@ -60,7 +59,7 @@ let () =
 					print_string (Llvm.string_of_llmodule (Codegen.translate sast))
 
 					  (* action - print the llvm module. See above. *)
-					(* | Compile -> let the_module = Codegen.translate sast in 
+					 | Compile -> let the_module = Codegen.translate sast in 
 										Llvm_analysis.assert_valid_module the_module;
-										print_string (Llvm.string_of_llmodule the_module) *)
+										print_string (Llvm.string_of_llmodule the_module) 
 
