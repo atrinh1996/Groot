@@ -65,11 +65,12 @@ type prog = defn list
 
 (* toString for Ast.typ *)
 let string_of_typ = function
-      IType -> "int"
-    | CType -> "char"
-    | BType -> "bool"
-    | TType -> "TREE"
-    | XType _ -> "typPARAM"
+      IType     -> "int"
+    | CType     -> "char"
+    | BType     -> "bool"
+    | TType     -> "TREE"
+    | XType _   -> "typPARAM"
+    | _         -> "STRINGOFTYPE: unknown" 
 
 (* toString for Ast.expr *)
 let rec string_of_expr = function
