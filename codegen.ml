@@ -126,7 +126,7 @@ let translate sdefns =
      | SApply ("printb", [arg]) -> 
         let bool_stringptr = if build_expr arg = (L.const_int bool_ty 1) then print_true else print_false
         in L.build_call puts_func [| bool_stringptr |] "printb" builder
-     | SApply (f, args) -> 
+     | SApply _ -> 
         raise (Failure ("TODO - codegen SAPPLY general"))
      | SLet (binds, e) -> raise (Failure ("TODO - codegen SLET"))
      | SLambda (formals, e) -> raise (Failure ("TODO - codegen SLambda"))
