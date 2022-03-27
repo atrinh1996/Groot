@@ -76,8 +76,6 @@ let translate sdefns =
 
   (* Format strings to use with printf for our literals *)
   let int_format_str  = L.build_global_stringptr "%d\n" "fmt"   builder
-  and char_format_str = L.build_global_stringptr "%s\n" "fmt"   builder
-  and bool_format_str = L.build_global_stringptr "%s\n" "fmt"   builder 
 
   (* string constants for printing booleans *)
   and boolT           = L.build_global_stringptr "#t"   "boolT" builder
@@ -112,12 +110,11 @@ let translate sdefns =
   (* Construct code for expression 
      Function takes a Sast.sexpr, and constructs the llvm where 
      builder is located; returns the llvalue representation of code*)
-  let rec build_expr ((t, e) : sexpr) = 
+  let rec build_expr ((_, e) : sexpr) = 
     match e with 
        SLiteral v   -> const_val v
-     | SVar     id  -> raise (Failure ("TODO - codegen SVar lookup"))
-     | SIf (condition, then_exp, else_exp) -> 
-            raise (Failure ("TODO - codegen SIF merge-then-else"))
+     | SVar     _  -> raise (Failure ("TODO - codegen SVar lookup"))
+     | SIf _ -> raise (Failure ("TODO - codegen SIF merge-then-else"))
      | SApply ("printi", [arg]) -> 
           L.build_call printf_func [| int_format_str ; (build_expr arg) |] "printi" builder
      | SApply ("printc", [arg]) -> 
@@ -126,17 +123,16 @@ let translate sdefns =
      | SApply ("printb", [arg]) -> 
         let bool_stringptr = if build_expr arg = (L.const_int bool_ty 1) then print_true else print_false
         in L.build_call puts_func [| bool_stringptr |] "printb" builder
-     | SApply _ -> 
-        raise (Failure ("TODO - codegen SAPPLY general"))
-     | SLet (binds, e) -> raise (Failure ("TODO - codegen SLET"))
-     | SLambda (formals, e) -> raise (Failure ("TODO - codegen SLambda"))
+     | SApply _ -> raise (Failure ("TODO - codegen SAPPLY general"))
+     | SLet _ -> raise (Failure ("TODO - codegen SLET"))
+     | SLambda _ -> raise (Failure ("TODO - codegen SLambda"))
   in 
 
 
   (* Construct the code for a definition *)
   let build_defn sdef = 
     match sdef with 
-        SVal (id, e) -> raise (Failure ("TODO - codegen SVal"))
+        SVal _ -> raise (Failure ("TODO - codegen SVal"))
       | SExpr e -> build_expr e
   in 
 
