@@ -14,10 +14,10 @@ declare i32 @puts(i8*)
 
 define void @main(%tree_struct %0) {
 entry:
-  %spc = alloca i8*, align 8
+  %spc = alloca i8*
   %loc = getelementptr i8*, i8** %spc, i32 0
-  store i8* getelementptr inbounds ([2 x i8], [2 x i8]* @globalChar, i32 0, i32 0), i8** %loc, align 8
-  %character_ptr = load i8*, i8** %spc, align 8
+  store i8* getelementptr inbounds ([2 x i8], [2 x i8]* @globalChar, i32 0, i32 0), i8** %loc
+  %character_ptr = load i8*, i8** %spc
   %printc = call i32 @puts(i8* %character_ptr)
   ret void
 }

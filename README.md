@@ -18,6 +18,16 @@ if the syntax is correct.
 - Nickolas Gravel       nickolas.gravel@tufts.edu
 
 
+## Compile & Run 
+- **Compile the g(ROOT) compiler with**
+    > make 
+- **Run test(s)**
+    > ./testall.sh
+- **Compile a source file: hello.gt, to executable, hello.exe**
+    > make hello 
+- **Run hello executable (prints 'h')**
+    > ./hello.exe
+
 
 ## Compile & Run
 - **Compile with**:
