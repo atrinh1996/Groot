@@ -1,11 +1,13 @@
-(*
-fun canonicalize; seems to generate the type variable names;
-	'a through 'z
-	once those are exhausted, then v1 and up, to infinity
 
-*)
+(* Tinfer.ml will conduct all type inferencing and return an SAST *)
 
 open Ast
+
+(* Create a type exception for compiler to raise in the even of type mismatch*)
+exception Type_error of string
+
+(* Create a function to throw type error if one occurs *)
+let type_error msg = raise (Type_error msg)
 
 module StringMap = Map.Make(String)
 
@@ -16,55 +18,14 @@ type gtype =
     | TTree
     | TVar of int
 
-(* type TConsts = {typ : } *)
-
-(* Takes an Ast (defn list) and will return an Sast (sdefn list) *)
-(* 
-
-type defn = 
-	| Val of ident * expr
-	| Expr of expr
-
-type sdefn = 
-  | SVal of ident * sexpr
-  | SExpr of sexpr
-
-type sexpr = Ast.typ * Sast.sx
-
-type typ = Integer | Character | Boolean
-
-*)
-
-(* Notes with Mert *)
-(*
-
-(let [x 3] z) <- will parse
-???? z 
-(let [x y] z)
----
-(define foo () 3)  '() -> int
-(foo 1 2 3 4 5) int * int * int * int * int -> int
-
-*)
-
-(* type texper = Var of grootType * ident | Let of (ident * grootType * texpr) list * texpr | .. *)
-
-(* type Gamma = grootType StringMap *)
-
-(* let infer_types defns : (Gamma) = StringMap.empty *)
-(* End Notes with Mert *)
-
 let semantic_check defns =
-	(* let irast = check_non_type_stuff defns in -- Note *)
-	(* let type_bindings = infer_types irast in -- Note *)
-	(* let typed_ast = apply_types irast type_bindings in
-	typed_ast;; -- Note *)
-	let fresh =
-  		let k = ref 0 in
-    		fun () -> incr k; TVar !k
-		in
 
-	let rec generate_constraints expr = match expr with
+	let fresh =
+		let k = ref 0 in
+  		fun () -> incr k; TVar !k
+	in
+
+	let rec generate_constraints env expr = match expr with
 		| Literal v -> 
 			let literal_check v = match v with
 				| Char _ -> (TChar, [])
@@ -72,10 +33,10 @@ let semantic_check defns =
 				| Bool _ -> (TBool, []) 
 				| Root r -> 
 					let rec tree_check t = match t with
-						| Leaf   -> (TTree, [])
+						| Leaf -> (TTree, [])
 						| Branch (e, t1, t2) -> 
 							let branch_check e t1 t2 =
-								let e, c1 = generate_constraints e in
+								let e, c1 = generate_constraints env e in
 									let t1, c2 = tree_check t1 in 
 										let t2, c3 = tree_check t2 in 
 											let tau = fresh () in (TTree, [(tau, e); (TTree, t1); (TTree, t2)] @ c1 @ c2 @ c3)
@@ -84,15 +45,16 @@ let semantic_check defns =
 			in literal_check v
 		| If (e1, e2, e3) ->
 			let if_check e1 e2 e3 =
-				let t1, c1 = generate_constraints e1 in
-					let	t2, c2 = generate_constraints e2 in
-						let t3, c3 = generate_constraints e3 in
+				let t1, c1 = generate_constraints env e1 in
+					let	t2, c2 = generate_constraints env e2 in
+						let t3, c3 = generate_constraints env e3 in
 							let tau = fresh () in (tau, [(TBool, t1); (tau, t2); (tau, t3)] @ c1 @ c2 @ c3)
 			in if_check e1 e2 e3
     | Var (_) -> (fresh (), [])
     | Apply (_, _) -> raise (Failure ("missing case for type checking"))
-    | Let (_, _) -> raise (Failure ("missing case for type checking"))
-    | Lambda (_,_) -> raise (Failure ("missing case for type checking"))
+    | Let (_, _)   -> raise (Failure ("missing case for type checking"))
+    | Lambda (formals , body) ->
+    		generate_constraints ((List.fold_left (fun acc n -> (fresh (), n)::acc)) formals []) body
   in
 			
 
@@ -132,9 +94,11 @@ let semantic_check defns =
 				SVal(name, e')
 		| Expr (_)      -> raise (Failure ("TODO - check_defn in Expr"))
 *)
-		| Val (_, e) -> generate_constraints e 
-		| Expr (e)   -> generate_constraints e
-in List.map check_defn defns 
+		| Val (_, e) -> generate_constraints StringMap.empty e 
+		| Expr (e)   -> generate_constraints StringMap.empty e
+	in List.map check_defn defns 
+	
+semantic_check defns 
 
 (* Probably will map a check-function over the defns (defn list : defs) *)
 (* check-function will take a defn and return an sdefn *)

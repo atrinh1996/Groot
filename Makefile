@@ -2,7 +2,7 @@
 # Inspired by Richard/CS107 who was inspired by one provided by 
 # Stephen Edwards for his Compilers course at Columbia University.
 
-DEPENDS=toplevel.ml ast.ml semant.ml sast.ml parser.mly scanner.mll diagnostic.ml
+DEPENDS=toplevel.ml ast.ml semant.ml sast.ml parser.mly scanner.mll diagnostic.ml tinfer.ml
 
 # IMPORTANT Note from Zach:
 #	the _tags file contains arguments that are ingested by ocamlbuild
@@ -19,3 +19,4 @@ lexer: ast.ml parser.mly scanner.mll
 clean:
 	ocamlbuild -clean
 	rm -rf parser.ml parser.mli scanner.ml toplevel.native groot.native
+	
