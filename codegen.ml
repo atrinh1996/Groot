@@ -26,6 +26,7 @@
 (* module L = Llvm *)
 (* module A = Ast *)
 open Llgtype
+(* open Genv *)
 open Sast 
 
 
@@ -48,12 +49,12 @@ let translate sdefns =
 
   (* DECLARE a print function (std::printf in C lib) *)
   let printf_ty : L.lltype = 
-      L.var_arg_function_type int_ty [| L.pointer_type char_ty |] in
+      L.var_arg_function_type int_ty [| char_ptr_ty |] in
   let printf_func : L.llvalue = 
      L.declare_function "printf" printf_ty the_module in
 
   let puts_ty : L.lltype = 
-      L.function_type int_ty [| L.pointer_type char_ty |] in
+      L.function_type int_ty [| char_ptr_ty |] in
   let puts_func : L.llvalue = 
      L.declare_function "puts" puts_ty the_module in
 

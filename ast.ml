@@ -18,7 +18,9 @@ type gtype =
 (*type primop = Add | Sub | Mul | Div | Mod | Eq | Neq 
             | Lt  | Gt  | Leq | Geq | And | Or*)
 
-type 'a env = (ident * 'a) list
+(* type 'a env = (ident * 'a) list *)
+(* let emptyEnv : 'a env = [] *)
+
 (* mutuallly recursive expression * value types *)
 type expr = Literal of value
           | Var     of ident
@@ -31,6 +33,7 @@ and value = Char    of char
           (*| Float   of float*)
           | Bool    of bool
           | Root    of tree
+          (* | Closure of ident list * expr * value ref env *)
           (* | Closure of ident list * expr * (unit -> value env) *)
           (* not sure abt this? *)
           (*| Primitive of primop * value list -> value*)
