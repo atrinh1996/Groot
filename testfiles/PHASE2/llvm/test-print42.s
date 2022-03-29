@@ -18,6 +18,7 @@ Lloh1:
 	str	x8, [sp]
 	bl	_printf
 	ldp	x29, x30, [sp, #16]             ; 16-byte Folded Reload
+	mov	w0, wzr
 	add	sp, sp, #32                     ; =32
 	ret
 	.loh AdrpAdd	Lloh0, Lloh1

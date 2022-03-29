@@ -48,7 +48,7 @@ SignalError() {
 # Compares the outfile with reffile.  Differences, if any, written to difffile
 Compare() {
     genfiles="$genfiles $3"
-    echo diff -b $1 $2 ">" $3 1>&2
+    echo "diff -b $1 $2 > $3 1>&2"
     diff -b "$1" "$2" > "$3" 2>&1 || {
 	SignalError "$1 differs"
 	echo "FAILED $1 differs from $2" 1>&2
@@ -59,8 +59,9 @@ Compare() {
 # Report the command, run it, and report any errors
 Run() {
     echo $* 1>&2
-    eval $* || {
-	SignalError "$1 failed on $*"
+    eval $* ||
+    {
+	SignalError "$1 failed on: $*"
 	return 1
     }
 }
@@ -89,6 +90,7 @@ Check() {
     mkdir -p "${basedir}/diff"
     mkdir -p "${basedir}/llvm"
     mkdir -p "${basedir}/exe"
+    mkdir -p "${basedir}/err"
     
     echo -e "\033[1m${basename}:\033[0m"
 
@@ -96,6 +98,7 @@ Check() {
     echo "###### Testing $basename" 1>&2
    
     tstfile="$1"
+
     refstd="${basedir}/ref_std/${basename}.ref"
     refllvm="${basedir}/ref_llvm/${basename}.ref"
     refast="${basedir}/ref_ast/${basename}.ref"
@@ -104,6 +107,7 @@ Check() {
     llvmfile="${basedir}/llvm/${basename}.ll"
     asmfile="${basedir}/llvm/${basename}.s"
     outfile="${basedir}/stdout/${basename}.out"
+    errfile="${basedir}/stderr/${basename}.err"
 
     diffile="${basedir}/diff/${basename}.diff"
 
@@ -111,20 +115,20 @@ Check() {
 
     # Run the diff tests, store generated files
     genfiles="$genfiles ${diffile} ${outfile} ${astfile} ${llvmfile}" &&
-    Run "$GROOT" "-a" "$tstfile" ">" "${astfile}"  &&
-    Run "$GROOT" "-l" "$tstfile" ">" "${llvmfile}" &&
-    Run "llc -relocation-model=pic ${llvmfile}"    &&
-    Run "cc -o ${basedir}/exe/${basename}.exe ${asmfile}" && 
-    Run "./exe/${basename}.exe > ${outfile}" &&
-    Compare ${astfile} ${refast} ${diffile}      &&
-    Compare ${llvmfile} ${refllvm} ${diffile}  &&
-    Compare ${outfile} ${refstd} ${diffile}  &&
+    Run "$GROOT" "-a" "$tstfile" ">" "${astfile}"                     &&
+    Run "$GROOT" "-l" "$tstfile" ">" "${llvmfile}"                    &&
+    Run "llc" "-relocation-model=pic" "${llvmfile}"                   &&
+    Run "cc" "-o" "${basedir}/exe/${basename}" "${asmfile}"           && 
+    Run "./${basedir}/exe/${basename} > ${outfile}"                   &&
+    Compare ${astfile} ${refast} ${diffile}                           &&
+    Compare ${llvmfile} ${refllvm} ${diffile}                         &&
+    Compare ${outfile} ${refstd} ${diffile}                           &&
 
     # Report the status and clean up the generated files
     if [ $error -eq 0 ] ; then
-	# if [ $keep -eq 0 ] ; then
-	#     rm -f $genfiles
-	# fi
+	if [ $keep -eq 0 ] ; then
+	    rm -f $genfiles
+	fi
 	echo -e "  \033[92mI AM GROOT!\033[0m"
 	echo "###### SUCCESS" 1>&2
     else
