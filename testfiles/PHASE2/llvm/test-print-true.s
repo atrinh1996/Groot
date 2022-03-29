@@ -14,6 +14,7 @@ Lloh0:
 Lloh1:
 	add	x0, x0, l_boolT@PAGEOFF
 	bl	_puts
+	mov	w0, wzr
 	ldp	x29, x30, [sp], #16             ; 16-byte Folded Reload
 	ret
 	.loh AdrpAdd	Lloh0, Lloh1

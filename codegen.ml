@@ -62,7 +62,7 @@ let translate sdefns =
  (* To test struct type
     Comment these lines in, run.
     Should make the code defining the struct appear in the llvm code. *)
-  let main_ty = L.function_type void_ty [| tree_struct_ty |] in
+  let main_ty = L.function_type int_ty [| tree_struct_ty |] in
   let the_main = L.define_function "main" main_ty the_module in
 
   (* To test a simple codegen. Gives an void main, no args. *)
@@ -141,8 +141,8 @@ let translate sdefns =
   let _ = List.map build_defn sdefns in
 
   (* Every function definition needs to end in a ret *)
-  let _ = L.build_ret_void builder in
-  (* let _ = L.build_ret (L.const_int int_ty 0) builder in *)
+  (* let _ = L.build_ret_void builder in *)
+  let _ = L.build_ret (L.const_int int_ty 0) builder in
 
   (* Return an llmodule *)
   the_module
