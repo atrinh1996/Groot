@@ -70,7 +70,7 @@ let string_of_typ = function
     | BType     -> "bool"
     | TType     -> "TREE"
     | XType _   -> "typPARAM"
-    | _         -> "STRINGOFTYPE: unknown" 
+    | Void      -> "void"
 
 (* toString for Ast.expr *)
 let rec string_of_expr = function
