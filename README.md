@@ -6,8 +6,7 @@ coincide with tree implementation. It is a functional programming language
 based on LISP-style syntax. 
 
 Currently we have implemented toplevel.native, which drives the parser and
-lexer for the (g)ROOT language, and will print the given input (formatted)
-if the syntax is correct. 
+lexer for the (g)ROOT language, and are able to compile and print literals.
 
 
 ## Contributors
@@ -19,7 +18,7 @@ if the syntax is correct.
 
 
 ## Compile & Run 
-- **Compile the g(ROOT) compiler with one of these two**
+- **Compile the g(ROOT) compiler with ONE of these two**
     > make
     > make toplevel.native
 - **Run test(s)**
@@ -28,6 +27,14 @@ if the syntax is correct.
     > make hello 
 - **Run hello executable (prints 'h')**
     > ./hello.exe
+- **Compile and create executable for any given source file in our language, 
+    which must have the format [filename].gt**
+   *We provide a hello.gt and a cat.gt as example files.*
+    > make [filename].exe
+    > ./[filename].exe
+
+
+
 
 
 ## Files
@@ -64,6 +71,9 @@ we run the executable is compared against a reference output.
 -  test-print-true.gt:  prints #t (groot's representation of boolean true)
 - test-print-false.gt:  prints #f (groot's representation of boolean false)
 
+Tests succeed if each prints to stdout the diff statements followed by "I AM GROOT!" in green.
+If tests fail, they will print "I am groot..." in red, followed by a description of where it fails.
+
 
 ## Tasks Completed
 - Semant: module currently does basic type checking with literals (int, bool, and char), 
@@ -75,4 +85,11 @@ we run the executable is compared against a reference output.
     for the hardcoded strings #t and #f for representing booleans. Codegen for
     literals and print function application are done.
 - Sast: Semantically-checked Abstract Syntax Tree and functions for printing it. This will
-    currently fail tested on anything that is not "printc", "printb" or "printf", or a literal. 
+    currently fail tested on anything that is not "printc", "printb" or "printi", or a literal. 
+
+
+## Environment
+This was created using opam-2.1 and llvm-13.
+
+If there are compilation issues that may be due to versioning, we have a docker image that may help:
+documentation on using it is available at https://hub.docker.com/r/zegger/llvm-opam
