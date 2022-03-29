@@ -143,13 +143,14 @@ in *)
     | Root(_)     -> raise (Failure ("TODO - value to svalue of Root"))
   in
 
-  (* For the given Ast.defn, returns an Sast.sdefn*)
+  (* For the given Ast.defn, returns an Sast.sdefn, eventually should call 
+  		constraint-generation for type inferencing*)
 	let check_defn d = match d with
 		| Val (name, e) -> 
 				let e' = expr e in 
 				SVal(name, e')
 		| Expr e      -> SExpr (expr e)
-(* 		| Val (name, e) -> generate_constraints e 
+(* 	| Val (name, e) -> generate_constraints e 
 		| Expr (e)      -> generate_constraints e
  *)
 

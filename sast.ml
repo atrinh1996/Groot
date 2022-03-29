@@ -13,12 +13,8 @@ and sx =
 and svalue = 
     SChar    of char
   | SInt     of int
-  (* | Float   of float *)
   | SBool    of bool
   | SRoot    of stree
-  (* not sure abt this? *)
-  (* | SClosure of ident list * sexpr * (unit -> value env)  *)
-  (* | Primitive of primop * value list -> value *)
 and stree =  
     SLeaf
   | SBranch of svalue * stree * stree
@@ -29,6 +25,7 @@ type sdefn =
   | SExpr of sexpr
 
 type sprog = sdefn list
+
 
 (* Pretty printing functions *)
 
@@ -60,7 +57,6 @@ and string_of_sx = function
 and string_of_svalue = function
     SChar c -> String.make 1 c 
   | SInt i -> string_of_int i
-  (* | Float   of float *)
   | SBool b -> if b then "#t" else "#f"
   | SRoot tr -> string_of_stree tr
 (* toString for Sast.stree *)

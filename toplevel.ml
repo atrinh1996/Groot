@@ -12,7 +12,7 @@ type action =
 	  Ast 
 	| Sast 
 	| LLVM_IR
- | Compile 
+ 	| Compile 
 
 let () =
 	let action = ref Ast in
