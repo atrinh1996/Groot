@@ -1,33 +1,37 @@
-	.section	__TEXT,__text,regular,pure_instructions
-	.build_version macos, 12, 0
-	.globl	_main                           ; -- Begin function main
-	.p2align	2
-_main:                                  ; @main
+	.text
+	.file	"gROOT"
+	.globl	main                            # -- Begin function main
+	.p2align	4, 0x90
+	.type	main,@function
+main:                                   # @main
 	.cfi_startproc
-; %bb.0:                                ; %entry
-	stp	x29, x30, [sp, #-16]!           ; 16-byte Folded Spill
+# %bb.0:                                # %entry
+	pushq	%rax
 	.cfi_def_cfa_offset 16
-	.cfi_offset w30, -8
-	.cfi_offset w29, -16
-Lloh0:
-	adrp	x0, l_boolT@PAGE
-Lloh1:
-	add	x0, x0, l_boolT@PAGEOFF
-	bl	_puts
-	mov	w0, wzr
-	ldp	x29, x30, [sp], #16             ; 16-byte Folded Reload
-	ret
-	.loh AdrpAdd	Lloh0, Lloh1
+	leaq	.LboolT(%rip), %rdi
+	callq	puts@PLT
+	xorl	%eax, %eax
+	popq	%rcx
+	.cfi_def_cfa_offset 8
+	retq
+.Lfunc_end0:
+	.size	main, .Lfunc_end0-main
 	.cfi_endproc
-                                        ; -- End function
-	.section	__TEXT,__cstring,cstring_literals
-l_fmt:                                  ; @fmt
+                                        # -- End function
+	.type	.Lfmt,@object                   # @fmt
+	.section	.rodata.str1.1,"aMS",@progbits,1
+.Lfmt:
 	.asciz	"%d\n"
+	.size	.Lfmt, 4
 
-l_boolT:                                ; @boolT
+	.type	.LboolT,@object                 # @boolT
+.LboolT:
 	.asciz	"#t"
+	.size	.LboolT, 3
 
-l_boolF:                                ; @boolF
+	.type	.LboolF,@object                 # @boolF
+.LboolF:
 	.asciz	"#f"
+	.size	.LboolF, 3
 
-.subsections_via_symbols
+	.section	".note.GNU-stack","",@progbits

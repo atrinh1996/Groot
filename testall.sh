@@ -13,8 +13,8 @@
 #   Edited by Nick Gravel - to support testing groot language
 #
 
-make -q clean
-make -q toplevel.native
+make clean
+make toplevel.native
 
 GROOT="./toplevel.native"
 #GROOT="_build/toplevel.native"
