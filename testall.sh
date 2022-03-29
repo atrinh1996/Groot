@@ -81,11 +81,14 @@ Check() {
     error=0
     basename=`echo $1 | sed 's/.*\\///
                              s/.gt//'`
-    basedir="`echo $1 | sed 's/\/[^\/]*$//'`/"
+    basedir="`echo $1 | sed 's/\/[^\/]*$//'`"  
 
     # Make stdout, stderr, and diff if not yet created
     mkdir -p "${basedir}/stdout"
+    mkdir -p "${basedir}/ast"
     mkdir -p "${basedir}/diff"
+    mkdir -p "${basedir}/llvm"
+    mkdir -p "${basedir}/exe"
     
     echo -e "\033[1m${basename}:\033[0m"
 
@@ -93,22 +96,35 @@ Check() {
     echo "###### Testing $basename" 1>&2
    
     tstfile="$1"
-    reffile="${basedir}ref/${basename}.ref"
-    outfile="${basedir}stdout/${basename}.out"
-    diffile="${basedir}diff/${basename}.diff"
+    refstd="${basedir}/ref_std/${basename}.ref"
+    refllvm="${basedir}/ref_llvm/${basename}.ref"
+    refast="${basedir}/ref_ast/${basename}.ref"
+
+    astfile="${basedir}/ast/${basename}.ast"
+    llvmfile="${basedir}/llvm/${basename}.ll"
+    asmfile="${basedir}/llvm/${basename}.s"
+    outfile="${basedir}/stdout/${basename}.out"
+
+    diffile="${basedir}/diff/${basename}.diff"
 
     genfiles=""
 
     # Run the diff tests, store generated files
-    genfiles="$genfiles ${diffile} ${outfile}" &&
-    Run "$GROOT" "$tstfile" ">" "${outfile}" &&
-    Compare ${outfile} ${reffile} ${diffile}
+    genfiles="$genfiles ${diffile} ${outfile} ${astfile} ${llvmfile}" &&
+    Run "$GROOT" "-a" "$tstfile" ">" "${astfile}"  &&
+    Run "$GROOT" "-l" "$tstfile" ">" "${llvmfile}" &&
+    Run "llc -relocation-model=pic ${llvmfile}"    &&
+    Run "cc -o ${basedir}/exe/${basename}.exe ${asmfile}" && 
+    Run "./exe/${basename}.exe > ${outfile}" &&
+    Compare ${astfile} ${refast} ${diffile}      &&
+    Compare ${llvmfile} ${refllvm} ${diffile}  &&
+    Compare ${outfile} ${refstd} ${diffile}  &&
 
     # Report the status and clean up the generated files
     if [ $error -eq 0 ] ; then
-	if [ $keep -eq 0 ] ; then
-	    rm -f $genfiles
-	fi
+	# if [ $keep -eq 0 ] ; then
+	#     rm -f $genfiles
+	# fi
 	echo -e "  \033[92mI AM GROOT!\033[0m"
 	echo "###### SUCCESS" 1>&2
     else
@@ -134,9 +150,9 @@ CheckFail() {
     echo "###### Testing $basename" 1>&2
 
     tstfile="$1"
-    reffile="${basedir}ref/${basename}.ref"
-    errfile="${basedir}stderr/${basename}.err"
-    diffile="${basedir}diff/${basename}.diff"
+    reffile="${basedir}/phase1/ref/${basename}.ref"
+    errfile="${basedir}/phase1/stderr/${basename}.err"
+    diffile="${basedir}/phase1/diff/${basename}.diff"
 
     genfiles=""
 
@@ -175,7 +191,7 @@ if [ $# -ge 1 ]
 then
     files=$@
 else
-    files="testfiles/test-*.gt testfiles/fail-*.gt"  # Default Test files
+    files="testfiles/phase2/*.gt"  # Default Test files
 fi
 
 # For each file in the files list

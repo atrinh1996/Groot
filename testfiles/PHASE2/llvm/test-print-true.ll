@@ -16,4 +16,3 @@ entry:
   %printb = call i32 @puts(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @boolT, i32 0, i32 0))
   ret void
 }
-
