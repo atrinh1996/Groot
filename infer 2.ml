@@ -20,7 +20,7 @@ type gtype =
     | TVar of int
 
 
-let type_infer defns =
+let semantic_check defns =
 	(* fresh : returns a unique type variable to use as placeholder *)
 	let fresh =
 		let k = ref 0 in
@@ -59,19 +59,20 @@ let type_infer defns =
     		let t1, c1 = generate_constraints env e1 in
     			let t2, c2 = generate_constraints env e2 in 
     				let tau = fresh() in (tau, (t1, TFunc(t2, t)) :: c1 @ c2)
-			in apply_check e1 e2
 
     | Let (_, _)   -> raise (Failure ("missing case for type checking"))
+
     | Lambda (formals , body) ->
 			let lambda_check f b = 
-				generate_constraints (List.fold_left (fun acc x -> (fresh (), x)::acc) [] formals) b
-			in lambda_check formals body
-	in	
+  			generate_constraints (List.fold_left (fun acc x -> (fresh (), x)::acc) [] formals) b
+  		in lambda_check formals body
+	in
 
 	let check_defn env d = match d with
 		| Val (_, e) -> generate_constraints env e 
 		| Expr (e)   -> generate_constraints env e
 	in List.map check_defn defns
+
 	
 
 (* Probably will map a check-function over the defns (defn list : defs) *)
