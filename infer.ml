@@ -61,7 +61,7 @@ let type_infer defns =
     | Apply (e1, es) -> 
     		let t1, c1 = generate_constraints env e1 in
   			let ts2, c2 = List.fold_left (fun acc e -> let t, c = generate_constraints env e in 
-  																										let ts, cs = acc in t::ts, c::cs) [] es in
+				let ts, cs = acc in t::ts, c::cs) [] es in
 				let retType = fresh() in (retType, (t1, functiontype resultType ts2) @ c1 @ c2)
     | Let (_, _)   -> raise (Failure ("missing case for type checking"))
     | Lambda (formals , body) -> (* TODO - Lambda need fixing *)
