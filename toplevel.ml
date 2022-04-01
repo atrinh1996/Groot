@@ -12,19 +12,19 @@ type action =
 	  Ast 
 	| Sast 
 	| LLVM_IR
-	| Dummy
-(* | Compile *)
+ 	| Compile
+	| Dummy (* Cast Testing *)
 
 let () =
 	let action = ref Ast in
 	let set_action a () = action := a in
 	let speclist = [
-		("-a", Arg.Unit (set_action Ast), "Print the AST (default)");
-    	("-s", Arg.Unit (set_action Sast), "Print the SAST");
-    	("-l", Arg.Unit (set_action LLVM_IR), "Print the generated LLVM IR");
-    	("-d", Arg.Unit (set_action Dummy), "Cast test");
-    	(* ("-c", Arg.Unit (set_action Compile),
-			"Check and print the generated LLVM IR"); *)
+		("-a", Arg.Unit (set_action Ast), 		"Print the AST (default)");
+    	("-s", Arg.Unit (set_action Sast), 		"Print the SAST");
+    	("-l", Arg.Unit (set_action LLVM_IR), 	"Print the generated LLVM IR");
+    	("-c", Arg.Unit (set_action Compile),
+			"Check and print the generated LLVM IR");
+    	("-d", Arg.Unit (set_action Dummy), 	"Cast test");
 	] in
 
 	let usage_msg = "usage: ./toplevel.native [-a|-s] [file.gt]" in
@@ -39,7 +39,6 @@ let () =
 			(* All other action needs to generate an SAST, store in variable sast *)
 			| _ -> 
 				let sast = Semant.semantic_check ast in
-					  (* print_string "TODO: Finish Semant.semantic_check" *)
 					match !action with 
 				(* in sast *)
 					  (* This option doesn't do anything, just need it to satisfy 
@@ -47,11 +46,8 @@ let () =
 						Ast -> ()
 					  (* action - prints the SAST using sast.
 					     Here is the RHS code: 
-					     print_string (Sast.string_of_sprog sast) 
-					  *)
-					  (* Diagnostic.error(Diagnostic.Unimplemented "SAST printing") *)
+					     print_string (Sast.string_of_sprog sast) *)
 					| Sast -> print_string (Sast.string_of_sprog sast)
-
 					  (* action - print the llvm module. Codegen.translate produces the llmodule
 					     from the given SAST called sast and then Llvm.string_of_llmodule converts it to string.
 					     Here is the RHS code: 
@@ -60,10 +56,9 @@ let () =
 					| LLVM_IR -> 
 					(* Codegen.translate sast *)
 					print_string (Llvm.string_of_llmodule (Codegen.translate sast))
-
 					  (* action - print the llvm module. See above. *)
-					(* | Compile -> let the_module = Codegen.translate sast in 
+					| Compile -> let the_module = Codegen.translate sast in 
 										Llvm_analysis.assert_valid_module the_module;
-										print_string (Llvm.string_of_llmodule the_module) *)
+										print_string (Llvm.string_of_llmodule the_module)
 					| Dummy -> let _ = Conversion.convert sast in ()
 

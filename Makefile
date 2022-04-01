@@ -10,6 +10,14 @@ DEPENDS=toplevel.ml ast.ml semant.ml sast.ml parser.mly scanner.mll diagnostic.m
 toplevel.native: $(DEPENDS)
 	OPAMCLI=2.0; opam exec -- ocamlbuild -use-ocamlfind toplevel.native
 
+hello: 
+	make toLLVM
+	make toAssem
+	make toExe
+
+%.exe: %.gt
+	./toplevel.native -c $< > tmp.ll && llc -relocation-model=pic tmp.ll > tmp.s && cc -o $@ tmp.s
+
 parser: parser.mly
 	ocamlyacc parser.mly
 

@@ -108,8 +108,7 @@ in *)
 
 	(* Returns the Sast.sexpr (Ast.typ, Sast.sx) version of the given Ast.expr *)
 	let rec expr = function
-                                (* Problem - I force the Ast.typ to be Integer *)
-		| Literal(lit)          -> (* (IType, SLiteral(value lit)) *)
+		| Literal(lit)          -> 
       let s = value lit in 
         ((match s with 
             SInt _ -> IType
@@ -120,8 +119,6 @@ in *)
     | Var(_)                -> raise (Failure ("TODO - expr to sexpr of Var"))
     | If(_, _, _)           -> raise (Failure ("TODO - expr to sexpr of If"))
     | Apply(fname, args)        -> 
-        (* match fname with   *)
-            (* Var s ->  *)
             let fd = find_func fname in 
              let formals_length = List.length fd.formals in 
              let param_length = List.length args in 
@@ -136,25 +133,24 @@ in *)
                 in
              let args' = List.map2 check_call fd.formals args
              in (fd.rettyp, SApply (fname, args'))
-
-          (* | _ -> raise (Failure ("Applying non-name in application")) *)
     | Let(_, _)             -> raise (Failure ("TODO - expr to sexpr of Let"))
     | Lambda(_, _)          -> raise (Failure ("TODO - expr to sexpr of Lambda"))
   (* Returns the Sast.svalue version fo the given Ast.value *)
   and value = function 
   	| Char(c)     -> SChar c
     | Int(i)      -> SInt i
-    | Bool(_)     -> raise (Failure ("TODO - value to svalue of Bool"))
+    | Bool(b)     -> SBool b
     | Root(_)     -> raise (Failure ("TODO - value to svalue of Root"))
   in
 
-  (* For the given Ast.defn, returns an Sast.sdefn*)
+  (* For the given Ast.defn, returns an Sast.sdefn, eventually should call 
+  		constraint-generation for type inferencing*)
 	let check_defn d = match d with
 		| Val (name, e) -> 
 				let e' = expr e in 
 				SVal(name, e')
 		| Expr e      -> SExpr (expr e)
-(* 		| Val (name, e) -> generate_constraints e 
+(* 	| Val (name, e) -> generate_constraints e 
 		| Expr (e)      -> generate_constraints e
  *)
 
