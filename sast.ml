@@ -9,7 +9,7 @@ and sx =
  | SIf      of sexpr * sexpr * sexpr
  | SApply   of ident * sexpr list
  | SLet     of (ident * sexpr) list * sexpr
- | SLambda  of ident list * sexpr
+ | SLambda  of (gtype * ident) list * sexpr
 and svalue = 
     SChar    of char
   | SInt     of int
@@ -51,7 +51,8 @@ and string_of_sx = function
       "(let ("  ^ String.concat " " (List.map string_of_binding binds) ^ ") " 
                 ^ string_of_sexpr body ^ ")"
   | SLambda (formals, body) ->
-      "(lambda (" ^ String.concat " " formals ^ ") " 
+      let (tys, names) = List.split formals in 
+      "(lambda (" ^ (List.fold_left2 (fun space ty para -> string_of_typ ty ^ space ^ para) " " tys names) ^ ") " 
                   ^ string_of_sexpr body ^ ")"
 (* toString for Sast.svalue *)
 and string_of_svalue = function

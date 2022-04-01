@@ -4,7 +4,7 @@
 *)
 
 open Ast
-open Sast 
+(* open Sast *)
 module StringMap = Map.Make(String)
 
 (* int StringMap.t - for our rho/variable environment 
@@ -13,21 +13,22 @@ type var_env = int StringMap.t
 
 type cname = string
 
-type ctyp = 
+(* type ctyp = 
     | CInttyp 
     | CChartyp
     | CBooltyp
     | CTreetyp
     | CXtyp of int 
-    | CVoidtyp
+    | CVoidtyp *)
 
-type cexpr = 
+type cexpr = gtype * cx
+and cx =
     | CLiteral  of cvalue 
     | CVar      of cname 
     | CIf       of cexpr * cexpr * cexpr
     | CApply    of cname * cexpr list 
     | CLet      of (cname * cexpr) list * cexpr 
-    | CLambda   of cname list * cexpr
+    | CLambda   of (gtype * cname) list * cexpr
 and cvalue = 
     | CChar     of char
     | CInt      of int
@@ -43,9 +44,9 @@ type cdefn =
 
 type fdef = 
 {
-    rettyp  : ctyp; 
+    rettyp  : gtype; 
     fname   : cname; 
-    formals : (cname * ctyp) list;
+    formals : (gtype * cname) list;
     frees   : var_env; 
     body    : cexpr;
 }
@@ -60,7 +61,7 @@ type cprog =
 }
 
 
-
+(***********************************************************************)
 
 
 
