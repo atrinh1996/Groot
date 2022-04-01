@@ -60,5 +60,5 @@ let () =
 					| Compile -> let the_module = Codegen.translate sast in 
 										Llvm_analysis.assert_valid_module the_module;
 										print_string (Llvm.string_of_llmodule the_module)
-					| Dummy -> let _ = Conversion.convert sast in ()
+					| Dummy -> let _ = Conversion.conversion sast in ()
 

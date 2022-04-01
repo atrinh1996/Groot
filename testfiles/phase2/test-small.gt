@@ -1,0 +1,11 @@
+(val x 42)
+
+(val retn (lambda (n m) n))
+
+(val retx (lambda (a) (retn x a)))
+
+(val y (retx 3))
+
+x
+
+(; (val x 5) ;)
