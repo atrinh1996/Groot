@@ -4,22 +4,16 @@
 *)
 
 open Ast
-(* open Sast *)
+open Sast 
 module StringMap = Map.Make(String)
 
 (* int StringMap.t - for our rho/variable environment 
    (DOES NOT MAP TO VALUES) *)
 type var_env = int StringMap.t
+let emptyEnv = StringMap.empty
 
 type cname = string
 
-(* type ctyp = 
-    | CInttyp 
-    | CChartyp
-    | CBooltyp
-    | CTreetyp
-    | CXtyp of int 
-    | CVoidtyp *)
 
 type cexpr = gtype * cx
 and cx =
@@ -38,9 +32,6 @@ and ctree =
     | CLeaf 
     | CBranch   of cvalue * ctree * ctree
 
-type cdefn = 
-    | CVal      of cname * cexpr
-    | CExpr     of cexpr
 
 type fdef = 
 {
@@ -50,8 +41,13 @@ type fdef =
     frees   : var_env; 
     body    : cexpr;
 }
-
 type func_env = fdef StringMap.t
+
+
+type cdefn = 
+    | CVal      of cname * cexpr
+    | CExpr     of cexpr
+
 
 type cprog = 
 {
@@ -62,66 +58,99 @@ type cprog =
 
 
 (***********************************************************************)
+(* Returns true if the given name id is already bound in the given 
+   StringMap env. False otherwise *)
+let isBound id env = StringMap.mem id env 
+
+(* Adds a binding of k to v in the given StringMap env *)
+let bind k v env = StringMap.add k v env 
+
+(* Returns the value id is bound to in the given StringMap env. If the 
+   binding doesn't exist, Not_Found exception is raised. *)
+let find id env = StringMap.find id env 
 
 
+(* partial cprog to return from this module *)
+let res = 
+{
+  main      = []; 
+  functions = emptyEnv; 
+  rho       = emptyEnv;
+}
 
+(* puts the given cdefn into the main list *)
+let addMain d = d :: res.main 
 
+(* puts the given function name (id) mapping to its definition (f) in the 
+   functions StringMap *)
+let addFunctions id f = StringMap.add id f res.functions 
 
-(* exception NotFound of ident 
-exception BindListLength *)
+(* Given expression an a string name n, returns true if n is 
+   a free variable in the expression *)
+let freeIn exp n = 
+  let rec free (_, e) = match e with  
+    | SLiteral _              -> false
+    | SVar s                  -> s = n
+    | SIf (s1, s2, s3)        -> free s1 || free s2 || free s3
+    | SApply (fname, args)  -> fname = n || 
+                               List.fold_left 
+                                  (fun a b -> a || free b) 
+                                  false args
+    | SLet (bs, body) -> List.fold_left (fun a (_, e) -> a || free e) false bs 
+                         || (free body && not (List.fold_left 
+                                                (fun a (x, _) -> a || x = n) 
+                                                false bs))
+    | SLambda (formals, body) -> let (_, names) = List.split formals in 
+        free body && not (List.fold_left (fun a x -> a || x = n) false names)
+  in free (Void, exp)
 
+(* Given the formals list and body of a lambda (xs, e), and a 
+   variable environment, the function returns an environment with only 
+   the free variables of this lambda. *)
+let improve (xs, e) rho = 
+  StringMap.filter (fun n _ -> freeIn (SLambda (xs, e)) n) rho
 
+(* Converts given sexpr to cexpr, and returns the cexpr *)
+let rec sexprToCexpr ((ty, e) : sexpr) = match e with 
+  | SLiteral v              -> (ty, CLiteral (value v))
+  | SVar s                  -> (ty, CVar s)
+  | SIf (s1, s2, s3)        -> (ty, CIf (sexprToCexpr s1, 
+                                         sexprToCexpr s2, 
+                                         sexprToCexpr s3))
+  | SApply (fname, args)    -> (ty, CApply (fname, List.map sexprToCexpr args))
+  | SLet (bs, body) -> 
+        (ty, CLet   (List.map (fun (x, e) -> (x, sexprToCexpr e)) bs, 
+                     sexprToCexpr body))
+  | SLambda (formals, body) -> (ty, CLambda (formals, sexprToCexpr body)) 
+and value = function 
+  | SChar c                 -> CChar c 
+  | SInt  i                 -> CInt  i 
+  | SBool b                 -> CBool b 
+  | SRoot t                 -> CRoot (tree t)
+and tree = function 
+  | SLeaf                   -> CLeaf 
+  | SBranch (v, t1, t2)     -> CBranch (value v, tree t1, tree t2)
 
-(* Searches for given name in the given environment. Raises NotFound error
-   if the name isn't in the environment. 
-   ident * 'a env -> 'a *)
-(* let rec find (name, environ) = 
-    match environ with 
-    | [] -> raise (NotFound name)
-    | (target, value) :: tail -> 
-        if name = target then value else find (name, tail) *)
-
-(* Checks for the existence of name in the environ *)
-(* let rec isBound (name, environ) = 
-    match environ with 
-    | []                        -> false
-    | (target, value) :: tail   -> name = target || isBound (name, tail) *)
-
-(* Adds a new binding in the environment, and returns the updated environment. 
-   ident * 'a * 'a env -> 'a env *)
-(* let bind (name, value, environ) = (name, value) :: environ *)
-
-(* Adds each name in variables list bound to the equivalent value ini values
-   binding to current environment. 
-   ident list * 'a list * 'a env -> 'a env *)
-(* let rec bindList (variables, values, environ) = 
-    match (variables, values) with 
-    | (x :: vars, v :: vals)    -> bindList (vars, vals, bind (x, v, environ))
-    | ([], [])                  -> environ 
-    | _                         -> raise BindListLength
- *)
-(* Creates an environment from the given two list of names and values. 
-   ident list * 'a list -> 'a env *)
-(* let mkEnv (variables, values) = bindList (variables, values, emptyEnv) *)
-
-(* Checks for duplicates in the environment. Returns option None if 
-   no duplicates are found, or Some option for the duplicate if found. 
-   ident list -> name option *)
-(* let rec duplicateName environ = 
-    match environ with 
-    | [] -> None 
-    | x :: xs ->    if List.exists (fun elem -> elem = x) xs 
-                        then Some x  
-                    else duplicateName xs
- *)
-
-(* type basis = cvalue ref env  *)
-
-(* type initial_basis = 
-    emptyEnv *)
-(*     let rho = List.fold_left 
-                (fun (name, prim) rho -> bind (name, PRIMITIVE (), rho)) 
-                emptyEnv 
-                [] 
-    in rho
-*)
+(* Converts given SVal to CVal, and returns the CVal *)
+let svalToCval (id, (ty, e)) = 
+  (* check if id was already defined in rho *)
+  let occurs = if (isBound id res.rho) then (find id res.rho) else 0 in 
+  let _ = bind id (occurs + 1) res.rho in 
+  let cval = 
+  (match e with 
+    | SLambda (fformals, fbody) -> 
+        let f_def = 
+          {
+            rettyp = ty; 
+            fname = id; 
+            formals = fformals;
+            frees = improve (fformals, fbody) res.rho; 
+            body = sexprToCexpr fbody;
+          } 
+        in 
+        let _ = StringMap.add   (id ^ string_of_int (find id res.rho)) 
+                                f_def res.functions
+        in None 
+    | _-> Some (CVal (id, sexprToCexpr (ty, e)))
+  )
+  in cval 
