@@ -39,6 +39,7 @@ let () =
 			(* All other action needs to generate an SAST, store in variable sast *)
 			| _ -> 
 				let sast = Semant.semantic_check ast in
+				let cast = Conversion.conversion sast in 
 					match !action with 
 				(* in sast *)
 					  (* This option doesn't do anything, just need it to satisfy 
@@ -55,10 +56,10 @@ let () =
 					  *)
 					| LLVM_IR -> 
 					(* Codegen.translate sast *)
-					print_string (Llvm.string_of_llmodule (Codegen.translate sast))
+					print_string (Llvm.string_of_llmodule (Codegen.translate cast))
 					  (* action - print the llvm module. See above. *)
-					| Compile -> let the_module = Codegen.translate sast in 
+					| Compile -> let the_module = Codegen.translate cast in 
 										Llvm_analysis.assert_valid_module the_module;
 										print_string (Llvm.string_of_llmodule the_module)
-					| Dummy -> let cast = Conversion.conversion sast in Cast.string_of_cprog cast
+					| Dummy -> Cast.string_of_cprog cast
 

@@ -25,9 +25,10 @@
 
 (* module L = Llvm *)
 (* module A = Ast *)
+open Cast
 open Llgtype
 (* open Genv *)
-open Sast 
+(* open Sast  *)
 
 
 module StringMap = Map.Make(String)
@@ -40,7 +41,7 @@ module StringMap = Map.Make(String)
   ie (id, (Ast.gtyp, Sast.sx)) or (Ast,gtyp, Sast.sx).
   Remember: we are dealing with a list of sdefn's 
  *)
-let translate sdefns = 
+let translate { main = _; functions = _; rho = _ } = 
 
   (* Create an LLVM module (container into which we'll 
      generate actual code) *)
@@ -92,7 +93,7 @@ let translate sdefns =
   (* Construct constants code for literal values.
      Function takes a Sast.svalue, and returls the constructed 
      llvalue  *)
-  let const_val v = 
+  (* let const_val v = 
     match v with 
         (* create the "string" constant in the code for the char *)
         SChar c -> (* L.const_string context (String.make 1 c) *)
@@ -106,12 +107,12 @@ let translate sdefns =
       (* HAS to be an i1 lltype for the br instructions *)
       | SBool b -> L.const_int bool_ty (if b then 1 else 0)
       | SRoot _ -> raise (Failure ("TODO - codegen SRoot Literal"))
-  in
+  in *)
 
   (* Construct code for expression 
      Function takes a Sast.sexpr, and constructs the llvm where 
      builder is located; returns the llvalue representation of code*)
-  let rec build_expr ((_, e) : sexpr) = 
+  (* let rec build_expr ((_, e) : sexpr) = 
     match e with 
        SLiteral v   -> const_val v
      | SVar     _  -> raise (Failure ("TODO - codegen SVar lookup"))
@@ -119,7 +120,7 @@ let translate sdefns =
      | SApply ("printi", [arg]) -> 
           L.build_call printf_func [| int_format_str ; (build_expr arg) |] "printi" builder
      | SApply ("printc", [arg]) -> 
-        (* L.build_call printf_func [| char_format_str ; (build_expr arg) |] "printc" builder *)
+        L.build_call printf_func [| char_format_str ; (build_expr arg) |] "printc" builder
         L.build_call puts_func [| build_expr arg |] "printc" builder
      | SApply ("printb", [arg]) -> 
         let bool_stringptr = if build_expr arg = (L.const_int bool_ty 1) then print_true else print_false
@@ -127,19 +128,19 @@ let translate sdefns =
      | SApply _ -> raise (Failure ("TODO - codegen SAPPLY general"))
      | SLet _ -> raise (Failure ("TODO - codegen SLET"))
      | SLambda _ -> raise (Failure ("TODO - codegen SLambda"))
-  in 
+  in  *)
 
 
   (* Construct the code for a definition *)
-  let build_defn sdef = 
+  (* let build_defn sdef = 
     match sdef with 
         SVal _ -> raise (Failure ("TODO - codegen SVal"))
       | SExpr e -> build_expr e
-  in 
+  in  *)
 
 
   (* Iterate over the sdefns list to construct the code for them *)
-  let _ = List.map build_defn sdefns in
+  (* let _ = List.map build_defn sdefns in *)
 
   (* Every function definition needs to end in a ret *)
   (* let _ = L.build_ret_void builder in *)

@@ -127,10 +127,10 @@ let string_of_rho rho =
                     s ^ string_of_typ ty ^ " " ^ id ^ string_of_int num ^ "\n") 
                  rho ""
 
-let string_of_cprog { main = m; functions = f; rho = r } = 
+let string_of_cprog { main = main; functions = functions; rho = rho } = 
     print_endline "Main:";
-    print_endline (string_of_main m);
+    print_endline (string_of_main main);
     print_endline "Functions:";
-    print_endline (string_of_functions f);
+    print_endline (string_of_functions functions);
     print_endline "Rho:";
-    print_endline (string_of_rho r);
+    print_endline (string_of_rho rho);
