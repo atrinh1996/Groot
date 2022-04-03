@@ -14,13 +14,6 @@ let res =
   rho       = emptyEnv;
 }
 
-(* let result = 
-  ref {
-    main      = []; 
-    functions = emptyEnv; 
-    rho       = emptyEnv;
-  } *)
-
 (* puts the given cdefn into the main list *)
 let addMain d = res.main <- d :: res.main
 
@@ -109,13 +102,9 @@ let svalToCval (id, (ty, e)) =
     | _-> Some (CVal (id, sexprToCexpr (ty, e)))
   )
   in cval 
-
 (***********************************************************************)
 
-let checkmain _ = 
-  match res.main with 
-    | [] -> print_endline "empty"
-    | _ :: _ -> print_endline "not empty"
+
 
 (* Given an sprog (which is an sdefn list), convert returns a 
    cprog version. *)
