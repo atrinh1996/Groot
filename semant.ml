@@ -35,6 +35,42 @@ type typ = Integer | Character | Boolean
 
 *)
 
+type ty_env = gtype StringMap.t 
+let gamma = ref StringMap.empty
+
+type func_decl = {
+  rettyp : gtype;
+  fname : string;
+  formals : (gtype * string) list;
+}
+
+
+(* Collection function declarations for built in prints *)
+let built_in_decls = ref StringMap.empty
+
+let () = built_in_decls := 
+  let add_bind map (name, ty) =  
+    StringMap.add 
+      name 
+      { 
+        rettyp = Void;
+        fname = name;
+        formals = [(ty, "x")];
+      }
+      map 
+  in List.fold_left add_bind !built_in_decls [ ("printi", IType ); 
+                                               ("printc", CType); 
+                                               ("printb", BType) ]
+
+let functions = ref !built_in_decls
+
+(* Returns a function from out symbol table *)
+let find_func fname map = 
+  try StringMap.find fname map
+  with Not_found -> raise (Failure ("unrecognized function " ^ fname))
+
+
+
 let semantic_check (defns) =
 	(* let fresh =
   		let k = ref 0 in
@@ -84,30 +120,10 @@ in *)
 		with Not_found -> raise (Failure ("undeclared identifier" ^ s))
 	in *)
 
-  (* Collection function declarations for built in prints *)
-  let built_in_decls =  
-    let add_bind map (name, ty) =  
-      StringMap.add 
-        name 
-        { rettyp = Void;
-          fname = name;
-          formals = [(ty, "x")];
-          locals = [];
-          body = [] } 
-        map 
-    in List.fold_left add_bind StringMap.empty [ ("printi", IType ); 
-                                                 ("printc", CType); 
-                                                 ("printb", BType) ]
-  in
-
-  (* Returns a function from out symbol table *)
-  let find_func fname = 
-    try StringMap.find fname built_in_decls
-    with Not_found -> raise (Failure ("unrecognized function " ^ fname))
-  in
+  
 
 	(* Returns the Sast.sexpr (Ast.typ, Sast.sx) version of the given Ast.expr *)
-	let rec expr = function
+	let rec expr id e gamma = match e with 
 		| Literal(lit)          -> 
       let s = value lit in 
         ((match s with 
@@ -116,17 +132,17 @@ in *)
           | SBool _ -> BType
           | SRoot _ -> TType)
         , SLiteral s)
-    | Var(_)                -> raise (Failure ("TODO - expr to sexpr of Var"))
+    | Var(x) -> (try (StringMap.find x gamma, SVar x) with Not_found -> raise (Failure "not found var"))
     | If(_, _, _)           -> raise (Failure ("TODO - expr to sexpr of If"))
     | Apply(fname, args)        -> 
-            let fd = find_func fname in 
+            let fd = find_func fname !functions in 
              let formals_length = List.length fd.formals in 
              let param_length = List.length args in 
              if param_length != formals_length 
                 then raise (Failure ("expected number of args, but got different number"))
              else 
                 let check_call (ft, _) e = 
-                  let (et, e') = expr e in 
+                  let (et, e') = expr "" e gamma in 
                   if et = ft then (et, e') else raise 
                   (Failure ("illegal argument found " ^ string_of_typ et 
                     ^ " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e))
@@ -134,7 +150,19 @@ in *)
              let args' = List.map2 check_call fd.formals args
              in (fd.rettyp, SApply (fname, args'))
     | Let(_, _)             -> raise (Failure ("TODO - expr to sexpr of Let"))
-    | Lambda(_, _)          -> raise (Failure ("TODO - expr to sexpr of Lambda"))
+    (* Forces labda to be int type. *)
+    | Lambda(formals, body) -> 
+        let formal_list = List.map (fun x -> (IType, x)) formals in 
+        let gamma' = List.fold_left (fun map x -> StringMap.add x IType map) gamma formals in 
+        let _ = if (id = "") then () 
+          else functions := StringMap.add id 
+                                          { 
+                                            rettyp = IType;
+                                            fname = id;
+                                            formals = formal_list;
+                                          } 
+                                          !functions in 
+        (IType, SLambda (formal_list, expr "" body gamma'))
   (* Returns the Sast.svalue version fo the given Ast.value *)
   and value = function 
   	| Char(c)     -> SChar c
@@ -147,9 +175,10 @@ in *)
   		constraint-generation for type inferencing*)
 	let check_defn d = match d with
 		| Val (name, e) -> 
-				let e' = expr e in 
+				let e' = expr name e !gamma in
+        let () = gamma := StringMap.add name (fst e') !gamma in 
 				SVal(name, e')
-		| Expr e      -> SExpr (expr e)
+		| Expr e      -> SExpr (expr "" e !gamma)
 (* 	| Val (name, e) -> generate_constraints e 
 		| Expr (e)      -> generate_constraints e
  *)
