@@ -1,46 +1,19 @@
 (*
     Notes:
 
-    sdefn contains sexr:
-        type sdefn = 
-          | SVal of ident * sexpr
-          | SExpr of sexpr
-
-    sexpr: 
-        type sexpr = gtype * sx
-        and sx = 
-           SLiteral of svalue
-         | SVar     of ident
-         | SIf      of sexpr * sexpr * sexpr
-         | SApply   of sexpr * sexpr list
-         | SLet     of (ident * sexpr) list * sexpr
-         | SLambda  of ident list * sexpr
-
-
     Format specifiers
       ints      %d 
       char      %c --> will use %s 
       string    %s (bool: #t and #f)
 *)
 
-(* module L = Llvm *)
-(* module A = Ast *)
 open Cast
 open Llgtype
-(* open Genv *)
-(* open Sast  *)
 
 
-module StringMap = Map.Make(String)
-
-(* translate sdefns - Given an SAST called sdefns, the function returns 
-   an LLVM module (llmodule type), which is the code generated from 
-   the SAST. Throws exception if something is wrong. 
-  
-  Note: An sdefn is an SVal or an SExpr, 
-  ie (id, (Ast.gtyp, Sast.sx)) or (Ast,gtyp, Sast.sx).
-  Remember: we are dealing with a list of sdefn's 
- *)
+(* translate sdefns - Given an CAST (type cprog, a record type), the function 
+   returns an LLVM module (llmodule type), which is the code generated from 
+   the CAST. Throws exception if something is wrong. *)
 let translate { main = _; functions = _; rho = _ } = 
 
   (* Create an LLVM module (container into which we'll 
