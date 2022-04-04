@@ -79,8 +79,10 @@ let rec sexprToCexpr ((ty, e) : sexpr) = match e with
                                          sexprToCexpr s2, 
                                          sexprToCexpr s3))
   | SApply (fname, args)    -> 
-      let (occurs, _) = (find fname res.rho) in 
-      let call = fname ^ string_of_int occurs in 
+      let call = try fname ^ string_of_int (fst (find fname res.rho)) 
+                 with Not_found -> fname in 
+      (* let call = fname ^ string_of_int occurs in  *)
+      (* let call = fname ^ (if occurs = 0 then "" else string_of_int occurs) in  *)
       (ty, CApply (call, List.map sexprToCexpr args))
   | SLet (bs, body) -> 
         (ty, CLet   (List.map (fun (x, e) -> (x, sexprToCexpr e)) bs, 

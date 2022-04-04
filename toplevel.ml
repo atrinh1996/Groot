@@ -8,6 +8,8 @@
    types
  *)
 
+(* open Cast *)
+
 type action = 
 	  Ast 
 	| Sast 

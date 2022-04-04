@@ -62,7 +62,7 @@ let () = built_in_decls :=
                                                ("printc", CType); 
                                                ("printb", BType) ]
 
-let functions = ref !built_in_decls
+let functions = built_in_decls
 
 (* Returns a function from out symbol table *)
 let find_func fname map = 
@@ -136,19 +136,19 @@ in *)
     | If(_, _, _)           -> raise (Failure ("TODO - expr to sexpr of If"))
     | Apply(fname, args)        -> 
             let fd = find_func fname !functions in 
-             let formals_length = List.length fd.formals in 
-             let param_length = List.length args in 
-             if param_length != formals_length 
-                then raise (Failure ("expected number of args, but got different number"))
-             else 
-                let check_call (ft, _) e = 
-                  let (et, e') = expr "" e gamma in 
-                  if et = ft then (et, e') else raise 
-                  (Failure ("illegal argument found " ^ string_of_typ et 
-                    ^ " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e))
-                in
-             let args' = List.map2 check_call fd.formals args
-             in (fd.rettyp, SApply (fname, args'))
+            let formals_length = List.length fd.formals in 
+            let param_length = List.length args in 
+            if param_length != formals_length 
+              then raise (Failure ("expected number of args, but got different number"))
+            else 
+              let check_call (ft, _) e = 
+                let (et, e') = expr "" e gamma in 
+                if et = ft then (et, e') else raise 
+                (Failure ("illegal argument found " ^ string_of_typ et 
+                  ^ " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e))
+              in
+            let args' = List.map2 check_call fd.formals args
+            in (fd.rettyp, SApply (fname, args'))
     | Let(_, _)             -> raise (Failure ("TODO - expr to sexpr of Let"))
     (* Forces labda to be int type. *)
     | Lambda(formals, body) -> 

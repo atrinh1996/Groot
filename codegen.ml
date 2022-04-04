@@ -15,7 +15,7 @@ open Llgtype
 (* translate sdefns - Given an CAST (type cprog, a record type), the function 
    returns an LLVM module (llmodule type), which is the code generated from 
    the CAST. Throws exception if something is wrong. *)
-let translate { main = _; functions = functions; rho = _ } = 
+let translate { main = main; functions = functions; rho = _; phi = _ } = 
 
   (* Create an LLVM module (container into which we'll 
      generate actual code) *)
@@ -47,21 +47,21 @@ let translate { main = _; functions = functions; rho = _ } =
 
 
   (* create a builder for the whole program, start it in main block *)
-  let builder = L.builder_at_end context (L.entry_block the_main) in
+  let main_builder = L.builder_at_end context (L.entry_block the_main) in
 
 
   (* Format strings to use with printf for our literals *)
-  let int_format_str  = L.build_global_stringptr "%d\n" "fmt"   builder
+  let int_format_str  = L.build_global_stringptr "%d\n" "fmt"   main_builder
 
   (* string constants for printing booleans *)
-  and boolT           = L.build_global_stringptr "#t"   "boolT" builder
-  and boolF           = L.build_global_stringptr "#f"   "boolF" builder
+  and boolT           = L.build_global_stringptr "#t"   "boolT" main_builder
+  and boolF           = L.build_global_stringptr "#f"   "boolF" main_builder
   in 
 
 
   let zero = L.const_int int_ty 0 in
-  let print_true = L.build_in_bounds_gep boolT [| zero |] "" builder in
-  let print_false = L.build_in_bounds_gep boolF [| zero |] "" builder in
+  let print_true = L.build_in_bounds_gep boolT [| zero |] "" main_builder in
+  let print_false = L.build_in_bounds_gep boolF [| zero |] "" main_builder in
 
   (* Lookup table of functin names (lambdas) to (function block, function def) *)
   let function_decls : (L.llvalue * fdef) StringMap.t = 
@@ -80,50 +80,50 @@ let translate { main = _; functions = functions; rho = _ } =
   (* Construct constants code for literal values.
      Function takes a Sast.svalue, and returls the constructed 
      llvalue  *)
-  (* let const_val v = 
+  let const_val v builder = 
     match v with 
         (* create the "string" constant in the code for the char *)
-        SChar c -> (* L.const_string context (String.make 1 c) *)
+        CChar c -> (* L.const_string context (String.make 1 c) *)
             let spc = L.build_alloca char_ptr_ty "spc" builder in 
             let globalChar = L.build_global_string (String.make 1 c) "globalChar" builder in 
             let newStr = L.build_bitcast globalChar char_ptr_ty "newStr" builder in 
             let loc = L.build_gep spc [| zero |] "loc" builder in 
             let _ = L.build_store newStr loc builder in 
             L.build_load spc "character_ptr" builder
-      | SInt  i -> L.const_int int_ty i 
+      | CInt  i -> L.const_int int_ty i 
       (* HAS to be an i1 lltype for the br instructions *)
-      | SBool b -> L.const_int bool_ty (if b then 1 else 0)
-      | SRoot _ -> raise (Failure ("TODO - codegen SRoot Literal"))
-  in *)
+      | CBool b -> L.const_int bool_ty (if b then 1 else 0)
+      | CRoot _ -> raise (Failure ("TODO - codegen SRoot Literal"))
+  in
 
   (* Construct code for expression 
-     Function takes a Sast.sexpr, and constructs the llvm where 
+     Function takes a Cast.cexpr, and constructs the llvm where 
      builder is located; returns the llvalue representation of code*)
-  (* let rec build_expr ((_, e) : sexpr) = 
+  let rec expr (_, e) builder = 
     match e with 
-       SLiteral v   -> const_val v
-     | SVar     _  -> raise (Failure ("TODO - codegen SVar lookup"))
-     | SIf _ -> raise (Failure ("TODO - codegen SIF merge-then-else"))
-     | SApply ("printi", [arg]) -> 
-          L.build_call printf_func [| int_format_str ; (build_expr arg) |] "printi" builder
-     | SApply ("printc", [arg]) -> 
-        L.build_call printf_func [| char_format_str ; (build_expr arg) |] "printc" builder
-        L.build_call puts_func [| build_expr arg |] "printc" builder
-     | SApply ("printb", [arg]) -> 
-        let bool_stringptr = if build_expr arg = (L.const_int bool_ty 1) then print_true else print_false
+       CLiteral v   -> const_val v builder
+     | CVar     _  -> raise (Failure ("TODO - codegen CVar lookup"))
+     | CIf _ -> raise (Failure ("TODO - codegen CIF merge-then-else"))
+     | CApply ("printi", [arg]) -> 
+          L.build_call printf_func [| int_format_str ; (expr arg builder) |] "printi" builder
+     | CApply ("printc", [arg]) -> 
+        (* L.build_call printf_func [| char_format_str ; (expr arg builder) |] "printc" builder *)
+        L.build_call puts_func [| expr arg builder |] "printc" builder
+     | CApply ("printb", [arg]) -> 
+        let bool_stringptr = if expr arg builder = (L.const_int bool_ty 1) then print_true else print_false
         in L.build_call puts_func [| bool_stringptr |] "printb" builder
-     | SApply _ -> raise (Failure ("TODO - codegen SAPPLY general"))
-     | SLet _ -> raise (Failure ("TODO - codegen SLET"))
-     | SLambda _ -> raise (Failure ("TODO - codegen SLambda"))
-  in  *)
+     | CApply _ -> raise (Failure ("TODO - codegen SAPPLY general"))
+     | CLet _ -> raise (Failure ("TODO - codegen CLET"))
+     | CLambda _ -> raise (Failure ("TODO - codegen CLambda"))
+  in 
 
 
-  (* Construct the code for a definition *)
-  (* let build_defn sdef = 
-    match sdef with 
-        SVal _ -> raise (Failure ("TODO - codegen SVal"))
-      | SExpr e -> build_expr e
-  in  *)
+  (* construct the code for each instruction in main (which is a cdefn list) *)
+  let build_main_body = function 
+    | CVal (_, _) -> raise (Failure ("TODO - codegen CVal"))
+    | CExpr e -> expr e main_builder
+  in 
+  let _ = List.map build_main_body main in 
 
 
   (* Iterate over the sdefns list to construct the code for them *)
@@ -131,7 +131,7 @@ let translate { main = _; functions = functions; rho = _ } =
 
   (* Every function definition needs to end in a ret *)
   (* let _ = L.build_ret_void builder in *)
-  let _ = L.build_ret (L.const_int int_ty 0) builder in
+  let _ = L.build_ret (L.const_int int_ty 0) main_builder in
 
   (* Return an llmodule *)
   the_module
