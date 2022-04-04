@@ -9,12 +9,13 @@
 
 open Cast
 open Llgtype
+(* open Fcodegen *)
 
 
 (* translate sdefns - Given an CAST (type cprog, a record type), the function 
    returns an LLVM module (llmodule type), which is the code generated from 
    the CAST. Throws exception if something is wrong. *)
-let translate { main = _; functions = _; rho = _ } = 
+let translate { main = _; functions = functions; rho = _ } = 
 
   (* Create an LLVM module (container into which we'll 
      generate actual code) *)
@@ -61,6 +62,19 @@ let translate { main = _; functions = _; rho = _ } =
   let zero = L.const_int int_ty 0 in
   let print_true = L.build_in_bounds_gep boolT [| zero |] "" builder in
   let print_false = L.build_in_bounds_gep boolF [| zero |] "" builder in
+
+  (* Lookup table of functin names (lambdas) to (function block, function def) *)
+  let function_decls : (L.llvalue * fdef) StringMap.t = 
+    let define_func map def =  
+      let name = def.fname 
+      and formal_types = 
+        Array.of_list (List.map (fun (t, _) -> ltype_of_gtype t) 
+                      (def.formals @ def.frees)) 
+      in 
+      let ftype = L.function_type (ltype_of_gtype def.rettyp) formal_types
+      in StringMap.add name (L.define_function name ftype the_module, def) map 
+    in List.fold_left define_func StringMap.empty functions 
+  in 
 
 
   (* Construct constants code for literal values.

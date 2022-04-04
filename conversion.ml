@@ -9,10 +9,10 @@ open Cast
 (* partial cprog to return from this module *)
 let res = 
 {
-  main      = []; 
-  functions = emptyEnv; 
+  main      = emptyList; 
+  functions = emptyList; 
   rho       = emptyEnv;
-  phi       = [];
+  phi       = emptyList;
 }
 
 
@@ -21,7 +21,7 @@ let addMain d = res.main <- d :: res.main
 
 (* puts the given function name (id) mapping to its definition (f) in the 
    functions StringMap *)
-let addFunction id f = res.functions <- StringMap.add id f res.functions 
+let addFunction f = res.functions <- f :: res.functions 
 
 let findFunction id = List.mem id res.phi
 let bindFunction id = res.phi <- id :: res.phi 
@@ -65,7 +65,11 @@ let improve (xs, e) rho =
 (* removes any occurrance of things in no_no list from the env (StringMap)
    and returns the new StringMap *)
 let clean no_no env =  
-  StringMap.filter (fun n _ -> not (List.mem n no_no)) env 
+  StringMap.filter (fun n _ -> not (List.mem n no_no)) env
+
+(* Given a var_env, returns a (gtype  * name) list version *)
+let toParamList venv = 
+  StringMap.fold (fun id (num, ty) res -> (ty, id ^ string_of_int num) :: res) venv []
 
 (* Converts given sexpr to cexpr, and returns the cexpr *)
 let rec sexprToCexpr ((ty, e) : sexpr) = match e with 
@@ -107,11 +111,12 @@ let svalToCval (id, (ty, e)) =
             rettyp = ty; 
             fname = id'; 
             formals = fformals;
-            frees = clean res.phi (improve (fformals, fbody) res.rho); 
+            frees = toParamList 
+                      (clean res.phi (improve (fformals, fbody) res.rho)); 
             body = sexprToCexpr fbody;
           } 
         in 
-        let () = addFunction id' f_def in  None 
+        let () = addFunction f_def in  None 
     | _ ->  (* let (occurs, _) = if (isBound id res.rho) then (find id res.rho) 
                               else (0, IType) 
             in 

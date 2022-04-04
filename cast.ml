@@ -11,6 +11,7 @@ module StringMap = Map.Make(String)
    (DOES NOT MAP TO VALUES) *)
 type var_env = (int * gtype) StringMap.t
 let emptyEnv = StringMap.empty
+let emptyList = []
 
 type cname = string
 
@@ -43,7 +44,7 @@ type fdef =
   rettyp  : gtype; 
   fname   : cname; 
   formals : (gtype * cname) list;
-  frees   : var_env; 
+  frees   : (gtype * cname) list; 
   body    : cexpr;
 }
 
@@ -54,7 +55,7 @@ type func_env = fdef StringMap.t
 type cprog = 
 {
   mutable main        : cdefn list; (* list for main instruction *)
-  mutable functions   : func_env;   (* table of function definitions *)
+  mutable functions   : fdef list;   (* table of function definitions *)
   mutable rho         : var_env;    (* variable declaration table *)
   mutable phi         : cname list; (* fname list to deal with dup defs of functions *)
 }
@@ -108,22 +109,23 @@ let string_of_cdefn = function
 let string_of_main main = 
     String.concat "\n" (List.map string_of_cdefn main) ^ "\n"
 
-let string_of_functions (funcs : func_env) = 
-  let string_of_fdef _ {
+let string_of_functions (funcs : fdef list) = 
+  let string_of_fdef ret_string {
         rettyp = return;
         fname = fname; 
         formals = formals;
         frees = frees;
         body = body;
-    } ret_string = 
+    } = 
       let string_of_formal (ty, para) = string_of_typ ty ^ " " ^ para in
-      let listfrees id (num, ty) l = (ty, id ^ string_of_int num) :: l in 
-      let args = formals @ List.rev (StringMap.fold listfrees frees []) in
+      (* let listfrees id (num, ty) l = (ty, id ^ string_of_int num) :: l in  *)
+      (* let args = formals @ List.rev (StringMap.fold listfrees frees []) in *)
+      let args = formals @ frees in
       let def = string_of_typ return ^ " " ^ fname ^ " (" 
         ^ String.concat ", " (List.map string_of_formal args)
         ^ ")\n{\n" ^  string_of_cexpr body  ^ "\n}\n"
       in ret_string ^ def ^ "\n"
-  in StringMap.fold string_of_fdef funcs ""
+  in List.fold_left string_of_fdef "" funcs
 
 let string_of_rho rho = 
   StringMap.fold (fun id (num, ty) s -> 
