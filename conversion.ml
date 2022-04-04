@@ -12,14 +12,19 @@ let res =
   main      = []; 
   functions = emptyEnv; 
   rho       = emptyEnv;
+  phi       = [];
 }
 
+
 (* puts the given cdefn into the main list *)
-let addMain d = res.main <- d :: res.main
+let addMain d = res.main <- d :: res.main 
 
 (* puts the given function name (id) mapping to its definition (f) in the 
    functions StringMap *)
 let addFunction id f = res.functions <- StringMap.add id f res.functions 
+
+let findFunction id = List.mem id res.phi
+let bindFunction id = res.phi <- id :: res.phi 
 
 (* Returns true if the given name id is already bound in the given 
    StringMap env. False otherwise *)
@@ -57,6 +62,11 @@ let freeIn exp n =
 let improve (xs, e) rho = 
   StringMap.filter (fun n _ -> freeIn (SLambda (xs, e)) n) rho
 
+(* removes any occurrance of things in no_no list from the env (StringMap)
+   and returns the new StringMap *)
+let clean no_no env =  
+  StringMap.filter (fun n _ -> not (List.mem n no_no)) env 
+
 (* Converts given sexpr to cexpr, and returns the cexpr *)
 let rec sexprToCexpr ((ty, e) : sexpr) = match e with 
   | SLiteral v              -> (ty, CLiteral (value v))
@@ -64,7 +74,10 @@ let rec sexprToCexpr ((ty, e) : sexpr) = match e with
   | SIf (s1, s2, s3)        -> (ty, CIf (sexprToCexpr s1, 
                                          sexprToCexpr s2, 
                                          sexprToCexpr s3))
-  | SApply (fname, args)    -> (ty, CApply (fname, List.map sexprToCexpr args))
+  | SApply (fname, args)    -> 
+      let (occurs, _) = (find fname res.rho) in 
+      let call = fname ^ string_of_int occurs in 
+      (ty, CApply (call, List.map sexprToCexpr args))
   | SLet (bs, body) -> 
         (ty, CLet   (List.map (fun (x, e) -> (x, sexprToCexpr e)) bs, 
                      sexprToCexpr body))
@@ -83,23 +96,27 @@ let svalToCval (id, (ty, e)) =
   (* check if id was already defined in rho *)
   let (occurs, _) = if (isBound id res.rho) then (find id res.rho) else (0, IType) in 
   let () = bind id (occurs + 1, ty) in 
+  let id' = id ^ string_of_int (occurs + 1) in 
   let cval = 
   (match e with 
     | SLambda (fformals, fbody) -> 
+        (* let () = bindFunction id in  *)
+        let () = if (findFunction id) then () else bindFunction id in
         let f_def = 
           {
             rettyp = ty; 
-            fname = id; 
+            fname = id'; 
             formals = fformals;
-            frees = improve (fformals, fbody) res.rho; 
+            frees = clean res.phi (improve (fformals, fbody) res.rho); 
             body = sexprToCexpr fbody;
           } 
         in 
-        let () = addFunction (id ^ string_of_int (fst (find id res.rho))) f_def  
-        (* let _ = StringMap.add   (id ^ string_of_int (fst (find id res.rho))) 
-                                f_def res.functions *)
-        in None 
-    | _-> Some (CVal (id, sexprToCexpr (ty, e)))
+        let () = addFunction id' f_def in  None 
+    | _ ->  (* let (occurs, _) = if (isBound id res.rho) then (find id res.rho) 
+                              else (0, IType) 
+            in 
+            let () = bind id (occurs + 1, ty) in *) 
+            Some (CVal (id, sexprToCexpr (ty, e)))
   )
   in cval 
 (***********************************************************************)
@@ -124,7 +141,8 @@ let conversion sdefns =
   let _ = List.iter convert sdefns in 
 
   {
-    main = List.rev res.main;
+    main      = List.rev res.main;
     functions = res.functions;
-    rho = res.rho
+    rho       = res.rho;
+    phi       = res.phi;
   }

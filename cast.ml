@@ -17,43 +17,46 @@ type cname = string
 
 type cexpr = gtype * cx
 and cx =
-    | CLiteral  of cvalue 
-    | CVar      of cname 
-    | CIf       of cexpr * cexpr * cexpr
-    | CApply    of cname * cexpr list 
-    | CLet      of (cname * cexpr) list * cexpr 
-    | CLambda   of (gtype * cname) list * cexpr
+  | CLiteral  of cvalue 
+  | CVar      of cname 
+  | CIf       of cexpr * cexpr * cexpr
+  | CApply    of cname * cexpr list 
+  | CLet      of (cname * cexpr) list * cexpr 
+  | CLambda   of (gtype * cname) list * cexpr
 and cvalue = 
-    | CChar     of char
-    | CInt      of int
-    | CBool     of bool
-    | CRoot     of ctree
+  | CChar     of char
+  | CInt      of int
+  | CBool     of bool
+  | CRoot     of ctree
 and ctree = 
-    | CLeaf 
-    | CBranch   of cvalue * ctree * ctree
-
-
-type fdef = 
-{
-    rettyp  : gtype; 
-    fname   : cname; 
-    formals : (gtype * cname) list;
-    frees   : var_env; 
-    body    : cexpr;
-}
-type func_env = fdef StringMap.t
-
+  | CLeaf 
+  | CBranch   of cvalue * ctree * ctree
 
 type cdefn = 
-    | CVal      of cname * cexpr
-    | CExpr     of cexpr
+  | CVal      of cname * cexpr
+  | CExpr     of cexpr
 
 
+(* function definiton record type (imperative style to record information) *)
+type fdef = 
+{
+  rettyp  : gtype; 
+  fname   : cname; 
+  formals : (gtype * cname) list;
+  frees   : var_env; 
+  body    : cexpr;
+}
+
+(* funciton definition table used to handle multiple definitons of a function *)
+type func_env = fdef StringMap.t
+
+(* a CAST *)
 type cprog = 
 {
-    mutable main        : cdefn list;
-    mutable functions   : func_env;
-    mutable rho         : var_env; 
+  mutable main        : cdefn list; (* list for main instruction *)
+  mutable functions   : func_env;   (* table of function definitions *)
+  mutable rho         : var_env;    (* variable declaration table *)
+  mutable phi         : cname list; (* fname list to deal with dup defs of functions *)
 }
 
 
@@ -124,13 +127,18 @@ let string_of_functions (funcs : func_env) =
 
 let string_of_rho rho = 
   StringMap.fold (fun id (num, ty) s -> 
-                    s ^ string_of_typ ty ^ " " ^ id ^ string_of_int num ^ "\n") 
+                    s ^ id ^ ": " ^ string_of_typ ty ^ " " ^ id ^ string_of_int num ^ "\n") 
                  rho ""
 
-let string_of_cprog { main = main; functions = functions; rho = rho } = 
+let string_of_phi phi = 
+  List.iter print_endline phi
+
+let string_of_cprog { main = main; functions = functions; rho = rho; phi = phi } = 
     print_endline "Main:";
     print_endline (string_of_main main);
     print_endline "Functions:";
     print_endline (string_of_functions functions);
     print_endline "Rho:";
     print_endline (string_of_rho rho);
+    print_endline "Phi:";
+    string_of_phi phi;

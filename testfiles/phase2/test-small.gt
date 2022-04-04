@@ -9,3 +9,7 @@ x
 (val y (retx 3))
 
 (val x 5) 
+
+(val retn (lambda (m n) n)) 
+
+(val rety (lambda () (retn x y)))

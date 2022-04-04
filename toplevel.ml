@@ -55,7 +55,7 @@ let () =
 					     print_string (Llvm.string_of_llmodule (Codegen.translate sast)) 
 					  *)
 					| LLVM_IR -> 
-					(* Codegen.translate sast *)
+					(* Codegen.translate cast *)
 					print_string (Llvm.string_of_llmodule (Codegen.translate cast))
 					  (* action - print the llvm module. See above. *)
 					| Compile -> let the_module = Codegen.translate cast in 
