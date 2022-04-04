@@ -119,18 +119,14 @@ let translate { main = main; functions = functions; rho = _; phi = _ } =
 
 
   (* construct the code for each instruction in main (which is a cdefn list) *)
-  let build_main_body = function 
+  (* let build_main_body = function 
     | CVal (_, _) -> raise (Failure ("TODO - codegen CVal"))
     | CExpr e -> expr e main_builder
   in 
-  let _ = List.map build_main_body main in 
+  let _ = List.map build_main_body main in *) 
 
-
-  (* Iterate over the sdefns list to construct the code for them *)
-  (* let _ = List.map build_defn sdefns in *)
 
   (* Every function definition needs to end in a ret *)
-  (* let _ = L.build_ret_void builder in *)
   let _ = L.build_ret (L.const_int int_ty 0) main_builder in
 
   (* Return an llmodule *)
