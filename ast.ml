@@ -1,48 +1,49 @@
-(* Abstract Syntax Tree for groot 
-   Functions for printing
-*)
+(* Abstract Syntax Tree (AST) for Groot *)
 
-(* type gtype = 
-    | TInt 
-    | TChar 
-    | TBool 
-    | TTree
-    | TVar of int *)
-
-(* any identifier *)
+(* Type of Variable Names *)
 type ident = string
 
-(*type primop = Add | Sub | Mul | Div | Mod | Eq | Neq 
-            | Lt  | Gt  | Leq | Geq | And | Or*)
+(* Types in Groot *)
+type gtype =
+    | TInt                (* integers [int] *)
+    | TBool               (* booleans [bool] *)
+    | TParam of int       (* parameters *)
 
-type 'a env = (ident * 'a) list
-(* mutually recursive expression * value types *)
-type expr = Literal of value
-          | Var     of ident
-          | If      of expr * expr * expr
-          | Apply   of expr * expr list
-          | Let     of (ident * expr) list * expr
-          | Lambda  of ident list * expr
-and value = Char    of char
-          | Int     of int
-          (*| Float   of float*)
-          | Bool    of bool
-          | Root    of tree
-          (* | Closure of ident list * expr * (unit -> value env) *)
-          (* not sure abt this? *)
-          (*| Primitive of primop * value list -> value*)
-and tree =  Leaf
-          | Branch of expr * tree * tree
-          (* TODO: maybe change "value * tree * tree" *)
-          (* Perhaps in the SAST, this is a value *)
+(* type primop = Add | Sub | Mul | Div | Mod | Eq | Neq 
+            | Lt  | Gt  | Leq | Geq | And | Or *)
 
-(* top-level definitions *)
+(* type 'a env = (ident * 'a) list *) (* What is this? *)
+
+(* Groot Expressions *)
+type expr = 
+  | Literal of value
+  | Var     of ident
+  | If      of expr * expr * expr
+  | Apply   of expr * expr list
+  | Let     of (ident * expr) list * expr
+  | Lambda  of ident list * expr
+and value = 
+  | Char    of char
+  | Int     of int
+  | Bool    of bool
+  | Root    of tree
+  (*| Float   of float*)
+  (* | Closure of ident list * expr * (unit -> value env) *)
+  (* not sure abt this? *)
+  (*| Primitive of primop * value list -> value*)
+and tree =  
+  | Leaf
+  | Branch of expr * tree * tree
+  (* TODO: maybe change "value * tree * tree" *)
+  (* Perhaps in the SAST, this is a value *)
+
+(* Top-Level Definitions *)
 type defn = 
-          | Val of ident * expr
-          | Expr of expr
-          (*| Define of ident * ident list * expr*)
-          (* fn name, arg names, body*)
-          (*| Use of ident*)
+  | Val  of ident * expr
+  | Expr of expr
+(*| Define of ident * ident list * expr*)
+(* fn name, arg names, body*)
+(*| Use of ident*)
 
 (* short for program, analogous to main *)
 type prog = defn list
