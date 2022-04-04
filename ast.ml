@@ -3,12 +3,6 @@
 (* Type of Variable Names *)
 type ident = string
 
-(* Types in Groot *)
-type gtype =
-    | TInt                (* integers [int] *)
-    | TBool               (* booleans [bool] *)
-    | TParam of int       (* parameters *)
-
 (* type primop = Add | Sub | Mul | Div | Mod | Eq | Neq 
             | Lt  | Gt  | Leq | Geq | And | Or *)
 
