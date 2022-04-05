@@ -6,13 +6,13 @@ module StringMap = Map.Make (String)
 exception Type_error of string
 
 type gtype =
-  | TYCON of gtype
+  | TYCON of tycon
   | TYVAR of tyvar
   | CONAPP of conapp
 and tycon =
-  | TInt of int                     								 (** integers [int] *)
-  | TBool                    							   (** booleans [bool] *)
-  | TChar					           								 (** chars    [char] *)
+  | TInt of int                    								 (** integers [int] *)
+  | TBool of bool                  							   (** booleans [bool] *)
+  | TChar of char	           								 (** chars    [char] *)
   | TArrow of gtype * gtype                  (** Function type [s -> t] *)
   (* | TTree of gtype * gscheme * gscheme       (** Trees *) *)
 and tyvar =
@@ -25,7 +25,7 @@ let type_error msg = raise (Type_error msg)
 (* fresh: returns an unused type parameter *)
 let fresh =
   let k = ref 0 in
-    fun () -> incr k; TParam !k
+  	fun () -> incr k; TParam !k
 
 let solve (cns : 'a list) = 
 	let rec solve cns subs =
@@ -49,23 +49,22 @@ let rec generate_constraints gctx e =
 	let rec constrain ctx e =
 	match e with
 	| Literal e        -> value e
-	| Var _            -> fresh (), []
+	| Var _            -> TYVAR (fresh ()), []
 	| If (e1, e2, e3)  -> raise (Type_error "missing case for If")
 	| Apply (_, _)     -> raise (Type_error "missing case for Apply")
 	| Let (_, _)       -> raise (Type_error "missing case for Let")
 	| Lambda (_,_)     -> raise (Type_error "missing case for Lambda")
 	and value v = 
 	match v with
-	| Int  _  ->  TInt, []
-	| Char _  -> TChar, []
-	| Bool _  -> TBool, []
+	| Int e  ->  TYCON (TInt e), []
+	| Char e  -> TYCON (TChar e), []
+	| Bool e  -> TYCON (TBool e), []
 	and tree t =
 	match t with 
-	| Leaf 		-> raise (Failure "missing case for Leaf")
-	| Branch  -> raise (Failure "missing case for Branch")
+	| Leaf 		-> raise (Type_error "missing case for Leaf")
+	| Branch (e, t1, t2) -> raise (Type_error "missing case for Branch")
 in constrain gctx e
 
 
-let typeinfer (ctx : 'a StringMap.t ) (e : expr list) =
-	raise Failure("Not yet implemented")
-typeinfer StringMap.empty defns
+let type_infer (ctx : 'a StringMap.t ) (d : defn list) =
+	raise (Type_error "not yet implemented")
