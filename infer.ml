@@ -56,12 +56,12 @@ let rec generate_constraints gctx e =
 		| Lambda (_,_) -> raise (Type_error "missing case for Lambda")
 		and value v = 
 		match v with
-		| Int e  ->  TYCON (TInt e), []
-		| Char e  -> TYCON (TChar e), []
-		| Bool e  -> TYCON (TBool e), []
+		| Int e ->  TYCON (TInt e), []
+		| Char e -> TYCON (TChar e), []
+		| Bool e -> TYCON (TBool e), []
 		and tree t =
 		match t with 
-		| Leaf 		-> raise (Type_error "missing case for Leaf")
+		| Leaf -> raise (Type_error "missing case for Leaf")
 		| Branch (e, t1, t2) -> raise (Type_error "missing case for Branch")
 	in constrain gctx e
 
