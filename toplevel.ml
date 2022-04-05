@@ -7,6 +7,7 @@
 (* may not need to use this, but this is how to robustly create unique exception
    types
  *)
+module StringMap = Map.Make (String)
 
 type action = 
 	  Ast 
@@ -36,7 +37,7 @@ let () =
 			| Ast     -> print_string (Ast.string_of_prog ast)
 			(* All other action needs to generate an SAST, store in variable sast *)
 			| _ -> 
-				let sast = Infer.type_infer ast in
+				let sast = Infer.type_infer StringMap.empty ast in
 					  print_string "TODO: Finish Infer.type_infer"
 					(* match !action with  *)
 				(* in sast *)
