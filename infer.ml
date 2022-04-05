@@ -48,12 +48,12 @@ let solve (cns : 'a list) =
 let rec generate_constraints gctx e =
 	let rec constrain ctx e =
 		match e with
-		| Literal e        -> value e
-		| Var _            -> TYVAR (fresh ()), []
-		| If (e1, e2, e3)  -> raise (Type_error "missing case for If")
-		| Apply (_, _)     -> raise (Type_error "missing case for Apply")
-		| Let (_, _)       -> raise (Type_error "missing case for Let")
-		| Lambda (_,_)     -> raise (Type_error "missing case for Lambda")
+		| Literal e -> value e
+		| Var _ -> TYVAR (fresh ()), []
+		| If (e1, e2, e3) -> raise (Type_error "missing case for If")
+		| Apply (_, _) -> raise (Type_error "missing case for Apply")
+		| Let (_, _) -> raise (Type_error "missing case for Let")
+		| Lambda (_,_) -> raise (Type_error "missing case for Lambda")
 		and value v = 
 		match v with
 		| Int e  ->  TYCON (TInt e), []
