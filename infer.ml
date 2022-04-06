@@ -10,37 +10,60 @@ type gtype =
   | TYVAR of tyvar
   | CONAPP of conapp
 and tycon =
-  | TInt of int                    								 (** integers [int] *)
-  | TBool of bool                  							   (** booleans [bool] *)
-  | TChar of char	           								 (** chars    [char] *)
+  | TInt                    								 (** integers [int] *)
+  | TBool                  							   (** booleans [bool] *)
+  | TChar           								 (** chars    [char] *)
   | TArrow of gtype * gtype                  (** Function type [s -> t] *)
   (* | TTree of gtype * gscheme * gscheme       (** Trees *) *)
 and tyvar =
 	| TParam of int          (** parameter *)
 and conapp = (tycon * gtype list)
 
+module TypeSet = Set.Make (
+	struct
+		let compare = Pervasives.compare
+		type t = gtype  
+	end )
+
 (* ty_error msg: reports a type error by raising [Type_error msg]. *)
 let type_error msg = raise (Type_error msg)
+
+let rec is_free_type_var var gt = 
+	match gt with
+	| TYCON _ -> false
+	| TYVAR tvar -> var = tvar
+	| CONAPP tcon -> List.fold_left 
+		(fun acc x -> is_free_type_var var x || acc)
+		false
+		(snd tcon)
 
 (* fresh: returns an unused type parameter *)
 let fresh =
   let k = ref 0 in
 	fun () -> incr k; TParam !k
 
-let solve (cns : 'a list) = 
-	let rec solver cns subs =
+let solve (constraints : 'a list) = 
+	let rec solver cns (subs : (tyvar * gtype) list) =
 		match cns with
-		| [] -> StringMap.empty
-		| (TYVAR k1, TYVAR k2) :: cns -> raise (Type_error "missing case in solver (case 1)")
-		| (TYVAR k, TYCON t) :: cns -> raise (Type_error "missing case in solver")
-		| (TYVAR k, CONAPP s) :: cns -> raise (Type_error "missing case in solver (case 3)")
-		| (TYCON t, TYVAR k) :: cns -> raise (Type_error "same as case 1")
-		| (TYCON t1, TYCON t2) :: cns -> raise (Type_error "missing case in solver")
-		| (TYCON t, CONAPP s) :: cns -> raise (Type_error "missing case in solver (case 6)")
-		| (CONAPP s, TYVAR k) :: cns -> raise (Type_error "same as case 3")
-		| (CONAPP s, TYCON t) :: cns -> raise (Type_error "same as case 6")
-		| (CONAPP s1, CONAPP s2) :: cns -> raise (Type_error "missing case in solver")
-	in solve cns []
+		| [] -> []
+		| (TYVAR t1, TYVAR t2) :: cns ->  solver cns ((t1, TYVAR t2)::subs)
+		| (TYVAR t, TYCON c) :: cns -> solver cns ((t, TYCON c)::subs)
+		(* TODO is there a cleaner way to do this? *)
+		| (TYVAR t, CONAPP a) :: cns -> 
+				if (List.fold_left (fun acc x -> (is_free_type_var t x || acc)) false (snd a)) 
+				then raise (Type_error "type error")
+				else solver cns ((t, CONAPP a)::subs)
+		| (TYCON c, TYVAR t) :: cns -> solver cns ((t, TYCON c)::subs)
+		| (TYCON c1, TYCON c2) :: cns -> 
+				if c1 = c2 
+				then solver cns subs 
+				else raise (Type_error "type error: (tycon,tycon)")
+		| (TYCON c, CONAPP a) :: cns -> raise (Type_error "type error: (tycon, conapp")
+		| (CONAPP a, TYVAR t) :: cns -> solver ((TYVAR t, CONAPP a)::cns) subs
+		| (CONAPP a, TYCON c) :: cns -> raise (Type_error "type error: (conapp, tycon")
+		| (CONAPP a1, CONAPP a2) :: cns -> solver ((List.combine (snd a1) (snd a2)) @ ((TYCON (fst a1), TYCON (fst a2))::cns)) subs
+
+	in solver constraints []
 
 
 (* generate_constraints gctx e: infers the type of expression 'e' and a set of
@@ -56,9 +79,9 @@ let rec generate_constraints gctx e =
 		| Lambda (_,_) -> raise (Type_error "missing case for Lambda")
 		and value v = 
 		match v with
-		| Int e ->  TYCON (TInt e), []
-		| Char e -> TYCON (TChar e), []
-		| Bool e -> TYCON (TBool e), []
+		| Int e ->  TYCON TInt, []
+		| Char e -> TYCON TChar, []
+		| Bool e -> TYCON TBool, []
 		and tree t =
 		match t with 
 		| Leaf -> raise (Type_error "missing case for Leaf")
