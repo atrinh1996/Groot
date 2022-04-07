@@ -1,4 +1,7 @@
-
+(* SAST = sdefn list *)
+(* sdefn = (id, sexpr *)
+(* sexpr = (gtype, sx) *)
+(* sx = AST.expr with sexpr inplace of expr *)
 open Ast
 
 module StringMap = Map.Make (String)
@@ -42,27 +45,51 @@ let fresh =
   let k = ref 0 in
 	fun () -> incr k; TParam !k
 
-let solve (constraints : 'a list) = 
+(* TODO implement this *)
+let sub theta cns =
+	cns
+(* 	let sub1 sub cn::cns = if fst sub = fst cn
+											then (snd sub, snd cn)
+	List.fold_left (fun acc x -> x) [] cns
+	for i in theta
+		for j in cns
+			if fst i appears in fst j
+				then make j into (snd i, snd j)
+			if fst i appears in snd j
+				then make j into (fst j, snd i) 
+ *)
+
+(* TODO implement this. Can it be the same as sub or use it somehow? *)
+let compose theta1 theta2 =
+	theta1
+
+let rec solve' c1 = 
+	match c1 with
+	| (TYVAR t1, TYVAR t2) -> [(t1, TYVAR t2)]
+	| (TYVAR t, TYCON c) -> [(t, TYCON c)]
+	| (TYVAR t, CONAPP a) -> 	
+			if (List.fold_left (fun acc x -> (is_free_type_var t x || acc)) false (snd a)) 
+															then raise (Type_error "type error")
+															else [(t, CONAPP a)]
+	| (TYCON c, TYVAR t) -> solve' (TYVAR t, TYCON c)
+	| (TYCON c1, TYCON c2) -> 
+					if c1 = c2 
+						then []
+						else raise (Type_error "type error: (tycon,tycon)")
+	| (TYCON c, CONAPP a) -> raise (Type_error "type error: (tycon, conapp")
+	| (CONAPP a, TYVAR t) -> solve' (TYVAR t, CONAPP a)
+	| (CONAPP a, TYCON c) -> raise (Type_error "type error: (conapp, tycon")
+	(* TODO check with Mert about this case *)
+	| (CONAPP a1, CONAPP a2) -> solve ((List.combine (snd a1) (snd a2)) @ [((TYCON (fst a1), TYCON (fst a2)))])
+
+
+and solve (constraints : 'a list) = 
 	let rec solver cns (subs : (tyvar * gtype) list) =
 		match cns with
 		| [] -> []
-		| (TYVAR t1, TYVAR t2) :: cns ->  solver cns ((t1, TYVAR t2)::subs)
-		| (TYVAR t, TYCON c) :: cns -> solver cns ((t, TYCON c)::subs)
-		(* TODO is there a cleaner way to do this? *)
-		| (TYVAR t, CONAPP a) :: cns -> 
-				if (List.fold_left (fun acc x -> (is_free_type_var t x || acc)) false (snd a)) 
-				then raise (Type_error "type error")
-				else solver cns ((t, CONAPP a)::subs)
-		| (TYCON c, TYVAR t) :: cns -> solver cns ((t, TYCON c)::subs)
-		| (TYCON c1, TYCON c2) :: cns -> 
-				if c1 = c2 
-				then solver cns subs 
-				else raise (Type_error "type error: (tycon,tycon)")
-		| (TYCON c, CONAPP a) :: cns -> raise (Type_error "type error: (tycon, conapp")
-		| (CONAPP a, TYVAR t) :: cns -> solver ((TYVAR t, CONAPP a)::cns) subs
-		| (CONAPP a, TYCON c) :: cns -> raise (Type_error "type error: (conapp, tycon")
-		| (CONAPP a1, CONAPP a2) :: cns -> solver ((List.combine (snd a1) (snd a2)) @ ((TYCON (fst a1), TYCON (fst a2))::cns)) subs
-
+		(* | (TYVAR t1, TYVAR t2) :: cns -> solver cns ((t1, TYVAR t2)::subs) *)
+		| cn :: cns -> 	let theta1 = solve' cn in 
+									 	let theta2 =  solve (sub theta1 cns) in compose theta2 theta1
 	in solver constraints []
 
 
