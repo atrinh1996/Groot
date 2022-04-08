@@ -6,13 +6,13 @@
 type ident = string
 
 
-type gtype = 
+(* type gtype = 
     | IType 
     | CType 
     | BType 
     | TType
     | XType of int
-    | Void
+    | Void *)
 
 
 (*type primop = Add | Sub | Mul | Div | Mod | Eq | Neq 
@@ -25,7 +25,7 @@ type gtype =
 type expr = Literal of value
           | Var     of ident
           | If      of expr * expr * expr
-          | Apply   of ident * expr list
+          | Apply   of expr * expr list
           | Let     of (ident * expr) list * expr
           | Lambda  of ident list * expr
 and value = Char    of char
@@ -67,13 +67,13 @@ type prog = defn list
 (* Pretty printing functions *)
 
 (* toString for Ast.typ *)
-let string_of_typ = function
+(* let string_of_typ = function
       IType     -> "int"
     | CType     -> "char"
     | BType     -> "bool"
     | TType     -> "TREE"
     | XType _   -> "typPARAM"
-    | Void      -> "void"
+    | Void      -> "void" *)
 
 (* toString for Ast.expr *)
 let rec string_of_expr = function

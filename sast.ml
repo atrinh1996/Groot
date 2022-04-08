@@ -2,14 +2,42 @@
 
 open Ast
 
+(* TYPES *)
+type tycon = string 
+type tyvar = TParam of int
+
+type gtype =
+    TYCON of tycon
+  | TYVAR of tyvar
+  | CONAPP of gtype * gtype list
+
+let inttype     = TYCON "int"
+let booltype    = TYCON "bool"
+let chartype    = TYCON "char"
+let treetype ty = CONAPP (TYCON "tree", [ty])
+let funtype (args, res) = 
+  CONAPP (TYCON "function", [CONAPP (TYCON "arguments", args), result])
+
+(* and tycon =
+  | TInt                                     (** integers [int] *)
+  | TBool                                  (** booleans [bool] *)
+  | TChar                            (** chars    [char] *)
+  | TArrow of gtype * gtype  *)                 (** Function type [s -> t] *)
+  (* | TTree of gtype * gscheme * gscheme       (** Trees *) *)
+(* and tyvar =
+  | TParam of int  *)         (** parameter *)
+(* and conapp = (tycon * gtype list) *)
+
+
+(* NOTE: SEXPR is a tupe of SAST.gtype * SEXPRESSION (sx) *)
 type sexpr = gtype * sx
 and sx = 
-   SLiteral of svalue
- | SVar     of ident
- | SIf      of sexpr * sexpr * sexpr
- | SApply   of ident * sexpr list
- | SLet     of (ident * sexpr) list * sexpr
- | SLambda  of (gtype * ident) list * sexpr
+    SLiteral of svalue
+  | SVar     of ident
+  | SIf      of sexpr * sexpr * sexpr
+  | SApply   of sexpr * sexpr list
+  | SLet     of (ident * sexpr) list * sexpr
+  | SLambda  of (gtype * ident) list * sexpr
 and svalue = 
     SChar    of char
   | SInt     of int
@@ -28,6 +56,23 @@ type sprog = sdefn list
 
 
 (* Pretty printing functions *)
+
+(* toString for Sast.gtype *)
+let rec string_of_typ = function
+    TYCON ty -> string_of_tycon ty
+  | TYVAR tp -> string_of_tyvar tp
+  | CONAPP (ty, tys) -> String.concat " " (List.map string_of_typ tys) 
+                        ^ " " ^ string_of_typ ty
+and string_of_tycon = function 
+    "int"       -> "int"
+  | "bool"      -> "bool"
+  | "char"      -> "char"
+  | "tree"      -> "tree"
+  | "function"  -> "function"
+  | t -> "unrecognized_type_" ^ t
+and string_of_tyvar = function 
+    TParam n -> string_of_int n
+  | _ -> "unrecognized_type_"
 
 
 (* toString for Sast.sexpr *)

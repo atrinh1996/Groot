@@ -1,7 +1,7 @@
 (* Closure conversion for groot compiler *)
 
 (* open Ast *)
-open Sast
+(* open Sast *)
 open Cast 
 
 
@@ -44,7 +44,7 @@ let freeIn exp n =
     | SLiteral _              -> false
     | SVar s                  -> s = n
     | SIf (s1, s2, s3)        -> free s1 || free s2 || free s3
-    | SApply (fname, args)  -> fname = n || 
+    | SApply (f, args)      -> free f || 
                                List.fold_left 
                                   (fun a b -> a || free b) 
                                   false args
@@ -74,16 +74,14 @@ let toParamList venv =
 (* Converts given sexpr to cexpr, and returns the cexpr *)
 let rec sexprToCexpr ((ty, e) : sexpr) = match e with 
   | SLiteral v              -> (ty, CLiteral (value v))
-  | SVar s                  -> (ty, CVar s)
+  | SVar s                  -> (ty, CVar (s ^ string_of_int (fst (find s res.rho))))
   | SIf (s1, s2, s3)        -> (ty, CIf (sexprToCexpr s1, 
                                          sexprToCexpr s2, 
                                          sexprToCexpr s3))
-  | SApply (fname, args)    -> 
-      let call = try fname ^ string_of_int (fst (find fname res.rho)) 
-                 with Not_found -> fname in 
-      (* let call = fname ^ string_of_int occurs in  *)
-      (* let call = fname ^ (if occurs = 0 then "" else string_of_int occurs) in  *)
-      (ty, CApply (call, List.map sexprToCexpr args))
+  | SApply (f, args)    -> (* raise (Failure ("TODO: Deal with application of expr")) *)
+      (* let call = try fname ^ string_of_int (fst (find fname res.rho)) 
+                 with Not_found -> fname in  *)
+      (ty, CApply (sexprToCexpr f, List.map sexprToCexpr args))
   | SLet (bs, body) -> 
         (ty, CLet   (List.map (fun (x, e) -> (x, sexprToCexpr e)) bs, 
                      sexprToCexpr body))
@@ -100,7 +98,7 @@ and tree = function
 (* Converts given SVal to CVal, and returns the CVal *)
 let svalToCval (id, (ty, e)) = 
   (* check if id was already defined in rho *)
-  let (occurs, _) = if (isBound id res.rho) then (find id res.rho) else (0, IType) in 
+  let (occurs, _) = if (isBound id res.rho) then (find id res.rho) else (0, ty) in 
   let () = bind id (occurs + 1, ty) in 
   let id' = id ^ string_of_int (occurs + 1) in 
   let cval = 
@@ -138,8 +136,8 @@ let conversion sdefns =
      and sorts it to the appropriate list in a cprog type. *)
   let convert = function 
     | SVal (id, (ty, sexp)) -> 
-        let def = svalToCval (id, (ty, sexp)) in 
-        (match def with 
+        (* let def = svalToCval (id, (ty, sexp)) in  *)
+        (match svalToCval (id, (ty, sexp)) with 
             | Some cval -> addMain cval 
             | None      -> ())
     | SExpr e -> addMain (CExpr (sexprToCexpr e))
