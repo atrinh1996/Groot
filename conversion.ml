@@ -1,6 +1,6 @@
 (* Closure conversion for groot compiler *)
 
-open Ast
+(* open Ast *)
 open Sast
 open Cast 
 
