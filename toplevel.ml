@@ -8,7 +8,7 @@
    types
  *)
 
-(* open Cast *)
+open Cast
 
 type action = 
 	  Ast 
@@ -41,6 +41,13 @@ let () =
 			(* All other action needs to generate an SAST, store in variable sast *)
 			| _ -> 
 				let sast = Semant.semantic_check ast in
+				(* let cast = 
+						{
+						  main      = []; 
+						  functions = []; 
+						  rho       = emptyEnv;
+						  phi       = [];
+						} in *)
 				let cast = Conversion.conversion sast in 
 					match !action with 
 				(* in sast *)
