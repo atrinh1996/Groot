@@ -46,22 +46,57 @@ let fresh =
 	fun () -> incr k; TParam !k
 
 (* TODO implement this *)
-let sub theta cns =
-	cns
-(* 	let sub1 sub cn::cns = if fst sub = fst cn
-											then (snd sub, snd cn)
-	List.fold_left (fun acc x -> x) [] cns
-	for i in theta
-		for j in cns
-			if fst i appears in fst j
-				then make j into (snd i, snd j)
-			if fst i appears in snd j
-				then make j into (fst j, snd i) 
- *)
+let sub (theta : (tyvar * gtype) list) (cns : (gtype * gtype) list) =
+	(* sub1 takes in a single constraint and updates it with any substitutions in theta *)
+	let sub1 cn = 
+		List.fold_left 
+			(fun (acc : (gtype * gtype)) (one_sub : tyvar * gtype) ->
+				match acc with
+				| (TYVAR t1, TYVAR t2) -> 
+		      (if (fst one_sub = t1) then (snd one_sub, snd acc)
+					else if (fst one_sub = t2) then (fst acc, snd one_sub)
+					else acc)
+				| (TYVAR t1, _) -> 
+		      (if (fst one_sub = t1) then (snd one_sub, snd acc)
+					else acc)
+				| (_, TYVAR t2) -> 
+		      (if (fst one_sub = t2) then (fst acc, snd one_sub)
+					else acc)
+			| (_, _) -> acc)
+			cn theta in 
+	List.map sub1 cns
+
+(* onesub theta1  = {x, y}
+acc theta2 = {z, n} -> {y, n} *)
+
+
 
 (* TODO implement this. Can it be the same as sub or use it somehow? *)
+(* currently applies the substitutions in theta1 to theta2 but TODO do we have
+   to reverse it? *)
 let compose theta1 theta2 =
-	theta1
+		let sub1 cn = 
+			List.fold_left 
+				(fun (acc : (tyvar * gtype)) (one_sub : tyvar * gtype) ->
+					match acc with
+					| (t1, TYVAR t2) -> 
+						match one_sub with
+						| (fst_one_sub, TYVAR snd_one_sub) ->
+				      (if (fst one_sub = t1) 
+				      	then (snd_one_sub, snd acc)
+							else if (fst one_sub = t2) then (fst acc, snd one_sub)
+							else acc)
+						| _ -> acc
+					| (t1, _) -> 
+							match one_sub with
+						| (fst_one_sub, TYVAR snd_one_sub) ->
+				      (if (fst_one_sub = t1) then (snd_one_sub, snd acc)
+							else acc)
+				    | _ -> acc)
+			      
+				cn theta1 in 
+		List.map sub1 theta2
+
 
 let rec solve' c1 = 
 	match c1 with
@@ -79,19 +114,18 @@ let rec solve' c1 =
 	| (TYCON c, CONAPP a) -> raise (Type_error "type error: (tycon, conapp")
 	| (CONAPP a, TYVAR t) -> solve' (TYVAR t, CONAPP a)
 	| (CONAPP a, TYCON c) -> raise (Type_error "type error: (conapp, tycon")
-	(* TODO check with Mert about this case *)
 	| (CONAPP a1, CONAPP a2) -> solve ((List.combine (snd a1) (snd a2)) @ [((TYCON (fst a1), TYCON (fst a2)))])
 
 
-and solve (constraints : 'a list) = 
+and solve (constraints : (gtype * gtype) list) = 
 	let rec solver cns (subs : (tyvar * gtype) list) =
 		match cns with
 		| [] -> []
-		(* | (TYVAR t1, TYVAR t2) :: cns -> solver cns ((t1, TYVAR t2)::subs) *)
-		| cn :: cns -> 	let theta1 = solve' cn in 
-									 	let theta2 =  solve (sub theta1 cns) in compose theta2 theta1
+		| cn :: cns -> 	
+			let theta1 = solve' cn in 						 	
+			let theta2 = solve (sub theta1 cns) in
+			compose theta2 theta1
 	in solver constraints []
-
 
 (* generate_constraints gctx e: infers the type of expression 'e' and a set of
    constraints, 'gctx' refers to the global context 'e' can refer to *)
