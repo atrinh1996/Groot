@@ -16,7 +16,7 @@ let booltype    = TYCON "bool"
 let chartype    = TYCON "char"
 let treetype ty = CONAPP (TYCON "tree", [ty])
 let funtype (args, res) = 
-  CONAPP (TYCON "function", [CONAPP (TYCON "arguments", args), result])
+  CONAPP (TYCON "function", [CONAPP (TYCON "arguments", args); res])
 
 (* and tycon =
   | TInt                                     (** integers [int] *)
@@ -72,7 +72,7 @@ and string_of_tycon = function
   | t -> "unrecognized_type_" ^ t
 and string_of_tyvar = function 
     TParam n -> string_of_int n
-  | _ -> "unrecognized_type_"
+  (* | _ -> "unrecognized_type_" *)
 
 
 (* toString for Sast.sexpr *)
@@ -87,7 +87,7 @@ and string_of_sx = function
               ^ string_of_sexpr se2 ^ " " 
               ^ string_of_sexpr se3 ^ ")"
   | SApply(f, args) -> 
-      "(" ^ f ^ " " 
+      "(" ^ string_of_sexpr f ^ " " 
           ^ String.concat " " (List.map string_of_sexpr args) ^ ")"
   | SLet(binds, body) -> 
       let string_of_binding (id, e) = 

@@ -75,7 +75,7 @@ and string_of_cx = function
                 ^ string_of_cexpr e2 ^ " " 
                 ^ string_of_cexpr e3 ^ ")"
     | CApply (f, args) -> 
-      "(" ^ f ^ " " 
+      "(" ^ string_of_cexpr f ^ " " 
           ^ String.concat " " (List.map string_of_cexpr args) ^ ")"
     | CLet (binds, body) -> 
         let string_of_binding (id, e) = 

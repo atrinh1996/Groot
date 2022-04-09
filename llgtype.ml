@@ -5,7 +5,8 @@
     Converts Ast.gtypes to LLCE types
  *)
 module L = Llvm
-module A = Ast
+(* module A = Ast *)
+module S = Sast
 
 (* creates the glocal context instance *)
 let context = L.global_context ()
@@ -35,12 +36,26 @@ let () = L.struct_set_body
 
 
 (* Convert gROOT types to LLVM types *)
-let ltype_of_gtype = function
+(* let ltype_of_gtype = function
     A.IType   -> int_ty
   | A.CType   -> char_ty 
   | A.BType   -> bool_ty
-  (* What is the size of a tree and xtype? *)
+  What is the size of a tree and xtype?
   | A.TType   -> tree_struct_ty
   (* | A.XType of int *)
-  | _         -> void_ty
+  | _         -> void_ty *)
 
+let rec ltype_of_gtype = function
+    S.TYCON ty          -> ltype_of_tycon ty
+  | S.TYVAR tp          -> ltype_of_tyvar tp
+  | S.CONAPP (ty, _)  -> ltype_of_gtype ty
+and ltype_of_tycon = function 
+    "int"       -> int_ty
+  | "bool"      -> bool_ty
+  | "char"      -> char_ty
+  | "tree"      -> tree_struct_ty
+  | "function"  -> void_ty
+  | _           -> void_ty
+and ltype_of_tyvar = function 
+    TParam _    -> void_ty
+  (* | _           -> void_ty *)

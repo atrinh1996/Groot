@@ -50,13 +50,14 @@ type defn =
           (* fn name, arg names, body*)
           (*| Use of ident*)
 
-type fdecl = 
-{ rettyp : gtype;
+(* type fdecl = 
+{ 
+    rettyp : gtype;
   fname : string;
   formals : (gtype * string) list;
   locals : (gtype * string) list;
   body : expr list 
-} 
+}  *)
 
 
 (* short for program, analogous to main *)
@@ -84,7 +85,7 @@ let rec string_of_expr = function
                 ^ string_of_expr true_branch ^ " " 
                 ^ string_of_expr false_branch ^ ")"
     | Apply(f, args) ->
-        "(" ^ f ^ " " 
+        "(" ^ string_of_expr f ^ " " 
             ^ String.concat " " (List.map string_of_expr args) ^ ")"
     | Let(binds, body)   ->
         let string_of_binding = function

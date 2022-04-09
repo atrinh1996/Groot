@@ -1,7 +1,7 @@
 (* Closure conversion for groot compiler *)
 
 (* open Ast *)
-(* open Sast *)
+open Sast
 open Cast 
 
 
@@ -54,7 +54,7 @@ let freeIn exp n =
                                                 false bs))
     | SLambda (formals, body) -> let (_, names) = List.split formals in 
         free body && not (List.fold_left (fun a x -> a || x = n) false names)
-  in free (IType, exp)
+  in free (inttype, exp)
 
 (* Given the formals list and body of a lambda (xs, e), and a 
    variable environment, the function returns an environment with only 
@@ -72,28 +72,41 @@ let toParamList venv =
   StringMap.fold (fun id (num, ty) res -> (ty, id ^ string_of_int num) :: res) venv []
 
 (* Converts given sexpr to cexpr, and returns the cexpr *)
-let rec sexprToCexpr ((ty, e) : sexpr) = match e with 
-  | SLiteral v              -> (ty, CLiteral (value v))
-  | SVar s                  -> (ty, CVar (s ^ string_of_int (fst (find s res.rho))))
-  | SIf (s1, s2, s3)        -> (ty, CIf (sexprToCexpr s1, 
-                                         sexprToCexpr s2, 
-                                         sexprToCexpr s3))
-  | SApply (f, args)    -> (* raise (Failure ("TODO: Deal with application of expr")) *)
-      (* let call = try fname ^ string_of_int (fst (find fname res.rho)) 
-                 with Not_found -> fname in  *)
-      (ty, CApply (sexprToCexpr f, List.map sexprToCexpr args))
-  | SLet (bs, body) -> 
-        (ty, CLet   (List.map (fun (x, e) -> (x, sexprToCexpr e)) bs, 
-                     sexprToCexpr body))
-  | SLambda (formals, body) -> (ty, CLambda (formals, sexprToCexpr body)) 
-and value = function 
-  | SChar c                 -> CChar c 
-  | SInt  i                 -> CInt  i 
-  | SBool b                 -> CBool b 
-  | SRoot t                 -> CRoot (tree t)
-and tree = function 
-  | SLeaf                   -> CLeaf 
-  | SBranch (v, t1, t2)     -> CBranch (value v, tree t1, tree t2)
+(* let rec sexprToCexpr ((ty, e) : sexpr) = match e with  *)
+let rec sexprToCexpr ((ty, e) : sexpr) (env : var_env) =
+  let rec exp ((typ, ex) : sexpr) = match ex with
+    | SLiteral v              -> (typ, CLiteral (value v))
+    | SVar s                  -> 
+        let occurs = (fst (find s env)) in 
+        let vname = s ^ (if occurs = 0 then "" else string_of_int occurs)
+        in (ty, CVar (vname))
+    | SIf (s1, s2, s3)        -> (typ, CIf (exp s1, exp s2, exp s3))
+    | SApply (f, args)    -> (* raise (Failure ("TODO: Deal with application of expr")) *)
+        (* let call = try fname ^ string_of_int (fst (find fname res.rho)) 
+                   with Not_found -> fname in  *)
+        (typ, CApply (exp f, List.map exp args))
+    | SLet (bs, body) -> 
+         (*  (ty, CLet   (List.map (fun (x, e) -> (x, sexprToCexpr e)) bs, 
+                       sexprToCexpr body)) *)
+        (typ, CLet (List.map (fun (x, e) -> (x, exp e)) bs, 
+                   sexprToCexpr body (List.fold_left 
+                                        (fun map (x, (t, _)) -> 
+                                          StringMap.add x (0, t) map) 
+                                        env bs)))
+    | SLambda (formals, body) -> (* (ty, CLambda (formals, sexprToCexpr body))  *)
+        (typ, CLambda (formals, sexprToCexpr body (List.fold_left 
+                                                  (fun map (t, x) -> 
+                                                    StringMap.add x (0, t) map)
+                                                  env formals)))
+  and value = function 
+    | SChar c                 -> CChar c 
+    | SInt  i                 -> CInt  i 
+    | SBool b                 -> CBool b 
+    | SRoot t                 -> CRoot (tree t)
+  and tree = function 
+    | SLeaf                   -> CLeaf 
+    | SBranch (v, t1, t2)     -> CBranch (value v, tree t1, tree t2)
+  in exp (ty, e)
 
 (* Converts given SVal to CVal, and returns the CVal *)
 let svalToCval (id, (ty, e)) = 
@@ -108,12 +121,15 @@ let svalToCval (id, (ty, e)) =
         let () = if (findFunction id) then () else bindFunction id in
         let f_def = 
           {
-            rettyp = ty; 
-            fname = id'; 
+            rettyp  = ty; 
+            fname   = id'; 
             formals = fformals;
-            frees = toParamList 
-                      (clean res.phi (improve (fformals, fbody) res.rho)); 
-            body = sexprToCexpr fbody;
+            frees   = toParamList 
+                        (clean res.phi (improve (fformals, fbody) res.rho)); 
+            body    = sexprToCexpr fbody (List.fold_left 
+                                            (fun map (typ, x) -> 
+                                              StringMap.add x (0, typ) map)
+                                            res.rho fformals);
           } 
         in 
         let () = addFunction f_def in  None 
@@ -121,7 +137,7 @@ let svalToCval (id, (ty, e)) =
                               else (0, IType) 
             in 
             let () = bind id (occurs + 1, ty) in *) 
-            Some (CVal (id, sexprToCexpr (ty, e)))
+            Some (CVal (id', sexprToCexpr (ty, e) res.rho))
   )
   in cval 
 (***********************************************************************)
@@ -140,7 +156,7 @@ let conversion sdefns =
         (match svalToCval (id, (ty, sexp)) with 
             | Some cval -> addMain cval 
             | None      -> ())
-    | SExpr e -> addMain (CExpr (sexprToCexpr e))
+    | SExpr e -> addMain (CExpr (sexprToCexpr e res.rho))
   in 
     
   let _ = List.iter convert sdefns in 
