@@ -104,12 +104,12 @@ let translate { main = main; functions = functions; rho = _; phi = _ } =
        CLiteral v   -> const_val v builder
      | CVar     _  -> raise (Failure ("TODO - codegen CVar lookup"))
      | CIf _ -> raise (Failure ("TODO - codegen CIF merge-then-else"))
-     | CApply ("printi", [arg]) -> 
+     | CApply ((_, CVar "printi"), [arg]) -> 
           L.build_call printf_func [| int_format_str ; (expr arg builder) |] "printi" builder
-     | CApply ("printc", [arg]) -> 
+     | CApply ((_, CVar"printc"), [arg]) -> 
         (* L.build_call printf_func [| char_format_str ; (expr arg builder) |] "printc" builder *)
         L.build_call puts_func [| expr arg builder |] "printc" builder
-     | CApply ("printb", [arg]) -> 
+     | CApply ((_, CVar "printb"), [arg]) -> 
         let bool_stringptr = if expr arg builder = (L.const_int bool_ty 1) then print_true else print_false
         in L.build_call puts_func [| bool_stringptr |] "printb" builder
      | CApply _ -> raise (Failure ("TODO - codegen SAPPLY general"))

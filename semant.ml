@@ -53,14 +53,14 @@ let () = built_in_decls :=
     StringMap.add 
       name 
       { 
-        rettyp = Void;
+        rettyp = inttype;
         fname = name;
         formals = [(ty, "x")];
       }
       map 
-  in List.fold_left add_bind !built_in_decls [ ("printi", IType ); 
-                                               ("printc", CType); 
-                                               ("printb", BType) ]
+  in List.fold_left add_bind !built_in_decls [ ("printi", inttype); 
+                                               ("printc", chartype); 
+                                               ("printb", booltype) ]
 
 let functions = built_in_decls
 
@@ -127,42 +127,47 @@ in *)
 		| Literal(lit)          -> 
       let s = value lit in 
         ((match s with 
-            SInt _ -> IType
-          | SChar _ -> CType
-          | SBool _ -> BType
-          | SRoot _ -> TType)
+            SInt _  -> inttype
+          | SChar _ -> chartype
+          | SBool _ -> booltype
+          | SRoot _ -> raise (Failure "TODO treetype"))
         , SLiteral s)
     | Var(x) -> (try (StringMap.find x gamma, SVar x) with Not_found -> raise (Failure "not found var"))
     | If(_, _, _)           -> raise (Failure ("TODO - expr to sexpr of If"))
-    | Apply(fname, args)        -> 
-            let fd = find_func fname !functions in 
+    | Apply(f, args)        -> 
+        let (t, f') = expr "" f gamma in 
+        let fd = (match f' with 
+                      SVar s -> find_func s !functions
+                    | _ -> raise (Failure "TODO: SApply with sexpr")) in 
+            (* let fd = find_func fname !functions in 
             let formals_length = List.length fd.formals in 
             let param_length = List.length args in 
             if param_length != formals_length 
               then raise (Failure ("expected number of args, but got different number"))
             else 
+          *)
               let check_call (ft, _) e = 
                 let (et, e') = expr "" e gamma in 
                 if et = ft then (et, e') else raise 
                 (Failure ("illegal argument found " ^ string_of_typ et 
                   ^ " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e))
-              in
+              in 
             let args' = List.map2 check_call fd.formals args
-            in (fd.rettyp, SApply (fname, args'))
+            in (fd.rettyp, SApply ((t, SVar fd.fname), args'))
     | Let(_, _)             -> raise (Failure ("TODO - expr to sexpr of Let"))
     (* Forces labda to be int type. *)
     | Lambda(formals, body) -> 
-        let formal_list = List.map (fun x -> (IType, x)) formals in 
-        let gamma' = List.fold_left (fun map x -> StringMap.add x IType map) gamma formals in 
+        let formal_list = List.map (fun x -> (inttype, x)) formals in 
+        let gamma' = List.fold_left (fun map x -> StringMap.add x inttype map) gamma formals in 
         let _ = if (id = "") then () 
           else functions := StringMap.add id 
                                           { 
-                                            rettyp = IType;
+                                            rettyp = inttype;
                                             fname = id;
                                             formals = formal_list;
                                           } 
                                           !functions in 
-        (IType, SLambda (formal_list, expr "" body gamma'))
+        (inttype, SLambda (formal_list, expr "" body gamma'))
   (* Returns the Sast.svalue version fo the given Ast.value *)
   and value = function 
   	| Char(c)     -> SChar c

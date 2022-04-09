@@ -3,8 +3,8 @@
     Assumes name-check and type-check have already happened
 *)
 
-open Ast
-(* open Sast  *)
+(* open Ast *)
+open Sast 
 module StringMap = Map.Make(String)
 
 (* int StringMap.t - for our rho/variable environment 
@@ -21,7 +21,7 @@ and cx =
   | CLiteral  of cvalue 
   | CVar      of cname 
   | CIf       of cexpr * cexpr * cexpr
-  | CApply    of cname * cexpr list 
+  | CApply    of cexpr * cexpr list 
   | CLet      of (cname * cexpr) list * cexpr 
   | CLambda   of (gtype * cname) list * cexpr
 and cvalue = 
@@ -75,7 +75,7 @@ and string_of_cx = function
                 ^ string_of_cexpr e2 ^ " " 
                 ^ string_of_cexpr e3 ^ ")"
     | CApply (f, args) -> 
-      "(" ^ f ^ " " 
+      "(" ^ string_of_cexpr f ^ " " 
           ^ String.concat " " (List.map string_of_cexpr args) ^ ")"
     | CLet (binds, body) -> 
         let string_of_binding (id, e) = 
