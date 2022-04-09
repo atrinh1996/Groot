@@ -22,11 +22,11 @@ and tyvar =
 	| TParam of int          (** parameter *)
 and conapp = (tycon * gtype list)
 
-(* module TypeSet = Set.Make (
+module TypeSet = Set.Make (
 	struct
 		let compare = Pervasives.compare
 		type t = gtype  
-	end ) *)
+	end )
 
 (* ty_error msg: reports a type error by raising [Type_error msg]. *)
 let type_error msg = raise (Type_error msg)
@@ -136,7 +136,11 @@ let rec generate_constraints genv e =
 				let t1, c1 = generate_constraints genv e1 in
 				let t2, c2 = generate_constraints genv e2 in
 				let t3, c3 = generate_constraints genv e2 in
-				(t3, [(TBool, t1); (t3, t2)] @ c1 @ c2 @ c3)
+				(t3, 
+					[(TBool, t1); (t3, t2)] 
+				@ c1 
+			@ c2 
+		@ c3)
 		| Apply (_, _) -> raise (Type_error "missing case for Apply")
 		| Let (_, _) -> raise (Type_error "missing case for Let")
 		| Lambda (_,_) -> raise (Type_error "missing case for Lambda")

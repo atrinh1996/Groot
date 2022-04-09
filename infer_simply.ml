@@ -22,11 +22,11 @@ and tyvar =
 	| TParam of int          (** parameter *)
 and conapp = (tycon * gtype list)
 
-(* module TypeSet = Set.Make (
+module TypeSet = Set.Make (
 	struct
 		let compare = Pervasives.compare
 		type t = gtype  
-	end ) *)
+	end )
 
 (* ty_error msg: reports a type error by raising [Type_error msg]. *)
 let type_error msg = raise (Type_error msg)
@@ -76,22 +76,16 @@ let compose theta1 theta2 =
 		let sub1 cn = 
 			List.fold_left 
 				(fun (acc : (tyvar * gtype)) (one_sub : tyvar * gtype) ->
-					match acc with
-					| (t1, TYVAR t2) -> 
-						match one_sub with
-						| (fst_one_sub, TYVAR snd_one_sub) ->
-				      (if (fst one_sub = t1) 
-				      	then (snd_one_sub, snd acc)
-							else if (fst one_sub = t2) then (fst acc, snd one_sub)
-							else acc)
-						| _ -> acc
-					| (t1, _) -> 
-							match one_sub with
-						| (fst_one_sub, TYVAR snd_one_sub) ->
-					      if (fst_one_sub = t1)
-					      then (snd_one_sub, snd acc)
-								else acc
-				    | _ -> acc)
+					match acc, one_sub with
+					| (t1, TYVAR t2), (fst_one_sub, TYVAR snd_one_sub) -> 
+			      	if (fst_one_sub = t1) then (snd_one_sub, t2)
+							else if (fst_one_sub = t2) then (t1, snd_one_sub)
+							else acc
+					| (t1, TYVAR t2), _ -> acc
+					| (t1, _), (fst_one_sub, TYVAR snd_one_sub) -> 
+				      if (fst_one_sub = t1) then (snd_one_sub, snd acc)
+							else acc
+			    | (t1, _), _ -> acc
 				cn theta1 in 
 		List.map sub1 theta2
 
@@ -127,29 +121,25 @@ and solve (constraints : (gtype * gtype) list) =
 
 (* generate_constraints gctx e: infers the type of expression 'e' and a set of
    constraints, 'gctx' refers to the global context 'e' can refer to *)
-let rec generate_constraints genv e =
-	let rec constrain env e =
+let rec generate_constraints gctx e =
+	let rec constrain ctx e =
 		match e with
 		| Literal e -> value e
 		| Var _ -> TYVAR (fresh ()), []
-		| If (e1, e2, e3) ->
-				let t1, c1 = generate_constraints genv e1 in
-				let t2, c2 = generate_constraints genv e2 in
-				let t3, c3 = generate_constraints genv e2 in
-				(t3, [(TBool, t1); (t3, t2)] @ c1 @ c2 @ c3)
+		| If (e1, e2, e3) -> raise (Type_error "missing case for If")
 		| Apply (_, _) -> raise (Type_error "missing case for Apply")
 		| Let (_, _) -> raise (Type_error "missing case for Let")
 		| Lambda (_,_) -> raise (Type_error "missing case for Lambda")
 		and value v = 
 		match v with
-		| Int e -> TYCON TInt, []
+		| Int e ->  TYCON TInt, []
 		| Char e -> TYCON TChar, []
 		| Bool e -> TYCON TBool, []
 		and tree t =
 		match t with 
 		| Leaf -> raise (Type_error "missing case for Leaf")
 		| Branch (e, t1, t2) -> raise (Type_error "missing case for Branch")
-	in constrain genv e
+	in constrain gctx e
 
 
 let type_infer (ctx : 'a StringMap.t ) (d : defn list) =
