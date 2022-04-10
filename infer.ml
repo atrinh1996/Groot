@@ -79,7 +79,7 @@ let compose theta1 theta2 =
 			match acc, one_sub with
 			| (a1, TYVAR a2), (s1, TYVAR s2) -> 
 	      	if a1 = s1 then (s1, snd acc)
-					else if s1 = a2 then a1, snd one_sub
+					else if s1 = a2 then (a1, snd one_sub)
 					else acc
 			| (a1, a2), (s1, TYVAR s2) -> 
 		      if (a1 = s1) then (s1, a2)
