@@ -3,20 +3,34 @@
 open Ast
 
 (* TYPES *)
-type tycon = string 
-type tyvar = TParam of int
+(* type tycon = string  *)
+(* type tyvar = TParam of int *)
 
 type gtype =
     TYCON of tycon
   | TYVAR of tyvar
-  | CONAPP of gtype * gtype list
+  | CONAPP of conapp 
+and tycon =  
+    TInt  
+  | TChar 
+  | TBool 
+  | TArrow of gtype * gtype
+and tyvar = 
+    TParam of int
+and conapp = (tycon * gtype list)
 
-let inttype     = TYCON "int"
+let inttype = TYCON TInt 
+let chartype = TYCON TChar
+let booltype = TYCON TBool
+(* let treetype ty = CONAPP () *)
+(* let funtype (args, res) =  *)
+
+(* let inttype     = TYCON "int"
 let booltype    = TYCON "bool"
 let chartype    = TYCON "char"
 let treetype ty = CONAPP (TYCON "tree", [ty])
 let funtype (args, res) = 
-  CONAPP (TYCON "function", [CONAPP (TYCON "arguments", args); res])
+  CONAPP (TYCON "function", [CONAPP (TYCON "arguments", args); res]) *)
 
 (* and tycon =
   | TInt                                     (** integers [int] *)
@@ -61,9 +75,18 @@ type sprog = sdefn list
 let rec string_of_typ = function
     TYCON ty -> string_of_tycon ty
   | TYVAR tp -> string_of_tyvar tp
-  | CONAPP (ty, tys) -> String.concat " " (List.map string_of_typ tys) 
-                        ^ " " ^ string_of_typ ty
+  | CONAPP con -> string_of_conapp con
 and string_of_tycon = function 
+    TInt            -> "int"
+  | TBool           -> "bool"
+  | TChar           -> "char"
+  | TArrow (t1, t2) -> "*TODO TArrow type string*"
+and string_of_tyvar = function 
+    TParam n -> string_of_int n
+and string_of_conapp (tyc, tys) = 
+  string_of_tycon tyc ^ " " ^ String.concat " " (List.map string_of_typ tys)
+
+(* and string_of_tycon = function 
     "int"       -> "int"
   | "bool"      -> "bool"
   | "char"      -> "char"
@@ -71,7 +94,7 @@ and string_of_tycon = function
   | "function"  -> "function"
   | t -> "unrecognized_type_" ^ t
 and string_of_tyvar = function 
-    TParam n -> string_of_int n
+    TParam n -> string_of_int n *)
   (* | _ -> "unrecognized_type_" *)
 
 

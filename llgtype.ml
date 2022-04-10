@@ -45,7 +45,7 @@ let () = L.struct_set_body
   (* | A.XType of int *)
   | _         -> void_ty *)
 
-let rec ltype_of_gtype = function
+(* let rec ltype_of_gtype = function
     S.TYCON ty          -> ltype_of_tycon ty
   | S.TYVAR tp          -> ltype_of_tyvar tp
   | S.CONAPP (ty, _)  -> ltype_of_gtype ty
@@ -57,5 +57,18 @@ and ltype_of_tycon = function
   | "function"  -> void_ty
   | _           -> void_ty
 and ltype_of_tyvar = function 
-    TParam _    -> void_ty
+    TParam _    -> void_ty *)
   (* | _           -> void_ty *)
+
+let rec ltype_of_gtype = function
+    S.TYCON ty -> ltype_of_tycon ty
+  | S.TYVAR tp -> ltype_of_tyvar tp
+  | S.CONAPP con -> ltype_of_conapp con
+and ltype_of_tycon = function 
+    S.TInt            -> int_ty
+  | S.TBool           -> bool_ty
+  | S.TChar           -> char_ty
+  | S.TArrow (_, _) -> raise (Failure ("TODO: lltype of TArrow"))
+and ltype_of_tyvar = function 
+    S.TParam _ -> void_ty
+and ltype_of_conapp (tyc, _) = ltype_of_tycon tyc
