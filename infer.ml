@@ -83,11 +83,9 @@ let compose theta1 theta2 =
 		      	snd acc)
 						else if fst one_sub = a2 then fst acc, snd one_sub
 						else acc
-				| (a1, TYVAR a2), _ -> acc
 				| (a1, _), (s1, TYVAR s2) -> 
 			      if (s1 = a1) then (s1, snd acc)
 						else acc
-		    | (a1, TYVAR a2), _ -> acc
 		    | (a1,_) , _ -> acc
 		  )
 			cn theta1 in 
