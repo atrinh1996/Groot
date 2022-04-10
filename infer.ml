@@ -73,22 +73,20 @@ acc theta2 = {z, n} -> {y, n} *)
 (* currently applies the substitutions in theta1 to theta2 but TODO do we have
    to reverse it? *)
 let compose theta1 theta2 =
-		let sub1 cn = 
-			List.fold_left 
-			(fun (acc : tyvar * gtype) (one_sub : tyvar * gtype) ->
-				match acc, one_sub with
-				| (a1, TYVAR a2), (s1, TYVAR s2) -> 
-		      	if s1 = a1 then 
-		      	(s1, 
-		      	snd acc)
-						else if fst one_sub = a2 then fst acc, snd one_sub
-						else acc
-				| (a1, _), (s1, TYVAR s2) -> 
-			      if (s1 = a1) then (s1, snd acc)
-						else acc
-		    | (a1,_) , _ -> acc
-		  )
-			cn theta1 in 
+	let sub1 cn = 
+		List.fold_left 
+		(fun (acc : tyvar * gtype) (one_sub : tyvar * gtype) ->
+			match acc, one_sub with
+			| (a1, TYVAR a2), (s1, TYVAR s2) -> 
+	      	if a1 = s1 then (s1, snd acc)
+					else if s1 = a2 then a1, snd one_sub
+					else acc
+			| (a1, a2), (s1, TYVAR s2) -> 
+		      if (a1 = s1) then (s1, a2)
+					else acc
+	    | (a1,_), _ -> acc
+	  )
+		cn theta1 in 
 	List.map sub1 theta2
 
 
