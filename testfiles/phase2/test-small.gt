@@ -16,3 +16,13 @@ x
 
 (retx 8)
 
+(lambda (t) t)
+
+(val test (lambda (a) 
+		(lambda (b) (retn a b))))
+		
+(val test1 (lambda () (rety)))
+
+(test1)
+
+((test 3) 4)

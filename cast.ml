@@ -66,7 +66,11 @@ type cprog =
 
 (* Pretty Print *)
 let rec string_of_cexpr (ty, e) = 
-    "[" ^ string_of_typ ty ^ " : " ^ string_of_cx e ^ "]"
+    (* "["  *)
+        (* ^ string_of_typ ty ^ " : "  *)
+        (* ^  *)
+        string_of_cx e 
+        (* ^ "]" *)
 and string_of_cx = function 
     | CLiteral v -> string_of_cvalue v
     | CVar n -> n  
@@ -117,13 +121,16 @@ let string_of_functions (funcs : fdef list) =
         frees = frees;
         body = body;
     } = 
-      let string_of_formal (ty, para) = string_of_typ ty ^ " " ^ para in
+      let string_of_formal  (ty, para) = string_of_typ ty ^ " " ^ para in
+      (* let string_of_free    (ty, nm) = string_of_typ ty ^ " " ^ nm in *)
       (* let listfrees id (num, ty) l = (ty, id ^ string_of_int num) :: l in  *)
       (* let args = formals @ List.rev (StringMap.fold listfrees frees []) in *)
       let args = formals @ frees in
       let def = string_of_typ return ^ " " ^ fname ^ " (" 
         ^ String.concat ", " (List.map string_of_formal args)
-        ^ ")\n{\n" ^  string_of_cexpr body  ^ "\n}\n"
+        ^ ")\n{\n" 
+        (* ^ String.concat "\n" (List.map string_of_free frees) ^ "\n" *)
+        ^ string_of_cexpr body  ^ "\n}\n"
       in ret_string ^ def ^ "\n"
   in List.fold_left string_of_fdef "" funcs
 
