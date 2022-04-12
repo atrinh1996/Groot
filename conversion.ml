@@ -139,14 +139,16 @@ and create_anon_function (fformals : (gtype * string) list) (fbody : sexpr) (ty 
       rettyp  = ty; 
       fname   = id; 
       formals = fformals;
-      frees   = toParamList 
-                  (clean res.phi (improve (fformals, fbody) env)); 
+      frees   = toParamList (improve (fformals, fbody) env);
+          (* toParamList (clean res.phi (improve (fformals, fbody) env)); *) 
       body    = sexprToCexpr fbody (List.fold_left 
                                       (fun map (typ, x) -> 
                                         StringMap.add x (0, typ) map)
                                       env fformals);
     } 
-  in let () = addFunction f_def in (ty, CApply ((ty, CVar id), (List.map (fun (typ, arg) -> (typ, CVar arg) ) fformals)))
+  in let () = addFunction f_def in 
+  (ty, CLambda (id, f_def.formals, f_def.body))
+  (* (ty, CApply ((ty, CVar id), (List.map (fun (typ, arg) -> (typ, CVar arg) ) fformals))) *)
 
 (* Converts given SVal to CVal, and returns the CVal *)
 let svalToCval (id, (ty, e)) = 
@@ -164,8 +166,8 @@ let svalToCval (id, (ty, e)) =
             rettyp  = ty; 
             fname   = id'; 
             formals = fformals;
-            frees   = toParamList 
-                        (clean res.phi (improve (fformals, fbody) res.rho)); 
+            frees   = toParamList (improve (fformals, fbody) res.rho); 
+              (* toParamList (clean res.phi (improve (fformals, fbody) res.rho));  *)
             body    = sexprToCexpr fbody (List.fold_left 
                                             (fun map (typ, x) -> 
                                               StringMap.add x (0, typ) map)

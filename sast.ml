@@ -23,7 +23,7 @@ let inttype = TYCON TInt
 let chartype = TYCON TChar
 let booltype = TYCON TBool
 (* let treetype ty = CONAPP () *)
-(* let funtype (args, res) =  *)
+(* let funtype (args, res) = CONAPP (, ) *)
 
 (* let inttype     = TYCON "int"
 let booltype    = TYCON "bool"

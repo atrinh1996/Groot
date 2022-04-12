@@ -25,4 +25,58 @@ x
 
 (test1)
 
-((test 3) 4)
+(val take3 (lambda (i j k) i))
+
+(val fun1 (lambda (a) 
+		(lambda (b) 
+			(lambda (c) (take3 a b c)))))
+
+
+(; 
+
+(val test (lambda (a) 
+		(lambda (b) (+ a b)))) 
+(test 5) ;; returns a function: (lambda (b) (+ 5 b))
+((test 5) 9) ;; returns result of (+ 5 9)
+
+(val foo (lambda (a) 
+		(lambda (b) (f a b))))
+
+(foo 1) 
+((foo 1) 2)
+
+int main() {
+	struct x = test(5) ;; { fptr = lambda1; frees = [5] }
+	
+	struct y1 = test(5) ;; { fptr = lambda1; frees = [5] } 
+	int y2 = y1.fptr(9, y1.a)
+	
+	struct z1 = foo(1) ;; { fptr = lambda2; frees = [1, f] }
+	int z2 = z1.fptr(2, 1, f)
+}
+
+int lambda1 (int b, int a) {
+	return a + b
+}
+
+int test (int a) {
+	struct x = { fptr = lambda1; frees = [a] }
+	ret x
+}
+
+int lambda2 (int b, int a, fptr f) {
+	res = f(a, b) 
+	ret res
+}
+
+int foo (int a, int (int int)* f) {
+	struct x = { fptr = lambda2; frees = [a, f] } 
+	ret x
+}
+
+;)
+
+
+
+
+

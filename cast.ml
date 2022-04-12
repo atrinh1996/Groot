@@ -23,7 +23,7 @@ and cx =
   | CIf       of cexpr * cexpr * cexpr
   | CApply    of cexpr * cexpr list 
   | CLet      of (cname * cexpr) list * cexpr 
-  | CLambda   of (gtype * cname) list * cexpr
+  | CLambda   of cname * (gtype * cname) list * cexpr
 and cvalue = 
   | CChar     of char
   | CInt      of int
@@ -86,9 +86,9 @@ and string_of_cx = function
               "[" ^ id ^ " " ^ (string_of_cexpr e) ^ "]"
         in "(let ("  ^ String.concat " " (List.map string_of_binding binds) 
                      ^ ") " ^ string_of_cexpr body ^ ")"
-    | CLambda (formals, body) -> 
+    | CLambda (id, formals, body) -> 
         let (tys, names) = List.split formals in 
-        "(lambda (" ^ (List.fold_left2 
+        "(" ^ id ^ " (" ^ (List.fold_left2 
                         (fun space ty para -> string_of_typ ty ^ space ^ para) 
                         " " tys names) 
                     ^ ") " 
