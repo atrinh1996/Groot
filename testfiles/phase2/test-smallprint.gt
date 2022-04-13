@@ -1,0 +1,14 @@
+(val x 42)
+
+x
+
+(printi x)
+
+(; redefine x and print it ;)
+
+(val x 12)
+
+x
+
+(printi x)
+

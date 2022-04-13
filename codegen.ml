@@ -63,7 +63,7 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
   let print_false = L.build_in_bounds_gep boolF [| zero |] "" main_builder in
 
   (* Lookup table of function names (lambdas) to (function block, function def) *)
-  let function_decls : (L.llvalue * fdef) StringMap.t = 
+  let function_decls : (L.llvalue * fdef * L.lltype) StringMap.t = 
     let define_func map def =  
       let name = def.fname 
       and formal_types = 
@@ -71,7 +71,7 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
                       (def.formals @ def.frees)) 
       in 
       let ftype = L.function_type (ltype_of_gtype def.rettyp) formal_types
-      in StringMap.add name (L.define_function name ftype the_module, def) map 
+      in StringMap.add name (L.define_function name ftype the_module, def, ftype) map 
     in List.fold_left define_func StringMap.empty functions 
   in 
 
@@ -149,7 +149,9 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
         in L.build_call puts_func [| bool_stringptr |] "printb" builder
      | CApply _ -> raise (Failure ("TODO - codegen CAPPLY general"))
      | CLet _ -> raise (Failure ("TODO - codegen CLET"))
-     | CLambda _ -> raise (Failure ("TODO - codegen CLambda"))
+     | CLambda (id, args, bod) -> (* store function pointer to function here *)
+        let (fblock, _, _) = StringMap.find id function_decls in fblock
+        (* L.build_load (lookup id lenv) id builder *)
   in 
 
   (* construct the code for each instruction in main (which is a cdefn list) *)
@@ -171,7 +173,7 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
 
   (* Build function block bodies *)
   let build_function_body fdef = 
-    let (function_block, _) = StringMap.find fdef.fname function_decls in
+    let (function_block, _, _) = StringMap.find fdef.fname function_decls in
     let fbuilder = L.builder_at_end context (L.entry_block function_block) in
     
     (* For each param, load them into the function body *)

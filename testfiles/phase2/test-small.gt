@@ -1,5 +1,6 @@
 (val x 42)
 
+(;
 x
 
 (printi x)
@@ -9,9 +10,14 @@ x
 x
 
 (printi x)
-
+;)
 
 (val retn (lambda (n m) n))
+
+(;
+retn
+
+;)
 
 (;
 (val retx (lambda (a) (retn x a)))

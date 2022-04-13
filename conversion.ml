@@ -188,7 +188,8 @@ let svalToCval (id, (ty, e)) =
                                             res.rho fformals);
           } 
         in 
-        let () = addFunction f_def in  None 
+        let () = addFunction f_def in
+        Some (CVal (id', (ty, CLambda (id', f_def.formals, f_def.body))))
     | _ ->  (* let (occurs, _) = if (isBound id res.rho) then (find id res.rho) 
                               else (0, IType) 
             in 
