@@ -45,6 +45,7 @@ type fdef =
   fname   : cname; 
   formals : (gtype * cname) list;
   frees   : (gtype * cname) list; 
+  (* frees   : (gtype * cname) list; *)
   body    : cexpr;
 }
 

@@ -2,8 +2,18 @@
 
 x
 
+(printi x)
+
+(val x 12)
+
+x
+
+(printi x)
+
+
 (val retn (lambda (n m) n))
 
+(;
 (val retx (lambda (a) (retn x a)))
 
 (val y (retx 3))
@@ -30,7 +40,7 @@ x
 (val fun1 (lambda (a) 
 		(lambda (b) 
 			(lambda (c) (take3 a b c)))))
-
+;)
 
 (; 
 

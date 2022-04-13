@@ -44,6 +44,12 @@ type func_decl = {
   formals : (gtype * string) list;
 }
 
+let () = gamma := 
+    let add_prints map (k, v) = 
+      StringMap.add k v map 
+    in List.fold_left add_prints !gamma [ ("printi", inttype); 
+                                         ("printc", chartype); 
+                                         ("printb", booltype) ]
 
 (* Collection function declarations for built in prints *)
 let built_in_decls = ref StringMap.empty
@@ -132,7 +138,7 @@ in *)
           | SBool _ -> booltype
           | SRoot _ -> raise (Failure "TODO treetype"))
         , SLiteral s)
-    | Var(x) -> (try (StringMap.find x gamma, SVar x) with Not_found -> raise (Failure "not found var"))
+    | Var(x) -> (try (StringMap.find x gamma, SVar x) with Not_found -> raise (Failure ("not found var " ^ x)))
     | If(_, _, _)           -> raise (Failure ("TODO - expr to sexpr of If"))
     | Apply(f, args)        -> 
         let (t, f') = expr "" f gamma in 

@@ -7,17 +7,28 @@ open Cast
 
 (***********************************************************************)
 (* partial cprog to return from this module *)
+(* Pre-load rho with prints built in *)
+let prerho env = 
+  let add_prints map (k, v) =
+    StringMap.add k v map
+  in List.fold_left add_prints env [  ("printi", (0, inttype)); 
+                                      ("printb", (0, booltype)); 
+                                      ("printc", (0, chartype)); 
+                                    ]
+
 let res = 
 {
   main      = emptyList; 
   functions = emptyList; 
-  rho       = emptyEnv;
+  rho       = prerho emptyEnv;
   phi       = emptyList;
 }
 
 (* name used for anonymous lambda functions *)
 let anon = "lambda"
 let count = ref 0
+
+
 
 (* puts the given cdefn into the main list *)
 let addMain d = res.main <- d :: res.main 
@@ -72,7 +83,10 @@ let clean no_no env =
 
 (* Given a var_env, returns a (gtype  * name) list version *)
 let toParamList venv = 
-  StringMap.fold (fun id (num, ty) res -> (ty, id ^ (if num = 0 then "" else  string_of_int num)) :: res) venv []
+  StringMap.fold  (fun id (num, ty) res -> 
+                      (ty, id ^ (if num = 0 then "" else  string_of_int num)) :: res
+                  ) 
+                  venv []
 
 (* let create_anon_function (fformals : (gtype * string) list) (fbody : sexpr) (ty : gtype) (env : var_env) = 
   let id = anon ^ string_of_int !count in 
