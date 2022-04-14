@@ -14,7 +14,7 @@ and tycon =
     TInt  
   | TChar 
   | TBool 
-  | TArrow of gtype * gtype
+  | TArrow of gtype * gtype list
 and tyvar = 
     TParam of int
 and conapp = (tycon * gtype list)
@@ -23,7 +23,14 @@ let inttype = TYCON TInt
 let chartype = TYCON TChar
 let booltype = TYCON TBool
 (* let treetype ty = CONAPP () *)
-let funtype (args, res) = CONAPP (TArrow (), args)
+
+(* function type, res is a tycon, args is gtype list *)
+let funtype1 (args, res) = CONAPP (res, args)
+
+(* Alt function type: res is a gtype, args is a gtype list*)
+(* let funtype2 (args, res) = TYCON (TArrow (res, args)) *)
+
+
 
 (* let inttype     = TYCON "int"
 let booltype    = TYCON "bool"

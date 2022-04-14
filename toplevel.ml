@@ -16,6 +16,7 @@ type action =
 	| LLVM_IR
  	| Compile
 	| Dummy (* Cast Testing *)
+	| Name_Check
 
 let () =
 	let action = ref Ast in
@@ -26,7 +27,9 @@ let () =
     	("-l", Arg.Unit (set_action LLVM_IR), 	"Print the generated LLVM IR");
     	("-c", Arg.Unit (set_action Compile),
 			"Check and print the generated LLVM IR");
+    	(* DUMMY Flags *)
     	("-d", Arg.Unit (set_action Dummy), 	"Cast test");
+    	("-n", Arg.Unit (set_action Name_Check), 	"Name Scope test");
 	] in
 
 	let usage_msg = "usage: ./toplevel.native [-a|-s] [file.gt]" in
@@ -40,7 +43,8 @@ let () =
 			  Ast     -> print_string (Ast.string_of_prog ast)
 			(* All other action needs to generate an SAST, store in variable sast *)
 			| _ -> 
-				let sast = Semant.semantic_check ast in
+				let ast' = Scope.check ast in 
+				let sast = Semant.semantic_check ast' in
 				(* let cast = 
 						{
 						  main      = []; 
@@ -71,4 +75,5 @@ let () =
 										Llvm_analysis.assert_valid_module the_module;
 										print_string (Llvm.string_of_llmodule the_module)
 					| Dummy -> Cast.string_of_cprog cast
+					| Name_Check -> print_string (Ast.string_of_prog ast')
 

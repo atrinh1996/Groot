@@ -139,7 +139,11 @@ in *)
           | SRoot _ -> raise (Failure "TODO treetype"))
         , SLiteral s)
     | Var(x) -> (try (StringMap.find x gamma, SVar x) with Not_found -> raise (Failure ("not found var " ^ x)))
-    | If(_, _, _)           -> raise (Failure ("TODO - expr to sexpr of If"))
+    | If(e1, e2, e3)           -> 
+        let (t1, e1') = expr id e1 gamma in 
+        let (t2, e2') = expr id e2 gamma in 
+        let (t3, e3') = expr id e3 gamma in 
+        (t2, SIf ((t1, e1'), (t2, e2'), (t3, e3')))
     | Apply(f, args)        -> 
         let (t, f') = expr "" f gamma in 
         let fd = (match f' with 
