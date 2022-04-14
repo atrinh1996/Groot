@@ -88,25 +88,6 @@ let toParamList venv =
                   ) 
                   venv []
 
-(* let create_anon_function (fformals : (gtype * string) list) (fbody : sexpr) (ty : gtype) (env : var_env) = 
-  let id = anon ^ string_of_int !count in 
-  let () = count := !count + 1 in
-  let () = bindFunction id in 
-  let f_def = 
-    {
-      rettyp  = ty; 
-      fname   = id; 
-      formals = fformals;
-      frees   = toParamList 
-                  (clean res.phi (improve (fformals, fbody) env)); 
-      body    = sexprToCexpr fbody (List.fold_left 
-                                      (fun map (typ, x) -> 
-                                        StringMap.add x (0, typ) map)
-                                      env fformals);
-    } 
-  in let () = addFunction f_def in (ty, CLambda (fformals, f_def.body)) *)
-
-
 (* Converts given sexpr to cexpr, and returns the cexpr *)
 (* let rec sexprToCexpr ((ty, e) : sexpr) = match e with  *)
 let rec sexprToCexpr ((ty, e) : sexpr) (env : var_env) =
@@ -150,7 +131,9 @@ and create_anon_function (fformals : (gtype * string) list) (fbody : sexpr) (ty 
   let () = bindFunction id in 
   let f_def = 
     {
-      rettyp  = ty; 
+      rettyp  = (match ty with 
+                    TYCON (TArrow (res, _)) -> res 
+                  | _ -> raise (Failure "Non-function function type")); 
       fname   = id; 
       formals = fformals;
       frees   = toParamList (improve (fformals, fbody) env);
@@ -177,7 +160,9 @@ let svalToCval (id, (ty, e)) =
         let () = if (findFunction id) then () else bindFunction id in
         let f_def = 
           {
-            rettyp  = ty; 
+            rettyp  = (match ty with 
+                          TYCON (TArrow (res, _)) -> res 
+                          | _ -> raise (Failure "Non-function function type"));
             fname   = id'; 
             formals = fformals;
             frees   = toParamList (improve (fformals, fbody) res.rho); 

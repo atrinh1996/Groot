@@ -168,7 +168,10 @@ in *)
     (* Forces labda to be int type. *)
     | Lambda(formals, body) -> 
         let formal_list = List.map (fun x -> (inttype, x)) formals in 
+        let (argsty, _) = List.split formal_list in
         let gamma' = List.fold_left (fun map x -> StringMap.add x inttype map) gamma formals in 
+        let (retty, ex) = expr "" body gamma' in 
+        let fty = funtype (retty, argsty) in 
         let _ = if (id = "") then () 
           else functions := StringMap.add id 
                                           { 
@@ -177,7 +180,7 @@ in *)
                                             formals = formal_list;
                                           } 
                                           !functions in 
-        (inttype, SLambda (formal_list, expr "" body gamma'))
+        (fty, SLambda (formal_list, (retty, ex)))
   (* Returns the Sast.svalue version fo the given Ast.value *)
   and value = function 
   	| Char(c)     -> SChar c

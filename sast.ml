@@ -25,10 +25,10 @@ let booltype = TYCON TBool
 (* let treetype ty = CONAPP () *)
 
 (* function type, res is a tycon, args is gtype list *)
-let funtype1 (args, res) = CONAPP (res, args)
+(* let funtype (args, res) = CONAPP (res, args) *)
 
 (* Alt function type: res is a gtype, args is a gtype list*)
-(* let funtype2 (args, res) = TYCON (TArrow (res, args)) *)
+let funtype (res, args) = TYCON (TArrow (res, args))
 
 
 
@@ -87,7 +87,7 @@ and string_of_tycon = function
     TInt            -> "int"
   | TBool           -> "bool"
   | TChar           -> "char"
-  | TArrow (t1, t2) -> "*TODO TArrow type string*"
+  | TArrow (retty, argsty) -> string_of_typ retty ^ " (" ^ String.concat " " (List.map string_of_typ argsty) ^ ")" 
 and string_of_tyvar = function 
     TParam n -> string_of_int n
 and string_of_conapp (tyc, tys) = 

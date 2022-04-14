@@ -17,7 +17,7 @@ let check defns =
     let rec exp e = match e with
         Literal _ -> () 
       | Var id -> if List.mem id rho then () 
-                  else raise (Unbound (" variable " ^ id))
+                  else raise (Unbound ("Unbound variable " ^ id))
       | If (e1, e2, e3) -> 
           let (_, _, _) = (exp e1, exp e2, exp e3) in ()
       | Apply (f, args) -> 

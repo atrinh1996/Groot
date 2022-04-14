@@ -63,7 +63,7 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
   let print_false = L.build_in_bounds_gep boolF [| zero |] "" main_builder in
 
   (* Lookup table of function names (lambdas) to (function block, function def) *)
-  let function_decls : (L.llvalue * fdef * L.lltype) StringMap.t = 
+  let function_decls : (L.llvalue * fdef) StringMap.t = 
     let define_func map def =  
       let name = def.fname 
       and formal_types = 
@@ -71,7 +71,7 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
                       (def.formals @ def.frees)) 
       in 
       let ftype = L.function_type (ltype_of_gtype def.rettyp) formal_types
-      in StringMap.add name (L.define_function name ftype the_module, def, ftype) map 
+      in StringMap.add name (L.define_function name ftype the_module, def) map 
     in List.fold_left define_func StringMap.empty functions 
   in 
 
@@ -100,14 +100,14 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
   let create_global id ty = 
     let lltyp = ltype_of_gtype ty in 
     let rec const_gtyp = function 
-        S.TYCON ty -> const_tycon ty
-      | S.TYVAR tp -> const_tyvar tp
-      | S.CONAPP con -> const_conapp con
+        S.TYCON ty    -> const_tycon ty
+      | S.TYVAR tp    -> const_tyvar tp
+      | S.CONAPP con  -> const_conapp con
     and const_tycon = function 
-        S.TInt            -> L.const_int lltyp 0
-      | S.TBool           -> L.const_int lltyp 0
-      | S.TChar           -> L.const_int lltyp 0
-      | S.TArrow (_, _) -> raise (Failure ("TODO: lltype of TArrow"))
+        S.TInt            -> L.const_int  lltyp 0
+      | S.TBool           -> L.const_int  lltyp 0
+      | S.TChar           -> L.const_int  lltyp 0
+      | S.TArrow (_, _)   -> L.const_null lltyp
     and const_tyvar = function 
         S.TParam _ -> raise (Failure ("TODO: lltype of TParam"))
     and const_conapp (tyc, _) = const_tycon tyc
@@ -133,7 +133,9 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
 
   (* Construct code for expression 
      Function takes a Cast.cexpr, and constructs the llvm where 
-     builder is located; returns the llvalue representation of code*)
+     builder is located; returns the llvalue representation of code. 
+
+      Note: style - consider currying the function params *)
   let rec expr (_, e) builder lenv = 
     match e with 
        CLiteral v   -> const_val v builder
@@ -147,10 +149,17 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
      | CApply ((_, CVar "printb"), [arg]) -> 
         let bool_stringptr = if expr arg builder lenv = (L.const_int bool_ty 1) then print_true else print_false
         in L.build_call puts_func [| bool_stringptr |] "printb" builder
-     | CApply _ -> raise (Failure ("TODO - codegen CAPPLY general"))
+     | CApply (f, args) -> raise (Failure ("TODO - codegen CApply"))
+       (*  let llargs = List.map (fun cexp -> expr cexp builder lenv) args in 
+        
+        L.build_call  fblock 
+                      (Array.of_list llargs) 
+                      "fun_name"
+                      builder  *)
+
      | CLet _ -> raise (Failure ("TODO - codegen CLET"))
      | CLambda (id, args, bod) -> (* store function pointer to function here *)
-        let (fblock, _, _) = StringMap.find id function_decls in fblock
+        let (fblock, _) = StringMap.find id function_decls in fblock
         (* L.build_load (lookup id lenv) id builder *)
   in 
 
@@ -173,7 +182,7 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
 
   (* Build function block bodies *)
   let build_function_body fdef = 
-    let (function_block, _, _) = StringMap.find fdef.fname function_decls in
+    let (function_block, _) = StringMap.find fdef.fname function_decls in
     let fbuilder = L.builder_at_end context (L.entry_block function_block) in
     
     (* For each param, load them into the function body *)
@@ -210,7 +219,7 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
           S.TInt            -> L.build_ret result
         | S.TBool           -> L.build_ret result
         | S.TChar           -> L.build_ret result
-        | S.TArrow (_, _) -> raise (Failure ("TODO: ret of TArrow"))
+        | S.TArrow (_, _) -> L.build_ret result
       and ret_of_tyvar = function 
           S.TParam _ -> raise (Failure ("TODO: ret of TParam"))
       and ret_of_conapp (tyc, _) = ret_of_tycon tyc

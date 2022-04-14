@@ -65,10 +65,13 @@ let rec ltype_of_gtype = function
   | S.TYVAR tp -> ltype_of_tyvar tp
   | S.CONAPP con -> ltype_of_conapp con
 and ltype_of_tycon = function 
-    S.TInt            -> int_ty
-  | S.TBool           -> bool_ty
-  | S.TChar           -> char_ty
-  | S.TArrow (_, _) -> raise (Failure ("TODO: lltype of TArrow"))
+    S.TInt                -> int_ty
+  | S.TBool               -> bool_ty
+  | S.TChar               -> char_ty
+  | S.TArrow (ret, args)  -> 
+      L.function_type (ltype_of_gtype ret) (Array.of_list (List.map ltype_of_gtype args))
 and ltype_of_tyvar = function 
+    (* What is this type even? *)
     S.TParam _ -> void_ty
+    (* And what types do conapps represent? *)
 and ltype_of_conapp (tyc, _) = ltype_of_tycon tyc

@@ -15,6 +15,12 @@ x
 (val retn (lambda (n m) n))
 
 (;
+(retn x 9)
+
+(retn 14 x)
+;)
+
+(;
 retn
 
 ;)

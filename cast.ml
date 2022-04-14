@@ -89,9 +89,10 @@ and string_of_cx = function
                      ^ ") " ^ string_of_cexpr body ^ ")"
     | CLambda (id, formals, body) -> 
         let (tys, names) = List.split formals in 
-        "(" ^ id ^ " (" ^ (List.fold_left2 
-                        (fun space ty para -> string_of_typ ty ^ space ^ para) 
-                        " " tys names) 
+        "(" ^ id ^ " (" ^ String.concat ", " 
+                            (List.map (fun (ty, name) -> 
+                                        string_of_typ ty ^ " " ^ name) 
+                                      formals)
                     ^ ") " 
                     ^ string_of_cexpr body ^ ")"
 and string_of_cvalue = function
