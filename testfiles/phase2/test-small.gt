@@ -14,9 +14,12 @@ x
 
 (val retn (lambda (n m) n))
 
-(;
-(retn x 9)
 
+
+
+(printi (retn x 9))
+
+(;
 (retn 14 x)
 ;)
 
@@ -97,6 +100,7 @@ int foo (int a, int (int int)* f) {
 }
 
 ;)
+
 
 
 

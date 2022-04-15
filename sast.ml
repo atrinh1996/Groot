@@ -143,8 +143,6 @@ and string_of_stree = function
                  ^ string_of_stree sib ^ " " 
                  ^ string_of_stree child ^ ")"
 
-
-
 (* toString for Sast.sdefn *)
 let string_of_sdefn = function 
   | SVal(id, e) -> "(val " ^ id ^ " " ^ string_of_sexpr e ^ ")"

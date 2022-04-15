@@ -107,7 +107,7 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
         S.TInt            -> L.const_int  lltyp 0
       | S.TBool           -> L.const_int  lltyp 0
       | S.TChar           -> L.const_int  lltyp 0
-      | S.TArrow (_, _)   -> L.const_null lltyp
+      | S.TArrow (_, _)   -> L.const_pointer_null (L.pointer_type lltyp)
     and const_tyvar = function 
         S.TParam _ -> raise (Failure ("TODO: lltype of TParam"))
     and const_conapp (tyc, _) = const_tycon tyc
@@ -149,13 +149,13 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
      | CApply ((_, CVar "printb"), [arg]) -> 
         let bool_stringptr = if expr arg builder lenv = (L.const_int bool_ty 1) then print_true else print_false
         in L.build_call puts_func [| bool_stringptr |] "printb" builder
-     | CApply (f, args) -> raise (Failure ("TODO - codegen CApply"))
-       (*  let llargs = List.map (fun cexp -> expr cexp builder lenv) args in 
-        
+     | CApply (f, args) -> (* raise (Failure ("TODO - codegen CApply")) *)
+        let llargs = List.map (fun cexp -> expr cexp builder lenv) args in 
+        let fblock = expr f builder lenv in
         L.build_call  fblock 
                       (Array.of_list llargs) 
                       "fun_name"
-                      builder  *)
+                      builder 
 
      | CLet _ -> raise (Failure ("TODO - codegen CLET"))
      | CLambda (id, args, bod) -> (* store function pointer to function here *)
@@ -185,13 +185,14 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
     let (function_block, _) = StringMap.find fdef.fname function_decls in
     let fbuilder = L.builder_at_end context (L.entry_block function_block) in
     
-    (* For each param, load them into the function body *)
+    (* For each param, load them into the function body. 
+        locals : llvalue StringMap.t*)
     let locals =  
-      let add_formal m (ty, nm) p = 
+      let add_formal map (ty, nm) p = 
         let () = L.set_value_name nm p in 
         let local = L.build_alloca (ltype_of_gtype ty) nm fbuilder in
         let _ = L.build_store p local fbuilder in 
-        StringMap.add nm local m 
+        StringMap.add nm local map
       in
       List.fold_left2 add_formal 
                       StringMap.empty 
