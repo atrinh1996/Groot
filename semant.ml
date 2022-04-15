@@ -145,10 +145,13 @@ in *)
         let (t3, e3') = expr id e3 gamma in 
         (t2, SIf ((t1, e1'), (t2, e2'), (t3, e3')))
     | Apply(f, args)        -> 
+        (* let (fty, app) = f in  *)
         let (t, f') = expr "" f gamma in 
-        let fd = (match f' with 
+        let args' = List.map (fun e -> expr "" e gamma) args in 
+        (t, SApply ((t, f'), args'))
+        (* let fd = (match f' with 
                       SVar s -> find_func s !functions
-                    | _ -> raise (Failure "TODO: SApply with sexpr")) in 
+                    | _ -> raise (Failure "TODO: SApply with sexpr")) in  *)
             (* let fd = find_func fname !functions in 
             let formals_length = List.length fd.formals in 
             let param_length = List.length args in 
@@ -156,14 +159,14 @@ in *)
               then raise (Failure ("expected number of args, but got different number"))
             else 
           *)
-              let check_call (ft, _) e = 
+              (* let check_call (ft, _) e = 
                 let (et, e') = expr "" e gamma in 
                 if et = ft then (et, e') else raise 
                 (Failure ("illegal argument found " ^ string_of_typ et 
                   ^ " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e))
               in 
             let args' = List.map2 check_call fd.formals args
-            in (fd.rettyp, SApply ((t, SVar fd.fname), args'))
+            in (fd.rettyp, SApply ((t, SVar fd.fname), args')) *)
     | Let(_, _)             -> raise (Failure ("TODO - expr to sexpr of Let"))
     (* Forces labda to be int type. *)
     | Lambda(formals, body) -> 

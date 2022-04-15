@@ -16,6 +16,7 @@ open Llgtype
    returns an LLVM module (llmodule type), which is the code generated from 
    the CAST. Throws exception if something is wrong. *)
 let translate { main = main; functions = functions; rho = rho; phi = _ } = 
+  (* let () = print_endline "entered Codegen" in  *)
 
   (* Create an LLVM module (container into which we'll 
      generate actual code) *)
@@ -128,7 +129,10 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
   in 
 
   let lookup id locals = 
-    try StringMap.find id locals with Not_found -> StringMap.find id globals
+    (* try fst (StringMap.find id function_decls)
+    with Not_found -> *)
+      try StringMap.find id locals 
+      with Not_found -> StringMap.find id globals
   in 
 
   (* Construct code for expression 
@@ -139,19 +143,31 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
   let rec expr (_, e) builder lenv = 
     match e with 
        CLiteral v   -> const_val v builder
-     | CVar     s  -> L.build_load (lookup s lenv) s builder
+     | CVar     s  -> 
+        (* let () = print_endline ("looking for " ^ s) in  *)
+        (try L.build_load (lookup s lenv) s builder
+                with Not_found -> 
+                    (* let () = print_endline ("failed looking for " ^ s)  *)
+                    raise(Failure "not found"))
      | CIf _ -> raise (Failure ("TODO - codegen CIF merge-then-else"))
      | CApply ((_, CVar "printi"), [arg]) -> 
           L.build_call printf_func [| int_format_str ; (expr arg builder lenv) |] "printi" builder
      | CApply ((_, CVar"printc"), [arg]) -> 
         (* L.build_call printf_func [| char_format_str ; (expr arg builder) |] "printc" builder *)
+        let () = print_endline "codegen: capply" in 
         L.build_call puts_func [| expr arg builder lenv |] "printc" builder
      | CApply ((_, CVar "printb"), [arg]) -> 
         let bool_stringptr = if expr arg builder lenv = (L.const_int bool_ty 1) then print_true else print_false
         in L.build_call puts_func [| bool_stringptr |] "printb" builder
      | CApply (f, args) -> (* raise (Failure ("TODO - codegen CApply")) *)
+        (* let () = print_endline "starting capply" in  *)
+        (* let s = (match f with 
+                  (_, CVar s) -> s 
+                  | _ -> raise (Failure "non fname applied")) in *) 
+        (* let () = print_endline ("fname is " ^ s) in  *)
         let llargs = List.map (fun cexp -> expr cexp builder lenv) args in 
         let fblock = expr f builder lenv in
+        (* let () = print_endline "got an fblock" in  *)
         L.build_call  fblock 
                       (Array.of_list llargs) 
                       "fun_name"

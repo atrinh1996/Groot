@@ -22,6 +22,7 @@ and cx =
   | CVar      of cname 
   | CIf       of cexpr * cexpr * cexpr
   | CApply    of cexpr * cexpr list 
+  (* | CApply    of cname * cexpr list  *)
   | CLet      of (cname * cexpr) list * cexpr 
   | CLambda   of cname * (gtype * cname) list * cexpr
 and cvalue = 

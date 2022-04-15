@@ -1,6 +1,20 @@
 (val x 42)
+(val retx (lambda () x))
+(printi (retx))
+
+(val x 12)
+(printi (retx))
+(val retx (lambda () x))
+(printi (retx)) 
+
+(val retx2 (lambda (n m) x))
+
+(printi (retx2 9 8))
 
 (;
+((if #t retx retn))
+
+
 x
 
 (printi x)
@@ -10,15 +24,15 @@ x
 x
 
 (printi x)
-;)
+
 
 (val retn (lambda (n m) n))
 
-
-
-
 (printi (retn x 9))
 (printi (retn 7 9))
+;)
+
+
 
 (;
 (retn 14 x)
@@ -56,6 +70,8 @@ retn
 (val fun1 (lambda (a) 
 		(lambda (b) 
 			(lambda (c) (take3 a b c)))))
+
+((if #t retx retn))
 ;)
 
 (; 
