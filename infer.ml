@@ -16,7 +16,7 @@ and tycon =
   | TInt                    								 			(** integers [int] *)
   | TBool                  							  				(** booleans [bool] *)
   | TChar           								 							(** chars    [char] *)
-  | TArrow of gtype            			(** Function type [s -> t] *)
+  | TArrow of gtype           			(** Function type [s -> t] *)
   (* | TTree of gtype * gscheme * gscheme       	(** Trees *) *)
 and tyvar =
 	| TVar of int          (** parameter *)
@@ -234,11 +234,17 @@ and string_of_tycon = function
   | TInt -> "int"
   | TBool -> "bool"
   | TChar -> "char"
-  (* | TArrow (retty, argsty) -> string_of_typ retty ^ " (" ^ String.concat " " (List.map string_of_typ argsty) ^ ")"  *)
+  | TArrow a -> string_of_typ (a)
 and string_of_tyvar = function 
   | TVar n -> string_of_int n
 and string_of_conapp (tyc, tys) = 
   string_of_tycon tyc ^ " " ^ String.concat " " (List.map string_of_typ tys)
+and string_of_constraints = function
+	| [] -> ""
+	| (f, s)::cs -> "(" ^ string_of_typ f ^ ", " ^ string_of_typ s ^ ") " ^ string_of_constraints cs
+and string_of_gencons = function
+	| [] -> ""
+	| (g, lcons)::gs -> "(" ^ string_of_typ g ^ ", " ^ string_of_constraints lcons ^ ") " ^ string_of_gencons gs
 
 let rec string_of_texpr (t, s) = 
 	"[" ^ string_of_typ t ^ ": " ^ string_of_tx s ^ "]"
@@ -246,9 +252,9 @@ and string_of_tx = function
 	| TLiteral v -> string_of_tvalue v
 	| TVar n -> string_of_tyvar (TVar (int_of_string n))
 	| TIf (e1, e2, e3) -> "if " ^ string_of_texpr e1 ^ " then " ^ string_of_texpr e2 ^ " else " ^ string_of_texpr e3
-	(* | TApply (f, a) -> "(" ^ string_of_texpr f ^ " " ^ String.concat " " (List.map string_of_texpr a) ^ ")" *)
-	(* | TLet (binds, body) -> "let " ^ String.concat " " (List.map string_of_tvalue (TVal binds)) ^ " in " ^ string_of_texpr body
-	| TLambda (formals, body)-> "\\" ^ String.concat " " (List.map string_of_tx formals) ^ " -> " ^ string_of_texpr body *)
+	| TApply (rt, (ft)) -> "(" ^ string_of_texpr rt ^ ", " ^ String.concat " " (List.map string_of_texpr ft) ^ ")"
+	(* | TLet (binds, body) -> "let " ^ String.concat " " (List.map string_of_tvalue (TVal binds)) ^ " in " ^ string_of_texpr body *)
+	(* | TLambda (formals, body)-> "\\" ^ String.concat " " (List.map string_of_tx formals) ^ " -> " ^ string_of_texpr body *)
 and string_of_tvalue = function
 	| TChar c -> string_of_tycon (TChar)
 	| TInt i -> string_of_int i
@@ -261,15 +267,6 @@ and string_of_ttree = function
 let string_of_tdefn = function 
 	| TVal(id, e) -> "(val " ^ id ^ " " ^ string_of_texpr e ^ ")"
 	| TExpr e -> string_of_texpr e
-
-let rec string_of_constraints = function
-	| [] -> ""
-	| (f, s)::cs -> "(" ^ string_of_typ f ^ ", " ^ string_of_typ s ^ ") " ^ string_of_constraints cs
-
-(* ('a, [(TBool, TBool) ('a, 'a)] *)
-let rec string_of_gencons = function
-	| [] -> ""
-	| (g, lcons)::gs -> "(" ^ string_of_typ g ^ ", " ^ string_of_constraints lcons ^ ") " ^ string_of_gencons gs
 
 let rec string_of_tprog tdefns =
 	String.concat "\n" (List.map string_of_tdefn tdefns) ^ "\n"
