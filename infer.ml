@@ -16,7 +16,7 @@ and tycon =
   | TInt                    								 			(** integers [int] *)
   | TBool                  							  				(** booleans [bool] *)
   | TChar           								 							(** chars    [char] *)
-  | TArrow of gtype * gtype list            			(** Function type [s -> t] *)
+  | TArrow of gtype            			(** Function type [s -> t] *)
   (* | TTree of gtype * gscheme * gscheme       	(** Trees *) *)
 and tyvar =
 	| TVar of int          (** parameter *)
@@ -117,6 +117,8 @@ and solve (constraints : (gtype * gtype) list) =
 
 (* generate_constraints gctx e: infers the type of expression 'e' and a set of
    constraints, 'gctx' refers to the global context 'e' can refer to *)
+(* let functiontype resultType formalsTypes = CONAPP (TArrow , formalsTypes @ [resultType])  *)
+
 let rec generate_constraints gctx e =
 	let rec constrain ctx e =
 		match e with
@@ -129,9 +131,20 @@ let rec generate_constraints gctx e =
 			let t2, c2 = generate_constraints gctx e2 in
 			let t3, c3 = generate_constraints gctx e2 in
 			(t3, [((TYCON TBool), t1); (t3, t2)] @ c1 @ c2 @ c3)
-		| Apply (_, _) -> raise (Type_error "missing case for Apply")
+		| Apply (name, formals) ->
+			let t1, c1 = generate_constraints ctx name in
+			let ts2, c2 = List.fold_left 
+				(fun acc e -> 
+					let t, c = generate_constraints ctx e in 
+					let ts, cs = acc in (t::ts, c @ cs)
+				) ([], c1)
+				formals in
+			let retType = TYVAR (fresh()) in 
+			(retType, (t1, (CONAPP (TArrow retType, ts2)))::c2)
 		| Let (_, _) -> raise (Type_error "missing case for Let")
-		| Lambda (_,_) -> raise (Type_error "missing case for Lambda")
+		| Lambda (f,b) -> 
+			generate_constraints (List.fold_left 
+				(fun acc x -> (x, ([(fresh ())], TYVAR (fresh ())))::acc) ctx f) b
 		and value v = 
 		match v with
 		| Int e ->  TYCON TInt, []
@@ -142,9 +155,6 @@ let rec generate_constraints gctx e =
 		| Leaf -> raise (Type_error "missing case for Leaf")
 		| Branch (e, t1, t2) -> raise (Type_error "missing case for Branch")
 	in constrain gctx e
-
-
-type ident = string
 
 let rec ftvs (ty : gtype) = 
 	match ty with
@@ -224,7 +234,7 @@ and string_of_tycon = function
   | TInt -> "int"
   | TBool -> "bool"
   | TChar -> "char"
-  | TArrow (retty, argsty) -> string_of_typ retty ^ " (" ^ String.concat " " (List.map string_of_typ argsty) ^ ")" 
+  (* | TArrow (retty, argsty) -> string_of_typ retty ^ " (" ^ String.concat " " (List.map string_of_typ argsty) ^ ")"  *)
 and string_of_tyvar = function 
   | TVar n -> string_of_int n
 and string_of_conapp (tyc, tys) = 
@@ -236,7 +246,7 @@ and string_of_tx = function
 	| TLiteral v -> string_of_tvalue v
 	| TVar n -> string_of_tyvar (TVar (int_of_string n))
 	| TIf (e1, e2, e3) -> "if " ^ string_of_texpr e1 ^ " then " ^ string_of_texpr e2 ^ " else " ^ string_of_texpr e3
-	| TApply (f, a) -> "(" ^ string_of_texpr f ^ " " ^ String.concat " " (List.map string_of_texpr a) ^ ")"
+	(* | TApply (f, a) -> "(" ^ string_of_texpr f ^ " " ^ String.concat " " (List.map string_of_texpr a) ^ ")" *)
 	(* | TLet (binds, body) -> "let " ^ String.concat " " (List.map string_of_tvalue (TVal binds)) ^ " in " ^ string_of_texpr body
 	| TLambda (formals, body)-> "\\" ^ String.concat " " (List.map string_of_tx formals) ^ " -> " ^ string_of_texpr body *)
 and string_of_tvalue = function
@@ -255,14 +265,11 @@ let string_of_tdefn = function
 let rec string_of_constraints = function
 	| [] -> ""
 	| (f, s)::cs -> "(" ^ string_of_typ f ^ ", " ^ string_of_typ s ^ ") " ^ string_of_constraints cs
-(* (Infer.gtype * (Infer.gtype * Infer.gtype) list) list *)
+
 (* ('a, [(TBool, TBool) ('a, 'a)] *)
 let rec string_of_gencons = function
 	| [] -> ""
 	| (g, lcons)::gs -> "(" ^ string_of_typ g ^ ", " ^ string_of_constraints lcons ^ ") " ^ string_of_gencons gs
 
-
 let rec string_of_tprog tdefns =
 	String.concat "\n" (List.map string_of_tdefn tdefns) ^ "\n"
-
-

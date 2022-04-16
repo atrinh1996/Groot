@@ -42,7 +42,7 @@ let type_infer defns =
 		| Literal v ->
 			(match v with
 			| Char _ -> (TChar, [])
-			| Int  _ -> (TInt, [])
+			| Int  _ -> (TInt, [])								
 			| Bool _ -> (TBool, [])
 (* 			| Root r ->
 				let rec tree_check t =
