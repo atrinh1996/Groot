@@ -13,14 +13,16 @@ type gtype =
   | TYVAR of tyvar
   | CONAPP of conapp
 and tycon =
-  | TInt                    								 (** integers [int] *)
-  | TBool                  							   (** booleans [bool] *)
-  | TChar           								 (** chars    [char] *)
-  | TArrow of gtype * gtype                  (** Function type [s -> t] *)
-  (* | TTree of gtype * gscheme * gscheme       (** Trees *) *)
+  | TInt                    								 			(** integers [int] *)
+  | TBool                  							  				(** booleans [bool] *)
+  | TChar           								 							(** chars    [char] *)
+  | TArrow of gtype * gtype list            			(** Function type [s -> t] *)
+  (* | TTree of gtype * gscheme * gscheme       	(** Trees *) *)
 and tyvar =
-	| TParam of int          (** parameter *)
+	| TVar of int          (** parameter *)
 and conapp = (tycon * gtype list)
+
+type tyscheme = (tyvar list * gtype)
 
 module TypeSet = Set.Make (
 	struct
@@ -35,15 +37,13 @@ let rec is_free_type_var var gt =
 	match gt with
 	| TYCON _ -> false
 	| TYVAR tvar -> var = tvar
-	| CONAPP tcon -> List.fold_left 
-		(fun acc x -> is_free_type_var var x || acc)
-		false
-		(snd tcon)
+	| CONAPP tcon -> 
+		List.fold_left (fun acc x -> is_free_type_var var x || acc) false (snd tcon)
 
 (* fresh: returns an unused type parameter *)
 let fresh =
   let k = ref 0 in
-	fun () -> incr k; TParam !k
+	fun () -> incr k; TVar !k
 
 let sub (theta : (tyvar * gtype) list) (cns : (gtype * gtype) list) =
 	(* sub1 takes in a single constraint and updates it with any substitutions in theta *)
@@ -121,7 +121,9 @@ let rec generate_constraints gctx e =
 	let rec constrain ctx e =
 		match e with
 		| Literal e -> value e
-		| Var _ -> TYVAR (fresh ()), []
+		| Var name -> 
+			let (_, (_, tau)) = List.find (fun x -> fst x = name) ctx in
+			(tau, [])
 		| If (e1, e2, e3) -> 
 			let t1, c1 = generate_constraints gctx e1 in
 			let t2, c2 = generate_constraints gctx e2 in
@@ -141,17 +143,126 @@ let rec generate_constraints gctx e =
 		| Branch (e, t1, t2) -> raise (Type_error "missing case for Branch")
 	in constrain gctx e
 
-let sub_theta_into_gamma theta gamma = raise (Type_error "function needs to be written")
+
+type ident = string
+
+let rec ftvs (ty : gtype) = 
+	match ty with
+	| TYVAR t -> [t]
+	| TYCON c -> []
+	| CONAPP a -> List.fold_left (fun acc x -> acc @ (ftvs x)) [] (snd a)
+
+(* let subst (theta : (tyvar * gtype) list) (t : gtype) (ftvs: tyvar list) =
+	match t with
+	| TYVAR t -> List.find (fun (x : tyvar * gtype) -> x = (t, TYVAR t)) theta
+	| TYCON c -> (TYCON c, t)
+	| CONAPP a -> (CONAPP a, t) *)
+
+let rec tysubst (theta: (tyvar * gtype) list) (t : gtype) (ftvs: tyvar list) =
+	match t with
+	| TYVAR t -> let (alpha, tau) = List.find (fun (x : tyvar * gtype) -> (fst x) = t) theta in if (List.exists (fun x -> x = t) ftvs) then tau else TYVAR t 
+	| TYCON c -> TYCON c
+	| _ -> raise (Type_error "missing case for CONAPP")
+	(* | CONAPP a -> CONAPP ((tysubst theta (fst a) ftvs), List.map (fun x -> tysubst theta x ftvs) (snd a)) *)
+
+let rec sub_theta_into_gamma (theta : (tyvar * gtype) list) (gamma : (ident * tyscheme) list) = 
+	match gamma with
+		| [] -> []
+		| (g :: gs) -> 
+			let (name, tysch) = g in
+			let (bound_types, btypes) = tysch in
+			let freetypes = List.filter (fun (x : tyvar) -> List.exists (fun (y : tyvar) -> y = x) bound_types) (ftvs btypes) in
+			let new_btype = tysubst theta btypes freetypes in
+			(name, (bound_types, new_btype)) :: sub_theta_into_gamma theta gs 
 
 (* type_infer should resturn a list of tasts *)
 (* TAST = [ tdefns ] *)
 (* defn list = [ (ident, expr) | expr ]*)
-let rec type_infer (ctx : 'a StringMap.t ) (d : defn list) =
+let rec type_infer (ctx : (ident * tyscheme) list ) (d : defn list) =
 	match d with
+	| [] -> []
 	| Val (name, e)::ds -> 
-		let result = generate_constraints ctx e in
-		(fst result, snd (type_infer (sub_theta_into_gamma (snd result) ctx) ds))
+		let (t, c) = generate_constraints ctx e in
+		let new_ctx = (name, (List.filter (fun (x : tyvar) -> List.exists (fun (y : tyvar) -> y = x) (ftvs t)) (ftvs t), t)) :: ctx in
+		type_infer new_ctx ds
 	| Expr (e)::ds ->
-		let result = generate_constraints ctx e in
-		(fst result, snd (type_infer (sub_theta_into_gamma (snd result) ctx) ds))
+		let (t, c) = generate_constraints ctx e in 
+		(t, c) :: type_infer ctx ds
  
+
+(* Below lies Nick's futile attempt at printing *)	
+
+type texpr = gtype * tx
+	and tx = 
+		| TLiteral of tvalue
+		| TVar     of ident
+		| TIf      of texpr * texpr * texpr
+		| TApply   of texpr * texpr list
+		| TLet     of (ident * texpr) list * texpr
+		| TLambda  of ident list * texpr
+	and tvalue = 
+		| TChar    of char
+		| TInt     of int
+		(* | Float   of float *)
+		| TBool    of bool
+		| TRoot    of ttree
+	and ttree =  
+		| TLeaf
+		| TBranch of tvalue * ttree * ttree
+
+type tdefn = 
+	| TVal of ident * texpr
+	| TExpr of texpr
+	
+type tprog = tdefn list	
+	
+let rec string_of_typ = function
+  | TYCON ty -> string_of_tycon ty
+  | TYVAR tp -> string_of_tyvar tp
+  | CONAPP con -> string_of_conapp con
+and string_of_tycon = function 
+  | TInt -> "int"
+  | TBool -> "bool"
+  | TChar -> "char"
+  | TArrow (retty, argsty) -> string_of_typ retty ^ " (" ^ String.concat " " (List.map string_of_typ argsty) ^ ")" 
+and string_of_tyvar = function 
+  | TVar n -> string_of_int n
+and string_of_conapp (tyc, tys) = 
+  string_of_tycon tyc ^ " " ^ String.concat " " (List.map string_of_typ tys)
+
+let rec string_of_texpr (t, s) = 
+	"[" ^ string_of_typ t ^ ": " ^ string_of_tx s ^ "]"
+and string_of_tx = function
+	| TLiteral v -> string_of_tvalue v
+	| TVar n -> string_of_tyvar (TVar (int_of_string n))
+	| TIf (e1, e2, e3) -> "if " ^ string_of_texpr e1 ^ " then " ^ string_of_texpr e2 ^ " else " ^ string_of_texpr e3
+	| TApply (f, a) -> "(" ^ string_of_texpr f ^ " " ^ String.concat " " (List.map string_of_texpr a) ^ ")"
+	(* | TLet (binds, body) -> "let " ^ String.concat " " (List.map string_of_tvalue (TVal binds)) ^ " in " ^ string_of_texpr body
+	| TLambda (formals, body)-> "\\" ^ String.concat " " (List.map string_of_tx formals) ^ " -> " ^ string_of_texpr body *)
+and string_of_tvalue = function
+	| TChar c -> string_of_tycon (TChar)
+	| TInt i -> string_of_int i
+	| TBool b -> string_of_bool b
+	| TRoot t -> string_of_ttree t
+and string_of_ttree = function
+	| TLeaf -> "SLeaf"
+	| TBranch (v, l, r) -> "SBranch " ^ string_of_tvalue v ^ " " ^ string_of_ttree l ^ " " ^ string_of_ttree r
+
+let string_of_tdefn = function 
+	| TVal(id, e) -> "(val " ^ id ^ " " ^ string_of_texpr e ^ ")"
+	| TExpr e -> string_of_texpr e
+
+let rec string_of_constraints = function
+	| [] -> ""
+	| (f, s)::cs -> "(" ^ string_of_typ f ^ ", " ^ string_of_typ s ^ ") " ^ string_of_constraints cs
+(* (Infer.gtype * (Infer.gtype * Infer.gtype) list) list *)
+(* ('a, [(TBool, TBool) ('a, 'a)] *)
+let rec string_of_gencons = function
+	| [] -> ""
+	| (g, lcons)::gs -> "(" ^ string_of_typ g ^ ", " ^ string_of_constraints lcons ^ ") " ^ string_of_gencons gs
+
+
+let rec string_of_tprog tdefns =
+	String.concat "\n" (List.map string_of_tdefn tdefns) ^ "\n"
+
+

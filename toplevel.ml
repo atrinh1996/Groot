@@ -38,8 +38,8 @@ let () =
 			| Ast -> print_string (Ast.string_of_prog ast)
 			(* All other action needs to generate an SAST, store in variable sast *)
 			| _ -> 
-				let sast = Infer.type_infer StringMap.empty ast in
-					  print_string "TODO: Finish Infer.type_infer"
+				let sast = Infer.type_infer [] ast in
+					  print_string (Infer.string_of_gencons sast)
 					(* match !action with  *)
 				(* in sast *)
 					  (* This option doesn't do anything, just need it to satisfy 
@@ -63,4 +63,3 @@ let () =
 					(* | Compile -> let the_module = Codegen.translate sast in 
 										Llvm_analysis.assert_valid_module the_module;
 										print_string (Llvm.string_of_llmodule the_module) *)
-
