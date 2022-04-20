@@ -47,9 +47,9 @@ type func_decl = {
 let () = gamma := 
     let add_prints map (k, v) = 
       StringMap.add k v map 
-    in List.fold_left add_prints !gamma [ ("printi", inttype); 
-                                         ("printc", chartype); 
-                                         ("printb", booltype) ]
+    in List.fold_left add_prints !gamma [ ("printi", funtype (inttype, [])); 
+                                               ("printc", funtype (chartype, [])); 
+                                               ("printb", funtype (booltype, [])) ]
 
 (* Collection function declarations for built in prints *)
 let built_in_decls = ref StringMap.empty
@@ -146,9 +146,15 @@ in *)
         (t2, SIf ((t1, e1'), (t2, e2'), (t3, e3')))
     | Apply(f, args)        -> 
         (* let (fty, app) = f in  *)
+        (* t is a TArrow  *)
         let (t, f') = expr "" f gamma in 
+        (* let () = print_endline ("type of apply expr: " ^ string_of_typ t) in  *)
+        let t' = (match t with 
+                    TYCON (TArrow (res, _)) -> res
+                  | _ -> raise (Failure "Sast: applied non-function type")
+                  ) in 
         let args' = List.map (fun e -> expr "" e gamma) args in 
-        (t, SApply ((t, f'), args'))
+        (t', SApply ((t', f'), args'))
         (* let fd = (match f' with 
                       SVar s -> find_func s !functions
                     | _ -> raise (Failure "TODO: SApply with sexpr")) in  *)
@@ -197,6 +203,7 @@ in *)
 	let check_defn d = match d with
 		| Val (name, e) -> 
 				let e' = expr name e !gamma in
+        (* let () = print_endline ("type of " ^ name ^ ": " ^ string_of_typ (fst e')) in  *)
         let () = gamma := StringMap.add name (fst e') !gamma in 
 				SVal(name, e')
 		| Expr e      -> SExpr (expr "" e !gamma)

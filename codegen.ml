@@ -8,6 +8,7 @@
 *)
 
 open Cast
+open Sast
 open Llgtype
 (* open Fcodegen *)
 
@@ -108,7 +109,7 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
         S.TInt            -> L.const_int  lltyp 0
       | S.TBool           -> L.const_int  lltyp 0
       | S.TChar           -> L.const_int  lltyp 0
-      | S.TArrow (_, _)   -> L.const_pointer_null (L.pointer_type lltyp)
+      | S.TArrow (_, _)   -> L.const_pointer_null lltyp
     and const_tyvar = function 
         S.TParam _ -> raise (Failure ("TODO: lltype of TParam"))
     and const_conapp (tyc, _) = const_tycon tyc
@@ -205,9 +206,12 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
         locals : llvalue StringMap.t*)
     let locals =  
       let add_formal map (ty, nm) p = 
+        (* let () = print_endline ("set val name: " ^ nm) in *)
         let () = L.set_value_name nm p in 
         let local = L.build_alloca (ltype_of_gtype ty) nm fbuilder in
         let _ = L.build_store p local fbuilder in 
+        (* let () = print_endline ("putting " ^ nm ^ " in fblocks locals") in  *)
+        (* let () = print_endline ("type of " ^ nm ^": " ^ string_of_typ ty) in  *)
         StringMap.add nm local map
       in
       List.fold_left2 add_formal 
@@ -221,6 +225,7 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
     (* Build the return  *)
     let (ty, exp) = fdef.body in 
     let result = expr fdef.body fbuilder locals in 
+    (* let () = print_endline ("built fbody") in  *)
 
     let add_terminal builder instr = 
       match L.block_terminator (L.insertion_block builder) with 

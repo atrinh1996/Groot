@@ -1,3 +1,16 @@
+
+(val ret4 (lambda () 4))
+(val call4 (lambda () (ret4)))
+(printi (call4))
+
+(val x 17)
+(val retx (lambda () x))
+(val takenthenx (lambda (n) (retx)))
+(printi (takenthenx 9))
+ 
+
+
+(; prints 42 42 12 12 
 (val x 42)
 (val retx (lambda () x))
 (printi (retx))
@@ -10,6 +23,9 @@
 (val retx2 (lambda (n m) x))
 
 (printi (retx2 9 8))
+;)
+
+
 
 (;
 ((if #t retx retn))

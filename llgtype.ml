@@ -69,9 +69,9 @@ and ltype_of_tycon = function
   | S.TBool               -> bool_ty
   | S.TChar               -> char_ty
   | S.TArrow (ret, args)  -> 
-    (* L.pointer_type ( *)
+    L.pointer_type (
       L.function_type (ltype_of_gtype ret) (Array.of_list (List.map ltype_of_gtype args))
-      (* ) *)
+    )
 and ltype_of_tyvar = function 
     (* What is this type even? *)
     S.TParam _ -> void_ty
