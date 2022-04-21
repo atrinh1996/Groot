@@ -22,7 +22,7 @@ and tycon =
   | TArrow of gtype           										(** Function type [s -> t] *)
   (* | TTree of gtype * gscheme * gscheme       	(** Trees *) *)
 and tyvar =
-	| TVar of int          (** parameter *)
+	| TVariable of int          (** parameter *)
 and conapp = (tycon * gtype list)
 
 type tyscheme = (tyvar list * gtype)
@@ -31,11 +31,11 @@ type tyscheme = (tyvar list * gtype)
 type texpr = gtype * tx
 	and tx = 
 		| TLiteral of tvalue
-		| TVar     of ident
-		| TIf      of texpr * texpr * texpr
-		| TApply   of texpr * texpr list
-		| TLet     of (ident * texpr) list * texpr
-		| TLambda  of ident list * texpr
+		| TypedVar     of ident
+		| TypedIf      of texpr * texpr * texpr
+		| TypedApply   of texpr * texpr list
+		| TypedLet     of (ident * texpr) list * texpr
+		| TypedLambda  of ident list * texpr
 	and tvalue = 
 		| TChar    of char
 		| TInt     of int
@@ -64,7 +64,7 @@ and string_of_tycon = function
   | TChar -> "char"
   | TArrow a -> string_of_typ (a)
 and string_of_tyvar = function 
-  | TVar n -> "tyvar" ^ string_of_int n
+  | TVariable n -> "tyvar" ^ string_of_int n
 and string_of_conapp (tyc, tys) = 
   "conapp: " ^ string_of_tycon tyc ^ " " ^ String.concat " " (List.map string_of_typ tys)
 and string_of_constraints = function
@@ -89,7 +89,7 @@ let rec is_free_type_var var gt =
 (* fresh: returns an unused type parameter *)
 let fresh =
   let k = ref 0 in
-	fun () -> incr k; TVar !k
+	fun () -> incr k; TVariable !k
 
 let sub (theta : (tyvar * gtype) list) (cns : (gtype * gtype) list) =
 	(* sub1 takes in a single constraint and updates it with any substitutions in theta *)
@@ -176,37 +176,34 @@ let rec generate_constraints gctx e =
 		| Literal e -> value e
 		| Var name -> 
 			let (_, (_, tau)) = List.find (fun x -> fst x = name) ctx in
-			(tau, [])
+			(tau, [], TypedVar(name, tau))
 		| If (e1, e2, e3) -> 
-			let t1, c1 = generate_constraints gctx e1 in
-			let t2, c2 = generate_constraints gctx e2 in
-			let t3, c3 = generate_constraints gctx e3 in
-			(t3, [((TYCON TBool), t1); (t3, t2)] @ c1 @ c2 @ c3)
+			let t1, c1, tex1 = generate_constraints gctx e1 in
+			let t2, c2, tex2 = generate_constraints gctx e2 in
+			let t3, c3, tex3 = generate_constraints gctx e3 in
+			(t3, [((TYCON TBool), t1); (t3, t2)] @ c1 @ c2 @ c3, (TypedIf (tex1, tex2, tex3), t3))
 		| Apply (name, formals) ->
-			let t1, c1 = generate_constraints ctx name in
-			let ts2, c2 = List.fold_left 
+			let t1, c1, tex1 = generate_constraints ctx name in
+			let ts2, c2, texs2 = List.fold_left 
 				(fun acc e -> 
 					let t, c = generate_constraints ctx e in 
 					let ts, cs = acc in (t::ts, c @ cs)
 				) ([], c1)
 				formals in
 			let retType = TYVAR (fresh()) in 
-
-			(retType, (t1, (CONAPP (TArrow retType, ts2)))::c2)
+			(retType, (t1, (CONAPP (TArrow retType, ts2)))::c2, (TypedApply(tex1, texs2), retType))
 		| Let (_, _) -> raise (Type_error "missing case for Let")
-		| Lambda (f,b) -> 
+		| Lambda (f, b) -> 
 			let binding = List.map (fun x -> (x, ([], TYVAR (fresh())))) f in
 			let new_context = binding @ ctx in
-			let (t, c) = generate_constraints new_context b in
-		  ((CONAPP ((TArrow t), (List.map (fun x -> (snd (snd x))) binding))), c)
-			(* 
-			let s = string_of_typ t in 
-			let _ = print_string s in (t, c) *)
+			let (t, c, tex) = generate_constraints new_context b in
+			let formal_tyvars = (List.map (fun x -> (snd (snd x))) binding)
+		  ((CONAPP ((TArrow t), formal_tyvars)), c, (TypedLambda(binding, tex), (CONAPP ((TArrow t), formal_tyvar))))
 		and value v = 
 		match v with
-		| Int e ->  TYCON TInt, [], TLiteral ( e ,TInt)
-		| Char e -> TYCON TChar, [], TLiteral (e, TChar )
-		| Bool e -> TYCON TBool, [], TLiteral (e, TBool)
+		| Int e ->  (TYCON (TInt), [], TLiteral (e ,TInt))
+		| Char e -> (TYCON (TChar), [], TLiteral (e, TChar))
+		| Bool e -> (TYCON (TBool), [], TLiteral (e, TBool))
 		and tree t =
 		match t with 
 		| Leaf -> raise (Type_error "missing case for Leaf")
@@ -271,7 +268,7 @@ let rec string_of_texpr (t, s) =
 	"[" ^ string_of_typ t ^ ": " ^ string_of_tx s ^ "]"
 and string_of_tx = function
 	| TLiteral v -> string_of_tvalue v
-	| TVar n -> string_of_tyvar (TVar (int_of_string n))
+	| TVariable n -> string_of_tyvar (TVariable (int_of_string n))
 	| TIf (e1, e2, e3) -> "if " ^ string_of_texpr e1 ^ " then " ^ string_of_texpr e2 ^ " else " ^ string_of_texpr e3
 	| TApply (rt, (ft)) -> "(" ^ string_of_texpr rt ^ ", " ^ String.concat " " (List.map string_of_texpr ft) ^ ")"
 	(* | TLet (binds, body) -> "let " ^ String.concat " " (List.map string_of_tvalue (TVal binds)) ^ " in " ^ string_of_texpr body *)
