@@ -182,6 +182,7 @@ and create_anon_function (fformals : (gtype * string) list) (fbody : sexpr) (ty 
   in 
   let () = addFunction f_def in 
   let ty' = newFuntype ty f_def.frees in 
+  let () = bind id (1, ty') in 
   (ty', CLambda (id, f_def.formals @ f_def.frees, f_def.body))
 (* When given an expression to apply in function application, the expression 
    turns into a named function call. 

@@ -136,12 +136,26 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
       with Not_found -> StringMap.find id globals
   in 
 
+  (* Add terminal instruction to a block *)
+    let add_terminal builder instr = 
+      match L.block_terminator (L.insertion_block builder) with 
+          Some _ -> ()
+        | None -> ignore (instr builder) in
+
   (* Construct code for expression 
      Function takes a Cast.cexpr, and constructs the llvm where 
      builder is located; returns the llvalue representation of code. 
 
-      Note: style - consider currying the function params *)
-  let rec expr (_, e) builder lenv = 
+     builder is llbuilder 
+     lenv is StringMap 
+     block is llvalue 
+     (_, e) is cexpr
+
+      Note: style - consider currying the function params 
+      Note: make it also return the builder?
+      (llvalue, llbuilder)
+    *)
+  let rec expr builder lenv block (_, e) = 
     match e with 
        CLiteral v   -> const_val v builder
      | CVar     s  -> 
@@ -150,15 +164,49 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
                 with Not_found -> 
                     (* let () = print_endline ("failed looking for " ^ s)  *)
                     raise(Failure "not found"))
-     | CIf _ -> raise (Failure ("TODO - codegen CIF merge-then-else"))
+     | CIf (e1, e2, e3) -> 
+          (* raise (Failure ("TODO - codegen CIF merge-then-else"))  *)
+
+          let deal_with_cond_block nbuilder exp = 
+            let ret = expr nbuilder lenv block exp in 
+            nbuilder
+          in
+
+          (* set aside the result of the condition expr *)
+          let bool_val = expr builder lenv block e1 in 
+
+          (* Create the merge block for after exec of then or the else block *)
+          let merge_bb = L.append_block context "merge" block in 
+          let branch_instr = L.build_br merge_bb in (* curried! needs an llbuilder *)
+
+          (* Create the "then" block *)
+          let then_bb = L.append_block context "then" block in
+          (* problem: this returns a llvalue, but needs llbuilder *)
+          (* let then_builder = expr (L.builder_at_end context then_bb) lenv then_bb e2 in *)
+          let then_builder = deal_with_cond_block (L.builder_at_end context then_bb) e2 in
+          let () = add_terminal then_builder branch_instr in 
+
+          (* Create the "else" block *)
+          let else_bb = L.append_block context "else" block in
+          (* problem: this returns a llvalue, but needs llbuilder *)
+          let else_builder = deal_with_cond_block (L.builder_at_end context else_bb) e3 in
+          let () = add_terminal else_builder branch_instr in 
+
+          (* Complete the if-then-else block, return should be llvalue *)
+          (* let _ =  *)
+          L.build_cond_br bool_val then_bb else_bb builder 
+          (* problem: this returns a llbuilder, but needs llvalue *)
+          (* in L.builder_at_end context merge_bb *)
+          
+
      | CApply ((_, CVar "printi"), [arg]) -> 
-          L.build_call printf_func [| int_format_str ; (expr arg builder lenv) |] "printi" builder
+          L.build_call printf_func [| int_format_str ; (expr builder lenv block arg) |] "printi" builder
      | CApply ((_, CVar"printc"), [arg]) -> 
         (* L.build_call printf_func [| char_format_str ; (expr arg builder) |] "printc" builder *)
-        let () = print_endline "codegen: capply" in 
-        L.build_call puts_func [| expr arg builder lenv |] "printc" builder
+        (* let () = print_endline "codegen: capply" in  *)
+        L.build_call puts_func [| expr builder lenv block arg |] "printc" builder
      | CApply ((_, CVar "printb"), [arg]) -> 
-        let bool_stringptr = if expr arg builder lenv = (L.const_int bool_ty 1) then print_true else print_false
+        let bool_stringptr = if expr builder lenv block arg = (L.const_int bool_ty 1) then print_true else print_false
         in L.build_call puts_func [| bool_stringptr |] "printb" builder
      | CApply (f, args) -> (* raise (Failure ("TODO - codegen CApply")) *)
         (* let () = print_endline "starting capply" in  *)
@@ -166,8 +214,8 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
                   (_, CVar s) -> s 
                   | _ -> raise (Failure "non fname applied")) in *) 
         (* let () = print_endline ("fname is " ^ s) in  *)
-        let llargs = List.map (fun cexp -> expr cexp builder lenv) args in 
-        let fblock = expr f builder lenv in
+        let llargs = List.map (fun cexp -> expr builder lenv block cexp) args in 
+        let fblock = expr builder lenv block f in
         (* let () = print_endline "got an fblock" in  *)
         L.build_call  fblock 
                       (Array.of_list llargs) 
@@ -185,17 +233,18 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
     | CVal (id, (ty, e)) -> 
         (* create a global define of a variable *)
         (* let _ = create_global id ty in  *)
-        let e' = expr (ty, e) main_builder StringMap.empty in 
+        let e' = expr main_builder StringMap.empty the_main (ty, e) in 
         (* raise (Failure "TODO") *)
         let _ = L.build_store e' (lookup id StringMap.empty) main_builder  in 
         ()
-    | CExpr e -> let _ = expr e main_builder StringMap.empty in 
+    | CExpr e -> let _ = expr main_builder StringMap.empty the_main e in 
         ()
   in 
   let _ = List.map build_main_body main in 
 
   (* Every function definition needs to end in a ret. Puts a return at end of main *)
   let _ = L.build_ret (L.const_int int_ty 0) main_builder in
+  (* let _ = add_terminal main_builder (L.build_ret (L.const_int int_ty 0)) in *)
 
   (* Build function block bodies *)
   let build_function_body fdef = 
@@ -224,14 +273,16 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
 
     (* Build the return  *)
     let (ty, exp) = fdef.body in 
-    let result = expr fdef.body fbuilder locals in 
+    let result = expr fbuilder locals function_block fdef.body in 
     (* let () = print_endline ("built fbody") in  *)
 
-    let add_terminal builder instr = 
+    (* Add terminal instruction to a block *)
+    (* let add_terminal builder instr = 
       match L.block_terminator (L.insertion_block builder) with 
           Some _ -> ()
-        | None -> ignore (instr builder) in
+        | None -> ignore (instr builder) in *)
 
+    (* Build instructions for returns based on the rettype *)
     let build_ret t = 
       let rec ret_of_gtyp = function
           S.TYCON ty -> ret_of_tycon ty
@@ -250,9 +301,10 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
 
     add_terminal fbuilder (build_ret fdef.rettyp)
 
+  in 
 
-
-  in let _ = List.iter build_function_body functions in 
+  (* iterate through each function def we need to build and build it *)
+  let _ = List.iter build_function_body functions in 
 
   (* Return an llmodule *)
   the_module

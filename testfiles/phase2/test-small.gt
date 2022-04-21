@@ -1,4 +1,9 @@
 
+
+(if #t (printi 1) (printi 0))
+
+
+(;
 (val ret4 (lambda () 4))
 (val call4 (lambda () (ret4)))
 (printi (call4))
@@ -7,7 +12,7 @@
 (val retx (lambda () x))
 (val takenthenx (lambda (n) (retx)))
 (printi (takenthenx 9))
- 
+;)
 
 
 (; prints 42 42 12 12 
