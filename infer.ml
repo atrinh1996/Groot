@@ -35,7 +35,7 @@ type texpr = gtype * tx
 		| TypedIf      of texpr * texpr * texpr
 		| TypedApply   of texpr * texpr list
 		| TypedLet     of (ident * texpr) list * texpr
-		| TypedLambda  of ident list * texpr
+		| TypedLambda  of (tyvar list * ident list) * texpr
 	and tvalue = 
 		| TChar    of char
 		| TInt     of int
@@ -170,40 +170,62 @@ and solve (constraints : (gtype * gtype) list) =
    constraints, 'gctx' refers to the global context 'e' can refer to *)
 (* let functiontype resultType formalsTypes = CONAPP (TArrow , formalsTypes @ [resultType])  *)
 
+(* type texpr = gtype * tx
+	and tx = 
+		| TLiteral of tvalue
+		| TypedVar     of ident
+		| TypedIf      of texpr * texpr * texpr
+		| TypedApply   of texpr * texpr list
+		| TypedLet     of (ident * texpr) list * texpr
+		| TypedLambda  of (tyvar list * ident list) * texpr *)
+
 let rec generate_constraints gctx e =
 	let rec constrain ctx e =
 		match e with
 		| Literal e -> value e
 		| Var name -> 
 			let (_, (_, tau)) = List.find (fun x -> fst x = name) ctx in
-			(tau, [], TypedVar(name, tau))
+			(tau, [], TypedVar name)
+			(* (tau, [], TypedVar(name, tau)) *)
 		| If (e1, e2, e3) -> 
 			let t1, c1, tex1 = generate_constraints gctx e1 in
 			let t2, c2, tex2 = generate_constraints gctx e2 in
 			let t3, c3, tex3 = generate_constraints gctx e3 in
-			(t3, [((TYCON TBool), t1); (t3, t2)] @ c1 @ c2 @ c3, (TypedIf (tex1, tex2, tex3), t3))
+			let c = [(TYCON TBool, t1); (t3, t2)] @ c1 @ c2 @ c3 in
+			let tex = TypedIf(tex1, tex2, tex3) in
+			(t3, c, tex)
+			(* (t3, [((TYCON TBool), t1); (t3, t2)] @ c1 @ c2 @ c3, TypedIf (tex1, tex2, tex3), )  *)
+			 (* (TypedIf (tex1, tex2, tex3), t3)) *)
 		| Apply (name, formals) ->
 			let t1, c1, tex1 = generate_constraints ctx name in
 			let ts2, c2, texs2 = List.fold_left 
 				(fun acc e -> 
 					let t, c = generate_constraints ctx e in 
 					let ts, cs = acc in (t::ts, c @ cs)
-				) ([], c1)
-				formals in
+				) ([], c1) formals in
 			let retType = TYVAR (fresh()) in 
-			(retType, (t1, (CONAPP (TArrow retType, ts2)))::c2, (TypedApply(tex1, texs2), retType))
+			let t = TYCON (TArrow (List.fold_left (fun acc t -> TYCON (TArrow (acc, t))) retType ts2)) in
+			let c = c2 @ [(retType, t)] in
+			let tex = TypedApply(tex1, texs2) in
+			(t, c, tex)
+			(* (t, c, TypedApply(tex1, texs2))) *)
+			(* (retType, (t1, (CONAPP (TArrow retType, ts2)))::c2, (TypedApply ((tex1, texs2), retType))) *)
 		| Let (_, _) -> raise (Type_error "missing case for Let")
 		| Lambda (f, b) -> 
 			let binding = List.map (fun x -> (x, ([], TYVAR (fresh())))) f in
-			let new_context = binding @ ctx in
+			let new_context = (binding @ ctx) in
 			let (t, c, tex) = generate_constraints new_context b in
-			let formal_tyvars = (List.map (fun x -> (snd (snd x))) binding)
-		  ((CONAPP ((TArrow t), formal_tyvars)), c, (TypedLambda(binding, tex), (CONAPP ((TArrow t), formal_tyvar))))
-		and value v = 
+			let formal_tyvars = (List.map (fun x -> (fst x, snd x)) binding) in
+			let tau = TArrow (List.fold_left (fun acc t -> TArrow (acc, t)) t formal_tyvars) in
+			(tau, (tau, t)::c, TypedLambda(formal_tyvars, tex))
+			
+		  (* (CONAPP (TArrow t, formal_tyvars), c, (TypedLambda (binding tex), t)) *)
+			(* (binding, tex, CONAPP (TArrow t, formal_tyvar)))) *)
+		and value v =  
 		match v with
-		| Int e ->  (TYCON (TInt), [], TLiteral (e ,TInt))
-		| Char e -> (TYCON (TChar), [], TLiteral (e, TChar))
-		| Bool e -> (TYCON (TBool), [], TLiteral (e, TBool))
+		| Int e ->  (TYCON TInt, [], TLiteral (TInt e))
+		| Char e -> (TYCON TChar, [], TLiteral (TChar e))
+		| Bool e -> (TYCON TBool, [], TLiteral (TBool e))
 		and tree t =
 		match t with 
 		| Leaf -> raise (Type_error "missing case for Leaf")
@@ -238,7 +260,6 @@ let rec sub_theta_into_gamma (theta : (tyvar * gtype) list) (gamma : (ident * ty
 			let freetypes = List.filter (fun (x : tyvar) -> List.exists (fun (y : tyvar) -> y = x) bound_types) (ftvs btypes) in
 			let new_btype = tysubst theta btypes freetypes in
 			(name, (bound_types, new_btype)) :: sub_theta_into_gamma theta gs 
-
 
 
 (* get_constraintsshould resturn a list of tasts *)
