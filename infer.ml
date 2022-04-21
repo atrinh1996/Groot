@@ -199,10 +199,10 @@ let rec generate_constraints gctx e =
 		| Apply (name, formals) ->
 			let t1, c1, tex1 = generate_constraints ctx name in
 			let ts2, c2, texs2 = List.fold_left 
-				(fun acc e -> 
-					let t, c = generate_constraints ctx e in 
-					let ts, cs = acc in (t::ts, c @ cs)
-				) ([], c1) formals in
+				(fun (acc : (gtype * (gtype * gtype) list) * (gtype * gtype) list) (x : ident) -> 
+					let t, c, tex = generate_constraints ctx x in
+					(t, c, (t, tex) :: acc)
+				) ((t1, []) , formals) in
 			let retType = TYVAR (fresh()) in 
 			let t = TYCON (TArrow (List.fold_left (fun acc t -> TYCON (TArrow (acc, t))) retType ts2)) in
 			let c = c2 @ [(retType, t)] in
