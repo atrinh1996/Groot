@@ -6,7 +6,12 @@
  *)
 module L = Llvm
 (* module A = Ast *)
-module S = Sast
+(* module S = Sast *)
+module C = Cast
+module StringMap = Map.Make(String)
+
+(* let struct_count = ref 0 *)
+
 
 (* creates the glocal context instance *)
 let context = L.global_context ()
@@ -35,45 +40,47 @@ let () = L.struct_set_body
             false
 
 
-(* Convert gROOT types to LLVM types *)
-(* let ltype_of_gtype = function
-    A.IType   -> int_ty
-  | A.CType   -> char_ty 
-  | A.BType   -> bool_ty
-  What is the size of a tree and xtype?
-  | A.TType   -> tree_struct_ty
-  (* | A.XType of int *)
-  | _         -> void_ty *)
+(* Convert Cast.ctype types to LLVM types *)
+let ltype_of_type (struct_table : L.lltype StringMap.t) (ty : C.ctype) = 
+    let rec ltype_of_ctype = function
+        C.Tycon ty -> ltype_of_tycon ty
+      | C.Tyvar tp -> ltype_of_tyvar tp
+      | C.Conapp con -> ltype_of_conapp con
+    and ltype_of_tycon = function 
+        C.Intty                -> int_ty
+      | C.Boolty               -> bool_ty
+      | C.Charty               -> char_ty
+      | C.Tarrow (ret, args)  -> 
+        (* let () = print_endline "function pointer type:" in  *)
+        (* let () = print_string "return type: " in  *)
+        let llretty = ltype_of_ctype ret in 
+        (* let () = print_string "\narg types: " in *)
+        let llargtys = List.map ltype_of_ctype args in 
+        (* let () = print_string "\n" in *)
+        L.pointer_type (
+          L.function_type llretty (Array.of_list llargtys)
+        )
+      | Clo (sname, _, _) -> StringMap.find sname struct_table
+      (* | Clo (_, _) -> raise (Failure "TODO: struct types") *)
+    and ltype_of_tyvar = function 
+        (* What is this type even? *)
+        C.Tparam _ -> void_ty
+        (* And what types do conapps represent? *)
+    and ltype_of_conapp (tyc, _) = ltype_of_tycon tyc
+in  ltype_of_ctype ty 
 
-(* let rec ltype_of_gtype = function
-    S.TYCON ty          -> ltype_of_tycon ty
-  | S.TYVAR tp          -> ltype_of_tyvar tp
-  | S.CONAPP (ty, _)  -> ltype_of_gtype ty
-and ltype_of_tycon = function 
-    "int"       -> int_ty
-  | "bool"      -> bool_ty
-  | "char"      -> char_ty
-  | "tree"      -> tree_struct_ty
-  | "function"  -> void_ty
-  | _           -> void_ty
-and ltype_of_tyvar = function 
-    TParam _    -> void_ty *)
-  (* | _           -> void_ty *)
 
-let rec ltype_of_gtype = function
-    S.TYCON ty -> ltype_of_tycon ty
-  | S.TYVAR tp -> ltype_of_tyvar tp
-  | S.CONAPP con -> ltype_of_conapp con
-and ltype_of_tycon = function 
-    S.TInt                -> int_ty
-  | S.TBool               -> bool_ty
-  | S.TChar               -> char_ty
-  | S.TArrow (ret, args)  -> 
-    L.pointer_type (
-      L.function_type (ltype_of_gtype ret) (Array.of_list (List.map ltype_of_gtype args))
-    )
-and ltype_of_tyvar = function 
-    (* What is this type even? *)
-    S.TParam _ -> void_ty
-    (* And what types do conapps represent? *)
-and ltype_of_conapp (tyc, _) = ltype_of_tycon tyc
+(* helper to construct named structs  *)
+let create_struct (name : C.cname) (membertys : C.ctype list) = 
+    (* let () = print_endline ("struct name: " ^ name) in  *)
+    (* let () = print_endline ("number of members: " ^ string_of_int (List.length membertys)) in  *)
+    let new_struct_ty = 
+        L.named_struct_type context name
+    in  
+    (* let () = struct_count := !struct_count + 1 in  *)
+    let () = 
+    L.struct_set_body 
+        new_struct_ty
+        (Array.of_list (List.map (ltype_of_type StringMap.empty) membertys))
+        false
+    in L.pointer_type new_struct_ty

@@ -1,6 +1,12 @@
 
+(val x 17)
+(val retx (lambda () x))
 
-(if #t (printi 1) (printi 0))
+(;
+(printi x)
+
+;)
+
 
 
 (;
@@ -12,7 +18,11 @@
 (val retx (lambda () x))
 (val takenthenx (lambda (n) (retx)))
 (printi (takenthenx 9))
+
+(val ret4 (lambda () 16))
+(printi (ret4))
 ;)
+
 
 
 (; prints 42 42 12 12 
@@ -35,7 +45,7 @@
 (;
 ((if #t retx retn))
 
-
+(if #t (printi 1) (printi 0))
 x
 
 (printi x)

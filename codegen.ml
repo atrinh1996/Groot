@@ -8,7 +8,7 @@
 *)
 
 open Cast
-open Sast
+(* open Sast *)
 open Llgtype
 (* open Fcodegen *)
 
@@ -16,7 +16,8 @@ open Llgtype
 (* translate sdefns - Given an CAST (type cprog, a record type), the function 
    returns an LLVM module (llmodule type), which is the code generated from 
    the CAST. Throws exception if something is wrong. *)
-let translate { main = main; functions = functions; rho = rho; phi = _ } = 
+let translate { main = main;  functions = functions; 
+                rho = rho;    structures = structures } = 
   (* let () = print_endline "entered Codegen" in  *)
 
   (* Create an LLVM module (container into which we'll 
@@ -64,15 +65,26 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
   let print_true = L.build_in_bounds_gep boolT [| zero |] "" main_builder in
   let print_false = L.build_in_bounds_gep boolF [| zero |] "" main_builder in
 
+  (* Declare the NAMED struct definitions *)
+  let struct_table : L.lltype StringMap.t = 
+    let gen_struct_def map closure = match closure with 
+        Tycon (Clo (name, anonFunTy, freetys)) -> 
+          let v = create_struct name (anonFunTy :: freetys)
+          in StringMap.add name v map
+      | _ -> raise (Failure ("Error: Codegeneration - lambda a non closure type"))
+    in List.fold_left gen_struct_def StringMap.empty structures 
+  in 
+
   (* Lookup table of function names (lambdas) to (function block, function def) *)
   let function_decls : (L.llvalue * fdef) StringMap.t = 
+    (* let () = print_endline "declaring functions" in  *)
     let define_func map def =  
       let name = def.fname 
       and formal_types = 
-        Array.of_list (List.map (fun (t, _) -> ltype_of_gtype t) 
+        Array.of_list (List.map (fun (t, _) -> ltype_of_type struct_table t) 
                       (def.formals @ def.frees)) 
       in 
-      let ftype = L.function_type (ltype_of_gtype def.rettyp) formal_types
+      let ftype = L.function_type (ltype_of_type struct_table def.rettyp) formal_types
       in StringMap.add name (L.define_function name ftype the_module, def) map 
     in List.fold_left define_func StringMap.empty functions 
   in 
@@ -100,21 +112,22 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
 
   (* creates a global pointer to some variable's value *)
   let create_global id ty = 
-    let lltyp = ltype_of_gtype ty in 
-    let rec const_gtyp = function 
-        S.TYCON ty    -> const_tycon ty
-      | S.TYVAR tp    -> const_tyvar tp
-      | S.CONAPP con  -> const_conapp con
+    let lltyp = ltype_of_type struct_table ty in 
+    let rec const_typ = function 
+        C.Tycon ty    -> const_tycon ty
+      | C.Tyvar tp    -> const_tyvar tp
+      | C.Conapp con  -> const_conapp con
     and const_tycon = function 
-        S.TInt            -> L.const_int  lltyp 0
-      | S.TBool           -> L.const_int  lltyp 0
-      | S.TChar           -> L.const_int  lltyp 0
-      | S.TArrow (_, _)   -> L.const_pointer_null lltyp
+        C.Intty            -> L.const_int  lltyp 0
+      | C.Boolty           -> L.const_int  lltyp 0
+      | C.Charty           -> L.const_int  lltyp 0
+      | C.Tarrow (_, _)    -> L.const_pointer_null lltyp
+      | C.Clo _            -> L.const_pointer_null lltyp
     and const_tyvar = function 
-        S.TParam _ -> raise (Failure ("TODO: lltype of TParam"))
+        C.Tparam _ -> raise (Failure ("TODO: lltype of TParam"))
     and const_conapp (tyc, _) = const_tycon tyc
     in 
-    let init = const_gtyp ty in 
+    let init = const_typ ty in 
     L.define_global id init the_module
   in 
 
@@ -128,6 +141,10 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
     in 
     StringMap.fold global_var rho StringMap.empty
   in 
+
+
+(* example of a global struct variable (pointer to struct) *)
+  (* let globals = StringMap.add "tree_test" (L.define_global "tree_test" (L.const_pointer_null tree_struct_ty) the_module) globals in *)
 
   let lookup id locals = 
     (* try fst (StringMap.find id function_decls)
@@ -163,11 +180,12 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
         (try L.build_load (lookup s lenv) s builder
                 with Not_found -> 
                     (* let () = print_endline ("failed looking for " ^ s)  *)
-                    raise(Failure "not found"))
-     | CIf (e1, e2, e3) -> 
-          (* raise (Failure ("TODO - codegen CIF merge-then-else"))  *)
+                    raise(Failure ("name not found: " ^ s)))
+     (* | CIf (e1, e2, e3) ->  *)
+     | CIf (_, _, _) -> 
+          raise (Failure ("TODO - codegen CIF merge-then-else"))
 
-          let deal_with_cond_block nbuilder exp = 
+          (* let deal_with_cond_block nbuilder exp = 
             let ret = expr nbuilder lenv block exp in 
             nbuilder
           in
@@ -197,7 +215,7 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
           L.build_cond_br bool_val then_bb else_bb builder 
           (* problem: this returns a llbuilder, but needs llvalue *)
           (* in L.builder_at_end context merge_bb *)
-          
+           *)
 
      | CApply ((_, CVar "printi"), [arg]) -> 
           L.build_call printf_func [| int_format_str ; (expr builder lenv block arg) |] "printi" builder
@@ -223,7 +241,7 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
                       builder 
 
      | CLet _ -> raise (Failure ("TODO - codegen CLET"))
-     | CLambda (id, args, bod) -> (* store function pointer to function here *)
+     | CLambda id -> (* store function pointer to function here *)
         let (fblock, _) = StringMap.find id function_decls in fblock
         (* L.build_load (lookup id lenv) id builder *)
   in 
@@ -257,7 +275,7 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
       let add_formal map (ty, nm) p = 
         (* let () = print_endline ("set val name: " ^ nm) in *)
         let () = L.set_value_name nm p in 
-        let local = L.build_alloca (ltype_of_gtype ty) nm fbuilder in
+        let local = L.build_alloca (ltype_of_type struct_table ty) nm fbuilder in
         let _ = L.build_store p local fbuilder in 
         (* let () = print_endline ("putting " ^ nm ^ " in fblocks locals") in  *)
         (* let () = print_endline ("type of " ^ nm ^": " ^ string_of_typ ty) in  *)
@@ -272,7 +290,7 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
 
 
     (* Build the return  *)
-    let (ty, exp) = fdef.body in 
+    (* let (ty, exp) = fdef.body in  *)
     let result = expr fbuilder locals function_block fdef.body in 
     (* let () = print_endline ("built fbody") in  *)
 
@@ -284,19 +302,20 @@ let translate { main = main; functions = functions; rho = rho; phi = _ } =
 
     (* Build instructions for returns based on the rettype *)
     let build_ret t = 
-      let rec ret_of_gtyp = function
-          S.TYCON ty -> ret_of_tycon ty
-        | S.TYVAR tp -> ret_of_tyvar tp
-        | S.CONAPP con -> ret_of_conapp con
+      let rec ret_of_typ = function
+          C.Tycon ty    -> ret_of_tycon ty
+        | C.Tyvar tp    -> ret_of_tyvar tp
+        | C.Conapp con  -> ret_of_conapp con
       and ret_of_tycon = function 
-          S.TInt            -> L.build_ret result
-        | S.TBool           -> L.build_ret result
-        | S.TChar           -> L.build_ret result
-        | S.TArrow (_, _) -> L.build_ret result
+          C.Intty       -> L.build_ret result
+        | C.Boolty      -> L.build_ret result
+        | C.Charty      -> L.build_ret result
+        | C.Tarrow _    -> L.build_ret result
+        | C.Clo _       -> L.build_ret result
       and ret_of_tyvar = function 
-          S.TParam _ -> raise (Failure ("TODO: ret of TParam"))
+          C.Tparam _ -> raise (Failure ("TODO: ret of TParam"))
       and ret_of_conapp (tyc, _) = ret_of_tycon tyc
-      in ret_of_gtyp t
+      in ret_of_typ t
     in 
 
     add_terminal fbuilder (build_ret fdef.rettyp)
