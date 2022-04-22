@@ -178,7 +178,7 @@ and solve (constraints : (gtype * gtype) list) =
 		| TypedApply   of texpr * texpr list
 		| TypedLet     of (ident * texpr) list * texpr
 		| TypedLambda  of (tyvar list * ident list) * texpr *)
-
+let functiontype resultType formalsTypes = CONAPP (TArrow resultType, formalsTypes)
 let rec generate_constraints gctx e =
 	let rec constrain ctx e =
 		match e with
@@ -198,18 +198,15 @@ let rec generate_constraints gctx e =
 			 (* (TypedIf (tex1, tex2, tex3), t3)) *)
 		| Apply (name, formals) ->
 			let t1, c1, tex1 = generate_constraints ctx name in
-			let ts2, c2, texs2 = List.fold_left 
-				(fun (acc : (gtype * (gtype * gtype) list) * (gtype * gtype) list) (x : ident) -> 
-					let t, c, tex = generate_constraints ctx x in
-					(t, c, (t, tex) :: acc)
-				) ((t1, []) , formals) in
-			let retType = TYVAR (fresh()) in 
-			let t = TYCON (TArrow (List.fold_left (fun acc t -> TYCON (TArrow (acc, t))) retType ts2)) in
-			let c = c2 @ [(retType, t)] in
+			let ts2, c2, texs2 = List.fold_left (fun acc e -> 
+				let t, c, x = generate_constraints ctx e in 
+				let ts, cs, xs = acc in (t::ts, c @ cs, x::xs)) ([], c1, []) formals in
+			let retType = functiontype (List.hd ts2) (List.tl ts2) in
+			let c = [(retType, t1)] @ c1 @ c2 in
 			let tex = TypedApply(tex1, texs2) in
-			(t, c, tex)
-			(* (t, c, TypedApply(tex1, texs2))) *)
-			(* (retType, (t1, (CONAPP (TArrow retType, ts2)))::c2, (TypedApply ((tex1, texs2), retType))) *)
+			(retType, c, tex)
+			(* (t2, [(t2, t1)] @ c1 @ c2, TypedApply (tex1, texs2), ) *)
+			(* (TypedApply (tex1, texs2), t2)) *)
 		| Let (_, _) -> raise (Type_error "missing case for Let")
 		| Lambda (f, b) -> 
 			let binding = List.map (fun x -> (x, ([], TYVAR (fresh())))) f in
