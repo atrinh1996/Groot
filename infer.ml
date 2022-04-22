@@ -157,7 +157,7 @@ let rec solve' c1 =
 
 
 and solve (constraints : (gtype * gtype) list) = 
-	let rec solver cns (subs : (tyvar * gtype) list) =
+	let solver cns (subs : (tyvar * gtype) list) =
 		match cns with
 		| [] -> []
 		| cn :: cns -> 	
@@ -170,6 +170,7 @@ and solve (constraints : (gtype * gtype) list) =
    constraints, 'gctx' refers to the global context 'e' can refer to *)
 (* let functiontype resultType formalsTypes = CONAPP (TArrow , formalsTypes @ [resultType])  *)
 
+(* TAST Types*)
 (* type texpr = gtype * tx
 	and tx = 
 		| TLiteral of tvalue
@@ -177,52 +178,61 @@ and solve (constraints : (gtype * gtype) list) =
 		| TypedIf      of texpr * texpr * texpr
 		| TypedApply   of texpr * texpr list
 		| TypedLet     of (ident * texpr) list * texpr
-		| TypedLambda  of (tyvar list * ident list) * texpr *)
+		| TypedLambda  of (tyvar list * ident list) * texpr
+	and tvalue = 
+		| TChar    of char
+		| TInt     of int
+		(* | Float   of float *)
+		| TBool    of bool
+		| TRoot    of ttree
+	and ttree =  
+		| TLeaf
+		| TBranch of tvalue * ttree * ttree *)
+
+(* conapp = (tycon * gtype list) *)
+
 let functiontype resultType formalsTypes = CONAPP (TArrow resultType, formalsTypes)
+(* This function returns: gtype * (gtype * gtype) list * tx *)
 let rec generate_constraints gctx e =
 	let rec constrain ctx e =
 		match e with
 		| Literal e -> value e
 		| Var name -> 
 			let (_, (_, tau)) = List.find (fun x -> fst x = name) ctx in
-			(tau, [], TypedVar name)
-			(* (tau, [], TypedVar(name, tau)) *)
+			(tau, [], (tau, (TypedVar name)))
 		| If (e1, e2, e3) -> 
 			let t1, c1, tex1 = generate_constraints gctx e1 in
 			let t2, c2, tex2 = generate_constraints gctx e2 in
 			let t3, c3, tex3 = generate_constraints gctx e3 in
 			let c = [(TYCON TBool, t1); (t3, t2)] @ c1 @ c2 @ c3 in
 			let tex = TypedIf(tex1, tex2, tex3) in
-			(t3, c, tex)
-			(* (t3, [((TYCON TBool), t1); (t3, t2)] @ c1 @ c2 @ c3, TypedIf (tex1, tex2, tex3), )  *)
-			 (* (TypedIf (tex1, tex2, tex3), t3)) *)
+			(t3, c, (t3, tex))
 		| Apply (name, formals) ->
-			let t1, c1, tex1 = generate_constraints ctx name in
+		let t1, c1, tex1 = generate_constraints ctx name in
 			let ts2, c2, texs2 = List.fold_left (fun acc e -> 
 				let t, c, x = generate_constraints ctx e in 
-				let ts, cs, xs = acc in (t::ts, c @ cs, x::xs)) ([], c1, []) formals in
-			let retType = functiontype (List.hd ts2) (List.tl ts2) in
-			let c = [(retType, t1)] @ c1 @ c2 in
-			let tex = TypedApply(tex1, texs2) in
-			(retType, c, tex)
-			(* (t2, [(t2, t1)] @ c1 @ c2, TypedApply (tex1, texs2), ) *)
-			(* (TypedApply (tex1, texs2), t2)) *)
+				let ts, cs, xs = acc in (t::ts, c @ cs, x::xs)) 
+			([], c1, []) formals in
+			let retType = TYVAR (fresh()) in 
+			(retType, 
+				(t1, (CONAPP (TArrow retType, ts2)))::c2, 
+				(CONAPP (TArrow retType, ts2), TypedApply(tex1, texs2)))
 		| Let (_, _) -> raise (Type_error "missing case for Let")
 		| Lambda (f, b) -> 
-			let binding = List.map (fun x -> (x, ([], TYVAR (fresh())))) f in
-			let new_context = (binding @ ctx) in
+			let binding = List.map (fun x -> (x, ([], (fresh())))) f in
+			let binding_as_gtype = List.map (fun (x, (y, z)) -> (x, (y, TYVAR z))) binding in
+			(* ctx : Ast.ident * ('a * gtype) *)
+			let new_context = binding_as_gtype @ ctx in
 			let (t, c, tex) = generate_constraints new_context b in
-			let formal_tyvars = (List.map (fun x -> (fst x, snd x)) binding) in
-			let tau = TArrow (List.fold_left (fun acc t -> TArrow (acc, t)) t formal_tyvars) in
-			(tau, (tau, t)::c, TypedLambda(formal_tyvars, tex))
-			
-		  (* (CONAPP (TArrow t, formal_tyvars), c, (TypedLambda (binding tex), t)) *)
-			(* (binding, tex, CONAPP (TArrow t, formal_tyvar)))) *)
+			let formal_tyvars_as_gtype = (List.map (fun (_, (_, x)) -> x) binding_as_gtype) in
+			let formal_tyvars = (List.map (fun (_, (_, x)) -> x) binding) in
+		  (CONAPP (TArrow t, formal_tyvars_as_gtype), c,
+		  	(CONAPP (TArrow t, formal_tyvars_as_gtype), TypedLambda ((formal_tyvars, f), tex)))
 		and value v =  
 		match v with
-		| Int e ->  (TYCON TInt, [], TLiteral (TInt e))
-		| Char e -> (TYCON TChar, [], TLiteral (TChar e))
-		| Bool e -> (TYCON TBool, [], TLiteral (TBool e))
+		| Int e ->  (TYCON TInt, [], (TYCON TInt, TLiteral (TInt e)))
+		| Char e -> (TYCON TChar, [], (TYCON TChar, TLiteral (TChar e)))
+		| Bool e -> (TYCON TBool, [], (TYCON TBool, TLiteral (TBool e)))
 		and tree t =
 		match t with 
 		| Leaf -> raise (Type_error "missing case for Leaf")
@@ -241,7 +251,7 @@ let rec ftvs (ty : gtype) =
 	| TYCON c -> (TYCON c, t)
 	| CONAPP a -> (CONAPP a, t) *)
 
-let rec tysubst (theta: (tyvar * gtype) list) (t : gtype) (ftvs: tyvar list) =
+let tysubst (theta: (tyvar * gtype) list) (t : gtype) (ftvs: tyvar list) =
 	match t with
 	| TYVAR t -> let (alpha, tau) = List.find (fun (x : tyvar * gtype) -> (fst x) = t) theta in if (List.exists (fun x -> x = t) ftvs) then tau else TYVAR t 
 	| TYCON c -> TYCON c
@@ -262,33 +272,62 @@ let rec sub_theta_into_gamma (theta : (tyvar * gtype) list) (gamma : (ident * ty
 (* get_constraintsshould resturn a list of tasts *)
 (* TAST = [ tdefns ] *)
 (* defn list = [ (ident, expr) | expr ]*)
+(* 'a * 'b -- but an expression was expected of type 'c list *)
 let rec get_constraints (ctx : (ident * tyscheme) list ) (d : defn list) =
 	match d with
 	| [] -> []
 	| Val (name, e)::ds -> 
-		let (t, c) = generate_constraints ctx e in
+		let (t, c, tex) = generate_constraints ctx e in
 		let new_ctx = (name, (List.filter (fun (x : tyvar) -> List.exists (fun (y : tyvar) -> y = x) (ftvs t)) (ftvs t), t)) :: ctx in
-		(t,c) :: get_constraints new_ctx ds
+		(t, c, tex) :: (get_constraints new_ctx ds)
 	| Expr (e)::ds ->
-		let (t, c) = generate_constraints ctx e in 
-		(t, c) :: get_constraints ctx ds
+		let (t, c, tex) = generate_constraints ctx e in 
+		(t, c, tex) :: get_constraints ctx ds
 
-let rec type_infer (ctx : (ident * tyscheme) list ) (ds : defn list) =
-	let constraints_l_of_l = (List.map (fun (_, x) -> x) (get_constraints ctx ds)) in
-	let constraints = List.flatten constraints_l_of_l in
+let apply_subs sub = (fun x -> x)
+
+let type_infer (ctx : (ident * tyscheme) list ) (ds : defn list) =
+	(* TODO this is the worst name for a variable ever but I don't really know what it is *)
+	let ans = (get_constraints ctx ds) in
+	let constraints_l_of_l = List.map (fun (_, x, _) -> x) ans in
+	let tests = (List.map (fun (_, _, x) -> x) ans) in
+	let constraints = List.flatten 
+	(List.map snd 
+	constraints_l_of_l) in
 	let subs = solve constraints in
-	subs
+		(List.map (apply_subs sub) tasts, subs)
+	
 
  
+(* TAST Types*)
+(* type texpr = gtype * tx
+	and tx = 
+		| TLiteral of tvalue
+		| TypedVar     of ident
+		| TypedIf      of texpr * texpr * texpr
+		| TypedApply   of texpr * texpr list
+		| TypedLet     of (ident * texpr) list * texpr
+		| TypedLambda  of (tyvar list * ident list) * texpr
+	and tvalue = 
+		| TChar    of char
+		| TInt     of int
+		(* | Float   of float *)
+		| TBool    of bool
+		| TRoot    of ttree
+	and ttree =  
+		| TLeaf
+		| TBranch of tvalue * ttree * ttree *)
+
+(* conapp = (tycon * gtype list) *)
 
 (* Below lies Nick's futile attempt at printing *)	
 let rec string_of_texpr (t, s) = 
 	"[" ^ string_of_typ t ^ ": " ^ string_of_tx s ^ "]"
 and string_of_tx = function
 	| TLiteral v -> string_of_tvalue v
-	| TVariable n -> string_of_tyvar (TVariable (int_of_string n))
-	| TIf (e1, e2, e3) -> "if " ^ string_of_texpr e1 ^ " then " ^ string_of_texpr e2 ^ " else " ^ string_of_texpr e3
-	| TApply (rt, (ft)) -> "(" ^ string_of_texpr rt ^ ", " ^ String.concat " " (List.map string_of_texpr ft) ^ ")"
+	| TypedVar n -> n
+	| TypedIf (e1, e2, e3) -> "if " ^ string_of_texpr e1 ^ " then " ^ string_of_texpr e2 ^ " else " ^ string_of_texpr e3
+	| TypedApply (rt, (ft)) -> "(" ^ string_of_texpr rt ^ ", " ^ String.concat " " (List.map string_of_texpr ft) ^ ")"
 	(* | TLet (binds, body) -> "let " ^ String.concat " " (List.map string_of_tvalue (TVal binds)) ^ " in " ^ string_of_texpr body *)
 	(* | TLambda (formals, body)-> "\\" ^ String.concat " " (List.map string_of_tx formals) ^ " -> " ^ string_of_texpr body *)
 and string_of_tvalue = function
