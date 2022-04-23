@@ -42,7 +42,7 @@ let boolty = Tycon Boolty
 
 (* int StringMap.t - for our rho/variable environment 
    (DOES NOT MAP TO VALUES) *)
-type var_env = (int * ctype) StringMap.t
+type var_env = ((int * ctype) list) StringMap.t
 let emptyEnv = StringMap.empty
 let emptyList = []
 
@@ -201,8 +201,10 @@ let string_of_functions (funcs : fdef list) =
   in List.fold_left string_of_fdef "" funcs
 
 let string_of_rho rho = 
-  StringMap.fold (fun id (num, ty) s -> 
-                    s ^ id ^ ": " ^ string_of_ctype ty ^ " " ^ id ^ string_of_int num ^ "\n") 
+  StringMap.fold (fun id occursList s -> 
+                    let (num, ty) = List.nth occursList 0 in 
+                    s ^ id ^ ": " ^ string_of_ctype ty ^ " " 
+                    ^ id ^ string_of_int num ^ "\n") 
                  rho ""
 
 let string_of_structures structss = 

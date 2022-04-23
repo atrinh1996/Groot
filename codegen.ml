@@ -188,14 +188,22 @@ let translate { main = main;  functions = functions;
   in 
 
   let globals : L.llvalue StringMap.t = 
-    let rec global_var k (num, typ) map = 
-      if num = 0 then map 
+    let global_vars k occursList map = 
+      let glo_var map' (num, typ) = 
+        if num = 0 
+          then map'
+        else  let id = "_" ^ k ^ "_" ^ string_of_int num in 
+              StringMap.add id (create_global id typ) map'
+              (* glo_var k (num - 1, typ) map' *)
+      in List.fold_left glo_var map occursList 
+
+      (* if num = 0 then map 
       else 
         let id = "_" ^ k ^ "_" ^ string_of_int num in 
         let map' = StringMap.add id (create_global id typ) map in 
-        global_var k (num - 1, typ) map'
+        global_var k (num - 1, typ) map' *)
     in 
-    StringMap.fold global_var rho StringMap.empty
+    StringMap.fold global_vars rho StringMap.empty
   in 
 
 
@@ -205,6 +213,7 @@ let translate { main = main;  functions = functions;
   let lookup id locals = 
     (* try fst (StringMap.find id function_decls)
     with Not_found -> *)
+      (* let () = print_endline ("looking up: " ^ id) in  *)
       try StringMap.find id locals 
       with Not_found -> StringMap.find id globals
   in 

@@ -10,7 +10,7 @@ open Cast
 (* Pre-load rho with prints built in *)
 let prerho env = 
   let add_prints map (k, v) =
-    StringMap.add k v map
+    StringMap.add k [v] map
   in List.fold_left add_prints env [  ("printi", (0, intty)); 
                                       ("printb", (0, boolty)); 
                                       ("printc", (0, charty)); 
@@ -31,6 +31,19 @@ let res =
 let anon = "anon"
 let count = ref 0
 
+(* Converts a gtype to a ctype *)
+let rec ofGtype = function
+    TYCON ty -> Tycon (ofTycon ty)
+  | TYVAR tp -> Tyvar (ofTyvar tp)
+  | CONAPP con -> Conapp (ofConapp con)
+and ofTycon = function 
+    TInt            -> Intty
+  | TBool           -> Boolty
+  | TChar           -> Charty
+  | TArrow (retty, argsty) -> Tarrow (ofGtype retty, List.map ofGtype argsty)
+and ofTyvar = function 
+    TParam n -> Tparam n
+and ofConapp (tyc, tys) = (ofTycon tyc, List.map ofGtype tys)
 
 
 (* puts the given cdefn into the main list *)
@@ -55,12 +68,25 @@ let addClosure elem = res.structures <- elem :: res.structures
    StringMap env. False otherwise *)
 let isBound id env = StringMap.mem id env 
 
-(* Adds a binding of k to v in the given StringMap env *)
-let bind k v = res.rho <- StringMap.add k v res.rho 
+(* Adds a binding of k to v in the global StringMap env *)
+let bind k v = res.rho <- 
+  (* let () = print_endline ("binding: " ^ k) in  *)
+  let currList = if isBound k res.rho then StringMap.find k res.rho else [] in  
+  let newList = v :: currList in 
+  StringMap.add k newList res.rho
 
 (* Returns the value id is bound to in the given StringMap env. If the 
    binding doesn't exist, Not_Found exception is raised. *)
-let find id env = StringMap.find id env 
+let find id env = 
+  (* let () = print_endline ("finding: " ^ id) in  *)
+  let occursList = StringMap.find id env in List.nth occursList 0
+
+(* Adds a local binding of k to v in the given StringMap env *)
+let bindLocal map k (t, _) =
+  (* let () = print_endline ("binding local: " ^ k) in  *)
+  let currList = if isBound k map then StringMap.find k map else [] in  
+  let localList = (0, ofGtype t) :: currList in 
+  StringMap.add k localList map
 
 (* Given expression an a string name n, returns true if n is 
    a free variable in the expression *)
@@ -82,23 +108,6 @@ let freeIn exp n =
   in free (TYCON TInt, exp)
 
 
-
-(* Converts a gtype to a ctype *)
-let rec ofGtype = function
-    TYCON ty -> Tycon (ofTycon ty)
-  | TYVAR tp -> Tyvar (ofTyvar tp)
-  | CONAPP con -> Conapp (ofConapp con)
-and ofTycon = function 
-    TInt            -> Intty
-  | TBool           -> Boolty
-  | TChar           -> Charty
-  | TArrow (retty, argsty) -> Tarrow (ofGtype retty, List.map ofGtype argsty)
-and ofTyvar = function 
-    TParam n -> Tparam n
-and ofConapp (tyc, tys) = (ofTycon tyc, List.map ofGtype tys)
-
-
-
 (* Given the formals list and body of a lambda (xs, e), and a 
    variable environment, the function returns an environment with only 
    the free variables of this lambda. *)
@@ -112,13 +121,15 @@ let clean no_no env =
 
 (* Given a var_env, returns a (ctype  * name) list version *)
 let toParamList (venv : var_env) = 
-  StringMap.fold  (fun id (num, ty) res -> 
+  StringMap.fold  (fun id occursList res -> 
+                      let (num, ty) = List.nth occursList 0 in 
                       let id' = if num = 0 then id else "_" ^ id ^ "_" ^ string_of_int num in 
                       (ty, id') :: res
                   ) 
                   venv []
 
 (* Returns the list of cexpr that are free in f *)
+(*
 let findFrees ((_, f) : cexpr) (body : sexpr) (rho : var_env) = 
   (* gets the fdef record type for the function definiton *)
   let flookup name : fdef = getFunction name in 
@@ -133,7 +144,8 @@ let findFrees ((_, f) : cexpr) (body : sexpr) (rho : var_env) =
         in List.map toCVarCexpr frees 
     | _ ->  let frees = toParamList (improve ([], body) rho) 
             in List.map toCVarCexpr frees
-  )
+  ) 
+*)
 
 (* turns a list of ty * name list to a Var list  *)
 let convertToVars (frees : (ctype * cname) list) = 
@@ -175,18 +187,22 @@ let rec sexprToCexpr ((ty, e) : sexpr) (env : var_env) =
     | SApply (f, args) -> 
         let (ctyp, f') = exp f in 
         let normalargs = List.map exp args in 
-        (* let () = print_endline (string_of_ctype ctyp) in  *)
-        let freesCount = 
+        (* The actual type of the function application is the type of the return*)
+        let (retty, freesCount) = 
           (match ctyp with 
-              Tycon (Clo (_, _, freetys)) -> List.length freetys
-            | _ -> 0) in  
-        (* let freesCount = (List.length actualargs) - (List.length normalargs) in  *)
-        (* let freeargs = findFrees (ctyp, f') f env in  *)
-        (ctyp, CApply ((ctyp, f'), normalargs, freesCount))
-        (* (ctyp, CApply ((ctyp, f'), normalargs @ freeargs)) *)
+              Tycon (Clo (_, functy, freetys)) -> 
+                (match functy with 
+                    Tycon (Tarrow (ret, _)) -> (ret, List.length freetys)
+                  | _ -> raise (Failure "Non-function function type"))
+            | _ -> (intty, 0)) in 
+        (retty, CApply ((retty, f'), normalargs, freesCount))
     | SLet (bs, body) -> 
-        let local_env = (List.fold_left (fun map (x, (t, _)) -> 
-                                          StringMap.add x (0, ofGtype t) map) 
+        let local_env = (List.fold_left (fun map (x, se) -> 
+                                          bindLocal map x se
+                                          (* let currList = StringMap.find x map in  
+                                          let localList = (0, ofGtype t) :: currList in 
+                                          StringMap.add x localList map *)
+                                        ) 
                                         env bs) in 
         let c_bs = List.map (fun (x, e) -> (x, exp e)) bs in 
         let (ctyp, body') = sexprToCexpr body local_env in 
@@ -216,8 +232,7 @@ and create_anon_function (fformals : (gtype * string) list) (fbody : sexpr) (ty 
   (* bookkeeping: record the name of the function *)
   (* let () = bindFunction id in  *)
   (* Create the record that represents the function body and definition *)
-  let local_env = List.fold_left (fun map (typ, x) -> 
-                                      StringMap.add x (0, ofGtype typ) map)
+  let local_env = List.fold_left (fun map (typ, x) -> bindLocal map x (typ, SVar x))
                                   env fformals 
   in 
   let func_body = sexprToCexpr fbody local_env in 
