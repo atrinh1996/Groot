@@ -54,12 +54,12 @@ and cx =
   | CLiteral  of cvalue 
   | CVar      of cname 
   | CIf       of cexpr * cexpr * cexpr
-  | CApply    of cexpr * cexpr list 
+  | CApply    of cexpr * cexpr list * int
   (* | CApply    of cname * cexpr list  *)
   | CLet      of (cname * cexpr) list * cexpr 
   (* May not need the last two members of the triple *)
   (* | CLambda   of cname * (ctype * cname) list * cexpr *)
-  | CLambda   of cname 
+  | CLambda   of cname * cexpr list
 and cvalue = 
   | CChar     of char
   | CInt      of int
@@ -140,7 +140,7 @@ and string_of_cx = function
         "(if "  ^ string_of_cexpr e1 ^ " " 
                 ^ string_of_cexpr e2 ^ " " 
                 ^ string_of_cexpr e3 ^ ")"
-    | CApply (f, args) -> 
+    | CApply (f, args, _) -> 
       "(" ^ string_of_cexpr f ^ " " 
           ^ String.concat " " (List.map string_of_cexpr args) ^ ")"
     | CLet (binds, body) -> 
@@ -148,7 +148,10 @@ and string_of_cx = function
               "[" ^ id ^ " " ^ (string_of_cexpr e) ^ "]"
         in "(let ("  ^ String.concat " " (List.map string_of_binding binds) 
                      ^ ") " ^ string_of_cexpr body ^ ")"
-    | CLambda id -> "(" ^ id ^ ")"
+    | CLambda (id, frees) -> 
+        "(" ^ id ^ " " 
+            ^ String.concat " " (List.map string_of_cexpr frees) 
+            ^ ")"
         (* let (tys, names) = List.split formals in 
         "(" ^ id ^ " (" ^ String.concat ", " 
                             (List.map (fun (ty, name) -> 

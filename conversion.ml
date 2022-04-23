@@ -127,7 +127,7 @@ let findFrees ((_, f) : cexpr) (body : sexpr) (rho : var_env) =
   (* convert each (ctype * cname) to a cexpr: (ctype, CVar cname) *)
   let toCVarCexpr (ty, id) = (ty, CVar id) in 
   (match f with 
-      CVar id | CLambda id -> 
+      CVar id | CLambda (id, _) -> 
         if List.mem id built_ins then [] else  
         let frees = getFrees (flookup id) 
         in List.map toCVarCexpr frees 
@@ -135,25 +135,24 @@ let findFrees ((_, f) : cexpr) (body : sexpr) (rho : var_env) =
             in List.map toCVarCexpr frees
   )
 
+(* turns a list of ty * name list to a Var list  *)
+let convertToVars (frees : (ctype * cname) list) = 
+    List.map (fun (t, n) -> (t, CVar n)) frees 
+
 
 
 (* Generate a new function gtype for lambda expressions in order to account
    for free variables, when given the original function type and an 
    association list of gtypes and var names to add to the new formals list
    of the function type. *)
-let newFuntype (origTyp : gtype) (toAdd : (ctype * cname) list) = 
+let newFuntype (origTyp : gtype) (newRet : ctype) (toAdd : (ctype * cname) list) = 
   let ftyp = (match origTyp with 
-                TYCON (TArrow (rettyp, argstyp)) -> 
+                TYCON (TArrow (_, argstyp)) -> 
                   let newFormalTys = List.map ofGtype argstyp in 
                   let (newFreeTys, _) = List.split toAdd in 
-                  (* let newFreeTys = List.map ofGtype newTys in  *)
-                  let newRettyp = ofGtype rettyp in 
-                  Tycon (Tarrow (newRettyp, newFormalTys @ newFreeTys))
+                  Tycon (Tarrow (newRet, newFormalTys @ newFreeTys))
               | _ -> raise (Failure "Non-function function type"))
   in ftyp
-
-
-
 
 
 (* Converts given sexpr to cexpr, and returns the cexpr *)
@@ -176,8 +175,15 @@ let rec sexprToCexpr ((ty, e) : sexpr) (env : var_env) =
     | SApply (f, args) -> 
         let (ctyp, f') = exp f in 
         let normalargs = List.map exp args in 
-        let freeargs = findFrees (ctyp, f') f env in 
-        (ctyp, CApply ((ctyp, f'), normalargs @ freeargs))
+        (* let () = print_endline (string_of_ctype ctyp) in  *)
+        let freesCount = 
+          (match ctyp with 
+              Tycon (Clo (_, _, freetys)) -> List.length freetys
+            | _ -> 0) in  
+        (* let freesCount = (List.length actualargs) - (List.length normalargs) in  *)
+        (* let freeargs = findFrees (ctyp, f') f env in  *)
+        (ctyp, CApply ((ctyp, f'), normalargs, freesCount))
+        (* (ctyp, CApply ((ctyp, f'), normalargs @ freeargs)) *)
     | SLet (bs, body) -> 
         let local_env = (List.fold_left (fun map (x, (t, _)) -> 
                                           StringMap.add x (0, ofGtype t) map) 
@@ -226,7 +232,7 @@ and create_anon_function (fformals : (gtype * string) list) (fbody : sexpr) (ty 
   in 
   let () = addFunction f_def in 
   (* New function type will include the types of free arguments *)
-  let anonFunTy = newFuntype ty f_def.frees in 
+  let anonFunTy = newFuntype ty f_def.rettyp f_def.frees in 
   (* Record the type of the anonymous function and its "rea" ftype *)
   let () = bind id (1, anonFunTy) in 
   (* The value of a Lambda expression is a Closure -- new type construction 
@@ -237,7 +243,8 @@ and create_anon_function (fformals : (gtype * string) list) (fbody : sexpr) (ty 
   let clo_ty = Tycon (Clo (clo_name, anonFunTy, freetys)) in 
   (* (clo_ty, CLambda (id, f_def.formals @ f_def.frees, f_def.body)) *)
   let () = addClosure clo_ty in 
-  (clo_ty, CLambda id)
+  let freeVars = convertToVars f_def.frees in 
+  (clo_ty, CLambda (id, freeVars))
 
 
 

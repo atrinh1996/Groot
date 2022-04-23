@@ -1,7 +1,27 @@
+ 
 
 (val x 17)
-(val retx (lambda () x))
 
+
+ 
+(val testAB (lambda (a) 
+		(lambda (b) 
+			x)))
+
+(testAB 5)
+
+
+((testAB 20) 12)
+
+(printi ((testAB 20) 12))
+
+
+
+
+(;
+(val retx (lambda () x))
+(val retn (lambda (n m) n))
+ ;)
 (;
 (printi x)
 
