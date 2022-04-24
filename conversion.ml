@@ -6,18 +6,16 @@ open Cast
 
 
 (***********************************************************************)
-(* partial cprog to return from this module *)
+
 (* Pre-load rho with prints built in *)
 let prerho env = 
   let add_prints map (k, v) =
     StringMap.add k [v] map
-  in List.fold_left add_prints env [  ("printi", (0, intty)); 
-                                      ("printb", (0, boolty)); 
-                                      ("printc", (0, charty)); 
-                                    ]
+  in List.fold_left add_prints env [("printi", (0, intty)); 
+                                    ("printb", (0, boolty)); 
+                                    ("printc", (0, charty)); ]
 
-let built_ins = ["printi"; "printc"; "printb"]
-
+(* partial cprog to return from this module *)
 let res = 
 {
   main        = emptyList; 
@@ -32,13 +30,13 @@ let count = ref 0
 
 (* Converts a gtype to a ctype *)
 let rec ofGtype = function
-    TYCON ty -> Tycon (ofTycon ty)
-  | TYVAR tp -> Tyvar (ofTyvar tp)
-  | CONAPP con -> Conapp (ofConapp con)
+    TYCON ty    -> Tycon (ofTycon ty)
+  | TYVAR tp    -> Tyvar (ofTyvar tp)
+  | CONAPP con  -> Conapp (ofConapp con)
 and ofTycon = function 
-    TInt            -> Intty
-  | TBool           -> Boolty
-  | TChar           -> Charty
+    TInt        -> Intty
+  | TBool       -> Boolty
+  | TChar       -> Charty
   | TArrow (retty, argsty) -> Tarrow (ofGtype retty, List.map ofGtype argsty)
 and ofTyvar = function 
     TParam n -> Tparam n
@@ -82,18 +80,18 @@ let bindLocal map k (t, _) =
    a free variable in the expression *)
 let freeIn exp n = 
   let rec free (_, e) = match e with  
-    | SLiteral _              -> false
-    | SVar s                  -> s = n
-    | SIf (s1, s2, s3)        -> free s1 || free s2 || free s3
-    | SApply (f, args)      -> free f || 
-                               List.fold_left 
-                                  (fun a b -> a || free b) 
-                                  false args
+    | SLiteral _        -> false
+    | SVar s            -> s = n
+    | SIf (s1, s2, s3)  -> free s1 || free s2 || free s3
+    | SApply (f, args)  -> free f  || List.fold_left 
+                                        (fun a b -> a || free b) 
+                                        false args
     | SLet (bs, body) -> List.fold_left (fun a (_, e) -> a || free e) false bs 
                          || (free body && not (List.fold_left 
                                                 (fun a (x, _) -> a || x = n) 
                                                 false bs))
-    | SLambda (formals, body) -> let (_, names) = List.split formals in 
+    | SLambda (formals, body) -> 
+        let (_, names) = List.split formals in 
         free body && not (List.fold_left (fun a x -> a || x = n) false names)
   in free (TYCON TInt, exp)
 
@@ -134,7 +132,8 @@ let newFuntype  (origTyp : gtype) (newRet : ctype)
     TYCON (TArrow (_, argstyp)) -> 
       let newFormalTys = List.map ofGtype argstyp in 
       let (newFreeTys, _) = List.split toAdd in 
-      Tycon (Tarrow (newRet, newFormalTys @ newFreeTys))
+      (* Tycon (Tarrow (newRet, newFormalTys @ newFreeTys)) *)
+      funty (newRet, newFormalTys @ newFreeTys)
   | _ -> raise (Failure "Non-function function type"))
 
 
@@ -148,7 +147,9 @@ let rec sexprToCexpr ((ty, e) : sexpr) (env : var_env) =
         let (occurs, ctyp) = find s env in 
         (* to match the renaming convention in svalToCval, and to ignore
            built in prints *)
-        let vname = if occurs = 0 then s else "_" ^ s ^ "_" ^ string_of_int occurs
+        let vname = if occurs = 0 
+                      then s 
+                    else "_" ^ s ^ "_" ^ string_of_int occurs
         in (ctyp, CVar (vname))
     | SIf (s1, s2, s3) -> 
         let cexp1 = exp s1 
@@ -158,7 +159,7 @@ let rec sexprToCexpr ((ty, e) : sexpr) (env : var_env) =
     | SApply (f, args) -> 
         let (ctyp, f') = exp f in 
         let normalargs = List.map exp args in 
-        (* The actual type of the function application is the type of the return*)
+        (* actual type of the function application is the type of the return*)
         let (retty, freesCount) = 
           (match ctyp with 
               Tycon (Clo (_, functy, freetys)) -> 
@@ -174,7 +175,7 @@ let rec sexprToCexpr ((ty, e) : sexpr) (env : var_env) =
         let c_bs = List.map (fun (x, e) -> (x, exp e)) bs in 
         let (ctyp, body') = sexprToCexpr body local_env in 
         (ctyp, CLet (c_bs, (ctyp, body')))
-    (* Supose we hit a lambda expression, turn it into a closure*)
+    (* Supose we hit a lambda expression, turn it into a closure *)
     | SLambda (formals, body) -> create_anon_function formals body typ env
   and value = function 
     | SChar c             -> CChar c 
@@ -215,7 +216,7 @@ and create_anon_function  (fformals : (gtype * string) list) (fbody : sexpr)
   (* The value of a Lambda expression is a Closure -- new type construction 
      will help create the structs in codegen that represents the closure *)
   let (freetys, _) = List.split f_def.frees in 
-  let clo_ty = Tycon (Clo (id ^ "_struct", anonFunTy, freetys)) in 
+  let clo_ty = closurety (id ^ "_struct", anonFunTy, freetys) in 
   let () = addClosure clo_ty in 
   let freeVars = convertToVars f_def.frees in 
   (clo_ty, CLambda (id, freeVars))

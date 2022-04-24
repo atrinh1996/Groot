@@ -55,7 +55,7 @@ let translate { main = main;  functions = functions;
  (* To test struct type
     Comment these lines in, run.
     Should make the code defining the struct appear in the llvm code. *)
-  let main_ty = L.function_type int_ty [| tree_struct_ty |] in
+  let main_ty = L.function_type int_ty [|  |] in
   let the_main = L.define_function "main" main_ty the_module in
 
   (* To test a simple codegen. Gives an void main, no args. *)
@@ -119,26 +119,6 @@ let translate { main = main;  functions = functions;
   in 
 
 
-  (* Construct constants code for literal values.
-     Function takes a Sast.svalue, and returns the constructed 
-     llvalue  *)
-  let const_val v builder = 
-    match v with 
-        (* create the "string" constant in the code for the char *)
-        CChar c -> 
-            let spc = L.build_alloca char_ptr_ty "spc" builder in 
-            let globalChar = L.build_global_string (String.make 1 c) "globalChar" builder in 
-            let newStr = L.build_bitcast globalChar char_ptr_ty "newStr" builder in 
-            let loc = L.build_gep spc [| zero |] "loc" builder in 
-            let _ = L.build_store newStr loc builder in 
-            L.build_load spc "character_ptr" builder
-      | CInt  i -> L.const_int int_ty i 
-      (* HAS to be an i1 lltype for the br instructions *)
-      | CBool b -> L.const_int bool_ty (if b then 1 else 0)
-      | CRoot _ -> raise (Failure ("TODO - codegen SRoot Literal"))
-  in
-
-
   (* creates a global pointer to some variable's value *)
   let create_global id ty = 
     let lltyp = ltype_of_type struct_table ty in 
@@ -191,86 +171,119 @@ let translate { main = main;  functions = functions;
           Some _ -> ()
         | None -> ignore (instr builder) in
 
-  (* Construct code for expression 
+
+  (* Construct constants code for literal values.
+     Function takes a builder and Sast.svalue, and returns the constructed 
+     llvalue  *)
+  let const_val builder = function 
+      (* create the "string" constant in the code for the char *)
+      CChar c -> 
+          let spc = L.build_alloca char_ptr_ty "spc" builder in 
+          let globalChar = L.build_global_string (String.make 1 c) "globalChar" builder in 
+          let newStr = L.build_bitcast globalChar char_ptr_ty "newStr" builder in 
+          let loc = L.build_gep spc [| zero |] "loc" builder in 
+          let _ = L.build_store newStr loc builder in 
+          L.build_load spc "character_ptr" builder
+    | CInt  i -> L.const_int int_ty i 
+    (* HAS to be an i1 lltype for the br instructions *)
+    | CBool b -> L.const_int bool_ty (if b then 1 else 0)
+    | CRoot _ -> raise (Failure ("TODO - codegen SRoot Literal"))
+  in
+
+
+
+  (* Construct code for expressions 
      Arguments: llbuilder, lookup table of local variables, 
      current llblock, and Cast.cexpr. 
-     Constructs the llvm where builder is located; returns the llvalue 
-     representation of code. 
-    *)
+     Constructs the llvm where builder is located; 
+     Returns an llbuilder and the llvalue representation of code. *)
   let rec expr builder lenv block (etyp, e) = 
     match e with 
-       CLiteral v   -> const_val v builder
+       CLiteral v   -> (builder, const_val builder v)
      | CVar     s  -> 
-        (try L.build_load (lookup s lenv) s builder
-         with Not_found -> raise(Failure ("name not found: " ^ s)))
-     (* | CIf (e1, e2, e3) ->  *)
-     | CIf (_, _, _) -> 
-          raise (Failure ("TODO - codegen CIF merge-then-else"))
-
-          (* let deal_with_cond_block nbuilder exp = 
-            let ret = expr nbuilder lenv block exp in 
-            nbuilder
-          in
-
+        let varValue = 
+          (try L.build_load (lookup s lenv) s builder 
+           with Not_found -> raise(Failure ("codegen: name not found: " ^ s)))
+        in (builder, varValue)
+     | CIf (e1, e2, e3) -> 
           (* set aside the result of the condition expr *)
-          let bool_val = expr builder lenv block e1 in 
+          let (_, bool_val) = expr builder lenv block e1 in 
 
           (* Create the merge block for after exec of then or the else block *)
           let merge_bb = L.append_block context "merge" block in 
-          let branch_instr = L.build_br merge_bb in (* curried! needs an llbuilder *)
+          let branch_instr = L.build_br merge_bb in 
 
           (* Create the "then" block *)
           let then_bb = L.append_block context "then" block in
-          (* problem: this returns a llvalue, but needs llbuilder *)
-          (* let then_builder = expr (L.builder_at_end context then_bb) lenv then_bb e2 in *)
-          let then_builder = deal_with_cond_block (L.builder_at_end context then_bb) e2 in
+          let (then_builder, _) = 
+            expr (L.builder_at_end context then_bb) lenv block e2 in
           let () = add_terminal then_builder branch_instr in 
 
           (* Create the "else" block *)
           let else_bb = L.append_block context "else" block in
-          (* problem: this returns a llvalue, but needs llbuilder *)
-          let else_builder = deal_with_cond_block (L.builder_at_end context else_bb) e3 in
+          let (else_builder, _) = 
+            expr (L.builder_at_end context else_bb) lenv block e3 in
           let () = add_terminal else_builder branch_instr in 
 
           (* Complete the if-then-else block, return should be llvalue *)
-          (* let _ =  *)
-          L.build_cond_br bool_val then_bb else_bb builder 
-          (* problem: this returns a llbuilder, but needs llvalue *)
-          (* in L.builder_at_end context merge_bb *)
-           *)
-
+          let _ = L.build_cond_br bool_val then_bb else_bb builder in 
+          (L.builder_at_end context merge_bb, bool_val)
      | CApply ((_, CVar "printi"), [arg], _) -> 
-          L.build_call printf_func [| int_format_str ; (expr builder lenv block arg) |] "printi" builder
+        let (builder', argument) = expr builder lenv block arg in 
+        let instruction = L.build_call  printf_func 
+                                        [| int_format_str ; argument |] 
+                                        "printi" builder'
+        in (builder', instruction)
+        (* L.build_call printf_func [| int_format_str ; (expr builder lenv block arg) |] "printi" builder *)
      | CApply ((_, CVar"printc"), [arg], _) -> 
-        L.build_call puts_func [| expr builder lenv block arg |] "printc" builder
+        let (builder', argument) = expr builder lenv block arg in 
+        let instruction = L.build_call  puts_func 
+                                        [| argument |] 
+                                        "printc" builder'
+        in (builder', instruction)
+        (* L.build_call puts_func [| expr builder lenv block arg |] "printc" builder *)
      | CApply ((_, CVar "printb"), [arg], _) -> 
-        let bool_stringptr = if expr builder lenv block arg = (L.const_int bool_ty 1) then print_true else print_false
-        in L.build_call puts_func [| bool_stringptr |] "printb" builder
+        let (builder', condition) = expr builder lenv block arg in 
+        let bool_stringptr = 
+            if condition = lltrue 
+              then print_true 
+            else print_false
+        in
+        let instruction = L.build_call  puts_func 
+                                        [| bool_stringptr |] 
+                                        "printb" builder'
+        in (builder', instruction)
+        (* let bool_stringptr = if expr builder lenv block arg = (L.const_int bool_ty 1) then print_true else print_false *)
+        (* in L.build_call puts_func [| bool_stringptr |] "printb" builder *)
      | CApply (f, args, numFrees) -> 
         (* Since all normal function application is as struct value, call to the 
            function at member index 0 of the struct *)
-        let applyClosure = expr builder lenv block f in
+        let (builder', applyClosure) = expr builder lenv block f in
         (* List of llvalues representing the actual arguments *)
-        let llargs = List.map (fun cexp -> expr builder lenv block cexp) args in 
+        let (_, llargs) = 
+          List.split (List.map (expr builder' lenv block) args) in 
         (* List of llvalues representing the hidden frees to be passed as arguments *)
         let llfrees = 
           let rec get_free idx frees = 
             if idx > numFrees 
               then List.rev frees
             else 
-              let struct_freeMemPtr = L.build_struct_gep applyClosure idx "freePtr" builder in
-              let struct_freeMem = L.build_load struct_freeMemPtr "freeVal" builder in
-              let frees' = struct_freeMem :: frees in
-              get_free (idx + 1) frees'
+              let struct_freeMemPtr = 
+                L.build_struct_gep applyClosure idx "freePtr" builder' in
+              let struct_freeMem = 
+                L.build_load struct_freeMemPtr "freeVal" builder' in
+              let frees' = struct_freeMem :: frees 
+              in get_free (idx + 1) frees'
           in get_free 1 []
         in
-        (* Access the struct member at index 0, which is the function, call it *)
-        let ptrFuncPtr = L.build_struct_gep applyClosure 0 "function_access" builder in 
-        let funcPtr = L.build_load ptrFuncPtr "function_call" builder in 
-        L.build_call  funcPtr 
-                      (Array.of_list (llargs @ llfrees)) 
-                      "function_result"
-                      builder 
+        (* Get the struct member at index 0, which is the function, call it *)
+        let ptrFuncPtr = 
+          L.build_struct_gep applyClosure 0 "function_access" builder' in
+        let funcPtr = L.build_load ptrFuncPtr "function_call" builder' in
+        let instruction = L.build_call  funcPtr
+                                        (Array.of_list (llargs @ llfrees))
+                                        "function_result" builder'
+        in (builder', instruction)
      | CLet _ -> raise (Failure ("TODO - codegen CLET"))
      | CLambda (id, freeargs)-> 
         (match etyp with 
@@ -279,11 +292,14 @@ let translate { main = main;  functions = functions;
             let struct_ty = StringMap.find clo_name struct_table in
             let struct_obj = L.build_alloca struct_ty "gstruct" builder in 
             (* Set the function field of the closure *)
-            let struct_fmem = L.build_struct_gep struct_obj 0 "funcField" builder in 
+            let struct_fmem = 
+              L.build_struct_gep struct_obj 0 "funcField" builder in 
             let (fblock, _) = StringMap.find id function_decls in
             let _ = L.build_store fblock struct_fmem builder in 
             (* Set each subsequent field of the frees *)
-            let llFreeArgs = List.map (expr builder lenv block) freeargs in 
+            let (_, llFreeArgs) = 
+              List.split (List.map (expr builder lenv block) freeargs) in 
+            (* let llFreeArgs = List.map (expr builder lenv block) freeargs in  *)
             let numFrees = List.length freeargs in 
             let structFields = 
               let rec generate_field_access idx fields =
@@ -295,15 +311,49 @@ let translate { main = main;  functions = functions;
                   generate_field_access (idx + 1) fields'
               in generate_field_access 1 []
             in
-            let _ = 
-              let set_free arg field = L.build_store arg field builder
-              in List.map2 set_free llFreeArgs structFields
+            let _ =   let set_free arg field = L.build_store arg field builder
+                      in List.map2 set_free llFreeArgs structFields
             in 
-            struct_obj
-        | _ -> raise (Failure ("Error: Codegeneration - lambda is a non closure type")))
+            (builder, struct_obj)
+            (* struct_obj *)
+        | _ -> raise (Failure ("codegen: lambda is a non closure type")))
   in 
 
-  (* construct the code for each instruction in main (which is a cdefn list) *)
+
+
+  (* generate code for a particular definition; returns an llbuilder. *)
+  let build_def builder = function 
+    | CVal (id, (ty, e)) -> 
+        (* assign a global define of a variable to a value *)
+        let (builder', e') = expr builder StringMap.empty the_main (ty, e) in 
+        let _ = L.build_store e' (lookup id StringMap.empty) builder' in 
+        builder'
+    | CExpr e -> 
+        let (builder', _) = expr builder StringMap.empty the_main e in
+        builder'
+  in
+
+  (* procedure to generate code for each definition in main block.
+     Takes a current llbuilder where to put instructions, and a 
+     list of definitions. Returns a builder of the last location 
+     to put final instruction. *)
+  let rec build_main builder = function 
+      [] -> builder
+    | front :: rest -> 
+        let builder' = build_def builder front in 
+        build_main builder' rest
+  in
+
+  let main_builder' = build_main main_builder main in 
+  (* Every function definition needs to end in a ret. Puts a return at end of main *)
+  let _ = L.build_ret (L.const_int int_ty 0) main_builder' in
+
+
+
+
+
+
+(*   (* construct the code for each instruction in main (which is a cdefn list) *)
   let build_main_body = function 
     | CVal (id, (ty, e)) -> 
         (* assign a global define of a variable to a value *)
@@ -317,7 +367,13 @@ let translate { main = main;  functions = functions;
 
   (* Every function definition needs to end in a ret. Puts a return at end of main *)
   let _ = L.build_ret (L.const_int int_ty 0) main_builder in
-  (* let _ = add_terminal main_builder (L.build_ret (L.const_int int_ty 0)) in *)
+  (* let _ = add_terminal main_builder (L.build_ret (L.const_int int_ty 0)) in *) *)
+
+
+
+
+
+
 
   (* Build function block bodies *)
   let build_function_body fdef = 
@@ -340,7 +396,7 @@ let translate { main = main;  functions = functions;
     in 
 
     (* Build the return  *)
-    let result = expr fbuilder locals function_block fdef.body in 
+    let (fbuilder', result) = expr fbuilder locals function_block fdef.body in 
 
     (* Build instructions for returns based on the rettype *)
     let build_ret t = 
@@ -359,7 +415,7 @@ let translate { main = main;  functions = functions;
       and ret_of_conapp (tyc, _) = ret_of_tycon tyc
       in ret_of_typ t
     in 
-    add_terminal fbuilder (build_ret fdef.rettyp)
+    add_terminal fbuilder' (build_ret fdef.rettyp)
   in 
 
   (* iterate through each function def we need to build and build it *)

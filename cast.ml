@@ -32,13 +32,9 @@ let intty = Tycon Intty
 let charty = Tycon Charty
 let boolty = Tycon Boolty
 (* let treetype ty = CONAPP () *)
-
-(* function type, res is a tycon, args is gtype list *)
-(* let funtype (args, res) = CONAPP (res, args) *)
-
-(* Alt function type: res is a gtype, args is a gtype list*)
-(* let funtype (res, args) = TYCON (TArrow (res, args)) *)
-
+let funty (ret, args) = Tycon (Tarrow (ret, args))
+let closurety (id, functy, freetys) = 
+        Tycon (Clo (id, functy, freetys))
 
 (* int StringMap.t - for our rho/variable environment 
    (DOES NOT MAP TO VALUES) *)
@@ -55,10 +51,7 @@ and cx =
   | CVar      of cname 
   | CIf       of cexpr * cexpr * cexpr
   | CApply    of cexpr * cexpr list * int
-  (* | CApply    of cname * cexpr list  *)
   | CLet      of (cname * cexpr) list * cexpr 
-  (* May not need the last two members of the triple *)
-  (* | CLambda   of cname * (ctype * cname) list * cexpr *)
   | CLambda   of cname * cexpr list
 and cvalue = 
   | CChar     of char
@@ -84,8 +77,6 @@ type fdef =
   frees   : (ctype * cname) list;
 }
 
-(* funciton definition table used to handle multiple definitons of a function *)
-(* type func_env = fdef StringMap.t *)
 
 (* closure is specifically a Tycon (Clo (struct name, function type field, frees field)) *)
 type closure = ctype
@@ -97,7 +88,6 @@ type cprog =
   mutable functions   : fdef list;   (* table of function definitions *)
   mutable rho         : var_env;    (* variable declaration table *)
   mutable structures  : closure list;
-  (* mutable phi         : cname list; fname list to deal with dup defs of functions *)
 }
 
 
@@ -117,7 +107,6 @@ and string_of_tycon = function
   | Clo (sname, funty, freetys) -> 
         sname ^ " {\n" 
             ^ string_of_ctype funty ^ "\n"
-            (* ^ "("  ^ String.concat " " (List.map string_of_ctype argstys) ^  ")\n" *)
             ^ String.concat "\n" (List.map string_of_ctype freetys)
         ^ "\n} ;; "
 and string_of_tyvar = function 
@@ -152,13 +141,6 @@ and string_of_cx = function
         "(" ^ id ^ " " 
             ^ String.concat " " (List.map string_of_cexpr frees) 
             ^ ")"
-        (* let (tys, names) = List.split formals in 
-        "(" ^ id ^ " (" ^ String.concat ", " 
-                            (List.map (fun (ty, name) -> 
-                                        string_of_ctype ty ^ " " ^ name) 
-                                      formals)
-                    ^ ") " 
-                    ^ string_of_cexpr body ^ ")" *)
 and string_of_cvalue = function
     | CChar c -> String.make 1 c 
     | CInt  i -> string_of_int i
@@ -188,14 +170,10 @@ let string_of_functions (funcs : fdef list) =
         body = body;
     } = 
       let string_of_formal  (ty, para) = string_of_ctype ty ^ " " ^ para in
-      (* let string_of_free    (ty, nm) = string_of_ctype ty ^ " " ^ nm in *)
-      (* let listfrees id (num, ty) l = (ty, id ^ string_of_int num) :: l in  *)
-      (* let args = formals @ List.rev (StringMap.fold listfrees frees []) in *)
       let args = formals @ frees in
       let def = string_of_ctype return ^ " " ^ fname ^ " (" 
         ^ String.concat ", " (List.map string_of_formal args)
         ^ ")\n{\n" 
-        (* ^ String.concat "\n" (List.map string_of_free frees) ^ "\n" *)
         ^ string_of_cexpr body  ^ "\n}\n"
       in ret_string ^ def ^ "\n"
   in List.fold_left string_of_fdef "" funcs

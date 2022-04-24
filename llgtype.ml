@@ -20,6 +20,8 @@ let zero = L.const_int int_ty 0
 (* REMOVE VOID later *)
 let void_ty    = L.void_type context
 
+let lltrue = L.const_int bool_ty 1
+
 (* "tree_struct" will appear as the struct name in llvm code *)
 let tree_struct_ty = L.named_struct_type context "tree_struct"
 let tree_struct_ptr_ty = L.pointer_type tree_struct_ty 
