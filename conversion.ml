@@ -1,35 +1,46 @@
 (* Closure conversion for groot compiler *)
 
-(* open Ast *)
+
 open Sast
 open Cast 
 
 
 (***********************************************************************)
-(* partial cprog to return from this module *)
+
 (* Pre-load rho with prints built in *)
 let prerho env = 
   let add_prints map (k, v) =
-    StringMap.add k v map
-  in List.fold_left add_prints env [  ("printi", (0, inttype)); 
-                                      ("printb", (0, booltype)); 
-                                      ("printc", (0, chartype)); 
-                                    ]
+    StringMap.add k [v] map
+  in List.fold_left add_prints env [("printi", (0, intty)); 
+                                    ("printb", (0, boolty)); 
+                                    ("printc", (0, charty)); ]
 
-let built_ins = ["printi"; "printc"; "printb"]
-
+(* partial cprog to return from this module *)
 let res = 
 {
-  main      = emptyList; 
-  functions = emptyList; 
-  rho       = prerho emptyEnv;
-  phi       = emptyList;
+  main        = emptyList; 
+  functions   = emptyList; 
+  rho         = prerho emptyEnv;
+  structures  = emptyList
 }
 
 (* name used for anonymous lambda functions *)
 let anon = "anon"
 let count = ref 0
 
+(* Converts a gtype to a ctype *)
+let rec ofGtype = function
+    TYCON ty    -> Tycon (ofTycon ty)
+  | TYVAR tp    -> Tyvar (ofTyvar tp)
+  | CONAPP con  -> Conapp (ofConapp con)
+and ofTycon = function 
+    TInt        -> Intty
+  | TBool       -> Boolty
+  | TChar       -> Charty
+  | TArrow (retty, argsty) -> Tarrow (ofGtype retty, List.map ofGtype argsty)
+and ofTyvar = function 
+    TParam n -> Tparam n
+and ofConapp (tyc, tys) = (ofTycon tyc, List.map ofGtype tys)
 
 
 (* puts the given cdefn into the main list *)
@@ -40,43 +51,50 @@ let addMain d = res.main <- d :: res.main
 let addFunction f = res.functions <- f :: res.functions 
 
 let getFunction id = 
-  List.find (fun frecord -> 
-              (* let () = print_endline ("Comparing against \"" ^ frecord.fname ^ "\"") in *)
-              id = frecord.fname) 
-            res.functions
+  List.find (fun frecord -> id = frecord.fname) res.functions
 
-let findFunction id = List.mem id res.phi
-let bindFunction id = res.phi <- id :: res.phi 
+let addClosure elem = res.structures <- elem :: res.structures
 
 (* Returns true if the given name id is already bound in the given 
    StringMap env. False otherwise *)
 let isBound id env = StringMap.mem id env 
 
-(* Adds a binding of k to v in the given StringMap env *)
-let bind k v = res.rho <- StringMap.add k v res.rho 
+(* Adds a binding of k to v in the global StringMap env *)
+let bind k v = res.rho <- 
+  let currList = if isBound k res.rho then StringMap.find k res.rho else [] in
+  let newList = v :: currList in 
+  StringMap.add k newList res.rho
 
 (* Returns the value id is bound to in the given StringMap env. If the 
    binding doesn't exist, Not_Found exception is raised. *)
-let find id env = StringMap.find id env 
+let find id env = 
+  let occursList = StringMap.find id env in List.nth occursList 0
+
+(* Adds a local binding of k to v in the given StringMap env *)
+let bindLocal map k (t, _) =
+  let currList = if isBound k map then StringMap.find k map else [] in
+  let localList = (0, ofGtype t) :: currList in 
+  StringMap.add k localList map
 
 (* Given expression an a string name n, returns true if n is 
    a free variable in the expression *)
 let freeIn exp n = 
   let rec free (_, e) = match e with  
-    | SLiteral _              -> false
-    | SVar s                  -> s = n
-    | SIf (s1, s2, s3)        -> free s1 || free s2 || free s3
-    | SApply (f, args)      -> free f || 
-                               List.fold_left 
-                                  (fun a b -> a || free b) 
-                                  false args
+    | SLiteral _        -> false
+    | SVar s            -> s = n
+    | SIf (s1, s2, s3)  -> free s1 || free s2 || free s3
+    | SApply (f, args)  -> free f  || List.fold_left 
+                                        (fun a b -> a || free b) 
+                                        false args
     | SLet (bs, body) -> List.fold_left (fun a (_, e) -> a || free e) false bs 
                          || (free body && not (List.fold_left 
                                                 (fun a (x, _) -> a || x = n) 
                                                 false bs))
-    | SLambda (formals, body) -> let (_, names) = List.split formals in 
+    | SLambda (formals, body) -> 
+        let (_, names) = List.split formals in 
         free body && not (List.fold_left (fun a x -> a || x = n) false names)
-  in free (inttype, exp)
+  in free (TYCON TInt, exp)
+
 
 (* Given the formals list and body of a lambda (xs, e), and a 
    variable environment, the function returns an environment with only 
@@ -89,66 +107,75 @@ let improve (xs, e) rho =
 let clean no_no env =  
   StringMap.filter (fun n _ -> not (List.mem n no_no)) env
 
-(* Given a var_env, returns a (gtype  * name) list version *)
-let toParamList venv = 
-  StringMap.fold  (fun id (num, ty) res -> 
-                      let id' = if num = 0 then id else "_" ^ id ^ "_" ^ string_of_int num in 
-                      (ty, id') :: res
-                  ) 
+(* Given a var_env, returns a (ctype  * name) list version *)
+let toParamList (venv : var_env) = 
+  StringMap.fold  (fun id occursList res -> 
+                      let (num, ty) = List.nth occursList 0 in 
+                      let id' = if num = 0 then id 
+                                else "_" ^ id ^ "_" ^ string_of_int num in 
+                      (ty, id') :: res)
                   venv []
 
-(* Returns the list of cexpr that are free in f *)
-let findFrees ((_, f) : cexpr) (body : sexpr) (rho : var_env) = 
-  (* gets the fdef record type for the function definiton *)
-  let flookup name = getFunction name in 
-  (* returns an fdef frees list, which is of type: (gtype * cname) list *)
-  let getFrees fdefn = fdefn.frees in 
-  (* conver each (gtype * cname) to a cexpr: (gtype, CVar cname) *)
-  let toCVarCexpr (ty, id) = (ty, CVar id) in 
-  (match f with 
-      CVar id | CLambda (id, _, _) -> 
-          if List.mem id built_ins then [] else  
-          let frees = getFrees (flookup id) 
-          in List.map toCVarCexpr frees 
-    | _ -> let frees = toParamList (improve ([], body) rho) in List.map toCVarCexpr frees
+(* turns a list of ty * name list to a Var list  *)
+let convertToVars (frees : (ctype * cname) list) = 
+    List.map (fun (t, n) -> (t, CVar n)) frees 
 
-  )
 
-(* Generate a new function gtype for lambda expressions in order to account
+
+(* Generate a new function type for lambda expressions in order to account
    for free variables, when given the original function type and an 
    association list of gtypes and var names to add to the new formals list
    of the function type. *)
-let newFuntype (origTyp : gtype) (toAdd : (gtype * cname) list) = 
-  let (newTys, _) = List.split toAdd in 
-  let ftyp = (match origTyp with 
-                TYCON (TArrow (rettyp, argstyp)) -> 
-                  TYCON (TArrow (rettyp, argstyp @ newTys))
-              | _ -> raise (Failure "Non-function function type"))
-  in ftyp
+let newFuntype  (origTyp : gtype) (newRet : ctype) 
+                (toAdd : (ctype * cname) list) = 
+  (match origTyp with 
+    TYCON (TArrow (_, argstyp)) -> 
+      let newFormalTys = List.map ofGtype argstyp in 
+      let (newFreeTys, _) = List.split toAdd in 
+      (* Tycon (Tarrow (newRet, newFormalTys @ newFreeTys)) *)
+      funty (newRet, newFormalTys @ newFreeTys)
+  | _ -> raise (Failure "Non-function function type"))
+
+
 
 (* Converts given sexpr to cexpr, and returns the cexpr *)
-(* let rec sexprToCexpr ((ty, e) : sexpr) = match e with  *)
 let rec sexprToCexpr ((ty, e) : sexpr) (env : var_env) =
   let rec exp ((typ, ex) : sexpr) = match ex with
-    | SLiteral v -> (typ, CLiteral (value v))
+    | SLiteral v -> (ofGtype typ, CLiteral (value v))
     | SVar s     -> 
-        let occurs = (fst (find s env)) in 
-        let vname = if occurs = 0 then s else "_" ^ s ^ "_" ^ string_of_int occurs
-        in (ty, CVar (vname))
-    | SIf (s1, s2, s3) -> (typ, CIf (exp s1, exp s2, exp s3))
+        (* In case s is a name of a define, get the closure type *)
+        let (occurs, ctyp) = find s env in 
+        (* to match the renaming convention in svalToCval, and to ignore
+           built in prints *)
+        let vname = if occurs = 0 
+                      then s 
+                    else "_" ^ s ^ "_" ^ string_of_int occurs
+        in (ctyp, CVar (vname))
+    | SIf (s1, s2, s3) -> 
+        let cexp1 = exp s1 
+        and cexp2 = exp s2
+        and cexp3 = exp s3 in 
+        (fst cexp2, CIf (cexp1, cexp2, cexp3))
     | SApply (f, args) -> 
-        let f' = exp f in 
+        let (ctyp, f') = exp f in 
         let normalargs = List.map exp args in 
-        let freeargs = findFrees f' f env in 
-        (* let () = print_endline "found the frees" in  *)
-        (* create_anon_function_call f args restyp env *)
-        (typ, CApply (f', normalargs @ freeargs))
+        (* actual type of the function application is the type of the return*)
+        let (retty, freesCount) = 
+          (match ctyp with 
+              Tycon (Clo (_, functy, freetys)) -> 
+                (match functy with 
+                    Tycon (Tarrow (ret, _)) -> (ret, List.length freetys)
+                  | _ -> raise (Failure "Non-function function type"))
+            | _ -> (intty, 0)) in 
+        (retty, CApply ((retty, f'), normalargs, freesCount))
     | SLet (bs, body) -> 
-        (typ, CLet (List.map (fun (x, e) -> (x, exp e)) bs, 
-                   sexprToCexpr body (List.fold_left 
-                                        (fun map (x, (t, _)) -> 
-                                          StringMap.add x (0, t) map) 
-                                        env bs)))
+        let local_env = (List.fold_left (fun map (x, se) -> 
+                                          bindLocal map x se) 
+                                        env bs) in 
+        let c_bs = List.map (fun (x, e) -> (x, exp e)) bs in 
+        let (ctyp, body') = sexprToCexpr body local_env in 
+        (ctyp, CLet (c_bs, (ctyp, body')))
+    (* Supose we hit a lambda expression, turn it into a closure *)
     | SLambda (formals, body) -> create_anon_function formals body typ env
   and value = function 
     | SChar c             -> CChar c 
@@ -162,82 +189,56 @@ let rec sexprToCexpr ((ty, e) : sexpr) (env : var_env) =
 (* When given just a lambda expresion withot a user defined identity/name 
    this function will generate a name and give the function a body --
    Lambda lifting. *)
-and create_anon_function (fformals : (gtype * string) list) (fbody : sexpr) (ty : gtype) (env : var_env) = 
+and create_anon_function  (fformals : (gtype * string) list) (fbody : sexpr) 
+                          (ty : gtype) (env : var_env) = 
+  (* All anonymous functions are named the same and numbered. *)
   let id = anon ^ string_of_int !count in 
   let () = count := !count + 1 in
-  let () = bindFunction id in 
+  (* Create the record that represents the function body and definition *)
+  let local_env = List.fold_left (fun map (typ, x) -> 
+                                    bindLocal map x (typ, SVar x))
+                                  env fformals in 
+  let func_body = sexprToCexpr fbody local_env in 
   let f_def = 
     {
-      rettyp  = (match ty with 
-                    TYCON (TArrow (res, _)) -> res 
-                  | _ -> raise (Failure "Non-function function type")); 
+      body    = func_body;
+      rettyp  = fst func_body;
       fname   = id; 
-      formals = fformals;
+      formals = List.map (fun (ty, nm) -> (ofGtype ty, nm)) fformals;
       frees   = toParamList (improve (fformals, fbody) env);
-      body    = sexprToCexpr fbody (List.fold_left 
-                                      (fun map (typ, x) -> 
-                                        StringMap.add x (0, typ) map)
-                                      env fformals);
     } 
   in 
   let () = addFunction f_def in 
-  let ty' = newFuntype ty f_def.frees in 
-  let () = bind id (1, ty') in 
-  (ty', CLambda (id, f_def.formals @ f_def.frees, f_def.body))
-(* When given an expression to apply in function application, the expression 
-   turns into a named function call. 
-   This helps enures during a call, the resulting call behaves 
-   as though it has access to its freevars. *)
-(* and create_anon_function_call (fbody : sexpr) (args : sexpr list) (retyp : gtype) (env : var_env) = 
-  let id = anon ^ string_of_int !count in 
-  let () = count := !count + 1 in 
-  let () = bindFunction id in 
-  let f_def = 
-    {
-      rettyp = retyp;  return type should be a function type to actually apply
-      fname = id; 
-      formals = [];
-      frees = toParamList (improve ([], fbody) env);
-      body = sexprToCexpr fbody env;
-    }
-  in 
-  let () = addFunction f_def in 
-  let ty' = newFuntype retyp f_def.frees in 
-  (ty', CApply ((retyp, CVar f_def.fname), f_def.formals @ f_def.frees)) *)
+  (* New function type will include the types of free arguments *)
+  let anonFunTy = newFuntype ty f_def.rettyp f_def.frees in 
+  (* Record the type of the anonymous function and its "rea" ftype *)
+  let () = bind id (1, anonFunTy) in 
+  (* The value of a Lambda expression is a Closure -- new type construction 
+     will help create the structs in codegen that represents the closure *)
+  let (freetys, _) = List.split f_def.frees in 
+  let clo_ty = closurety (id ^ "_struct", anonFunTy, freetys) in 
+  let () = addClosure clo_ty in 
+  let freeVars = convertToVars f_def.frees in 
+  (clo_ty, CLambda (id, freeVars))
+
 
 
 (* Converts given SVal to CVal, and returns the CVal *)
 let svalToCval (id, (ty, e)) = 
-  (* check if id was already defined in rho *)
-  let (occurs, _) = if (isBound id res.rho) then (find id res.rho) else (0, ty) in 
+  (* check if id was already defined in rho, in order to get 
+     the actual frequency the variable name was defined. 
+     The (0, inttype is a placeholder) *)
+  let (occurs, _) = if (isBound id res.rho) 
+                      then (find id res.rho) 
+                    else (0, intty) in
+  (* Modify the name to account for the redefinitions, and so old closures 
+     can access original variable values *)
   let id' = "_" ^ id ^ "_" ^ string_of_int (occurs + 1) in 
-  let cval = 
-  (match e with 
-    | SLambda (fformals, fbody) -> 
-        let () = if (findFunction id) then () else bindFunction id in
-        let f_def = 
-          {
-            rettyp  = (match ty with 
-                          TYCON (TArrow (res, _)) -> res 
-                          | _ -> raise (Failure "Non-function function type"));
-            fname   = id'; 
-            formals = fformals;
-            frees   = toParamList (improve (fformals, fbody) res.rho); 
-              (* toParamList (clean res.phi (improve (fformals, fbody) res.rho));  *)
-            body    = sexprToCexpr fbody (List.fold_left 
-                                            (fun map (typ, x) -> 
-                                              StringMap.add x (0, typ) map)
-                                            res.rho fformals);
-          } 
-        in 
-        let () = addFunction f_def in
-        let ty' = newFuntype ty f_def.frees in 
-        let () = bind id (occurs + 1, ty') in 
-        Some (CVal (id', (ty', CLambda (id', f_def.formals @ f_def.frees, f_def.body))))
-    | _ ->  
-        let () = bind id (occurs + 1, ty) in 
-        Some (CVal (id', sexprToCexpr (ty, e) res.rho)))
-  in cval 
+  let (ty', cexp) = sexprToCexpr (ty, e) res.rho in 
+  (* bind original name to the number of occurrances and the variable's type *)
+  let () = bind id (occurs + 1, ty') in 
+  (* Return the possibly new CVal definition *)
+  CVal (id', (ty', cexp))
 (***********************************************************************)
 
 
@@ -245,25 +246,19 @@ let svalToCval (id, (ty, e)) =
 (* Given an sprog (which is an sdefn list), convert returns a 
    cprog version. *)
 let conversion sdefns =
-
   (* With a given sdefn, function converts it to the appropriate CAST type
      and sorts it to the appropriate list in a cprog type. *)
   let convert = function 
     | SVal (id, (ty, sexp)) -> 
-        (match svalToCval (id, (ty, sexp)) with 
-            | Some cval -> addMain cval 
-            | None      -> ())
-    | SExpr e -> (* addMain (CExpr (sexprToCexpr e res.rho)) *)
-        (match (sexprToCexpr e res.rho) with 
-            | (_, CLambda _) -> ()
-            | cexp      -> addMain (CExpr cexp))
+        let cval = svalToCval (id, (ty, sexp)) in addMain cval
+    | SExpr e -> 
+        let cexp = sexprToCexpr e res.rho in addMain (CExpr cexp)
   in 
     
   let _ = List.iter convert sdefns in 
-  (* let () = print_endline "exiting coversion" in  *)
     {
-      main      = List.rev res.main;
-      functions = res.functions;
-      rho       = res.rho;
-      phi       = res.phi;
+      main       = List.rev res.main;
+      functions  = res.functions;
+      rho        = res.rho;
+      structures = res.structures
     }
