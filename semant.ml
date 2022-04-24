@@ -10,30 +10,6 @@ open Sast
 
 module StringMap = Map.Make(String)
 
-(* type TConsts = {typ : } *)
-
-(* type grootType = 
-				| BoolType 
-				| CharType
-				| IntType
-				| TreeType
- *)
-(* Takes an Ast (defn list) and will return an Sast (sdefn list) *)
-(* 
-
-type defn = 
-	| Val of ident * expr
-	| Expr of expr
-
-type sdefn = 
-  | SVal of ident * sexpr
-  | SExpr of sexpr
-
-type sexpr = Ast.typ * Sast.sx
-
-type typ = Integer | Character | Boolean
-
-*)
 
 type ty_env = gtype StringMap.t 
 let gamma = ref StringMap.empty
@@ -78,55 +54,7 @@ let find_func fname map =
 
 
 let semantic_check (defns) =
-	(* let fresh =
-  		let k = ref 0 in
-    		fun () -> incr k; XType !k
-		in *)
 
-	(* let rec generate_constraints expr = match expr with
-		| Literal v -> 
-			let literal_check v = match v with
-				| Char _ -> (CType, [])
-				| Int  _ -> (IType, [])
-				| Bool _ -> (BType, []) 
-				| Root r -> 
-					let rec tree_check t = match t with
-						| Leaf   -> (TType, [])
-						| Branch (e, t1, t2) -> 
-							let branch_check e t1 t2 =
-								let e, c1 = generate_constraints e in
-									let t1, c2 = tree_check t1 in 
-										let t2, c3 = tree_check t2 in 
-											let alpha = fresh () in (TType, [(alpha, e); (TType, t1); (TType, t2)] @ c1 @ c2 @ c3)
-							in branch_check e t1 t2
-						| _ -> raise (Failure ("You done fucked up the tree."))
-					in tree_check r
-			in literal_check v
-		| If (e1, e2, e3) ->
-			(* TODO is there a more OCamlese way to match in assignment, like x, y = generate_constraint e1 *)
-			let if_check e1 e2 e3 =
-				let t1, c1 = generate_constraints e1 in
-					let	t2, c2 = generate_constraints e2 in
-						let t3, c3 = generate_constraints e3 in
-							let alpha = fresh () in (alpha, [(BType, t1); (alpha, t2); (alpha, t3)] @ c1 @ c2 @ c3)
-			in if_check e1 e2 e3
-		
-			(* | _ -> raise (Failure ("missing case for type checking")) *)
-in *)
-			
-
-(*handle type-checking for evaluation - make sure the expression returns the
-	correct type, build local symbol table and do local type checking*)
-
-	(* Lookup what Ast.typ value that the key name s maps to. *)
-	(* let typeof_identifier s = 
-		Requires creation of symbols table
-		   code for try: StringMap.find s symbols
-		try StringMap.find s symbols
-		with Not_found -> raise (Failure ("undeclared identifier" ^ s))
-	in *)
-
-  
 
 	(* Returns the Sast.sexpr (Ast.typ, Sast.sx) version of the given Ast.expr *)
 	let rec expr id e gamma = match e with 
@@ -155,24 +83,6 @@ in *)
                   ) in 
         let args' = List.map (fun e -> expr "" e gamma) args in 
         (t', SApply ((t', f'), args'))
-        (* let fd = (match f' with 
-                      SVar s -> find_func s !functions
-                    | _ -> raise (Failure "TODO: SApply with sexpr")) in  *)
-            (* let fd = find_func fname !functions in 
-            let formals_length = List.length fd.formals in 
-            let param_length = List.length args in 
-            if param_length != formals_length 
-              then raise (Failure ("expected number of args, but got different number"))
-            else 
-          *)
-              (* let check_call (ft, _) e = 
-                let (et, e') = expr "" e gamma in 
-                if et = ft then (et, e') else raise 
-                (Failure ("illegal argument found " ^ string_of_typ et 
-                  ^ " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e))
-              in 
-            let args' = List.map2 check_call fd.formals args
-            in (fd.rettyp, SApply ((t, SVar fd.fname), args')) *)
     | Let(_, _)             -> raise (Failure ("TODO - expr to sexpr of Let"))
     (* Forces labda to be int type. *)
     | Lambda(formals, body) -> 
@@ -203,13 +113,10 @@ in *)
 	let check_defn d = match d with
 		| Val (name, e) -> 
 				let e' = expr name e !gamma in
-        (* let () = print_endline ("type of " ^ name ^ ": " ^ string_of_typ (fst e')) in  *)
         let () = gamma := StringMap.add name (fst e') !gamma in 
 				SVal(name, e')
 		| Expr e      -> SExpr (expr "" e !gamma)
-(* 	| Val (name, e) -> generate_constraints e 
-		| Expr (e)      -> generate_constraints e
- *)
+
 
 in List.map check_defn defns 
 
