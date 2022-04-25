@@ -83,7 +83,13 @@ let semantic_check (defns) =
                   ) in 
         let args' = List.map (fun e -> expr "" e gamma) args in 
         (t', SApply ((t', f'), args'))
-    | Let(_, _)             -> raise (Failure ("TODO - expr to sexpr of Let"))
+    | Let(bs, body)             -> 
+      let bs' = List.map (fun (x, ex) -> (x, expr x ex gamma)) bs in
+      let gamma' = List.fold_left (fun map (x, (t, _)) -> StringMap.add x t map) 
+                                  gamma bs'  in 
+      let (ty, sbody) = expr id body gamma' in 
+      (ty, SLet (bs', (ty, sbody)))
+
     (* Forces labda to be int type. *)
     | Lambda(formals, body) -> 
         let formal_list = List.map (fun x -> (inttype, x)) formals in 

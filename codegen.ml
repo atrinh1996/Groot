@@ -205,7 +205,12 @@ let translate { main = main;  functions = functions;
           (try L.build_load (lookup s lenv) s builder 
            with Not_found -> raise(Failure ("codegen: name not found: " ^ s)))
         in (builder, varValue)
-     | CIf (e1, e2, e3) -> 
+     | CIf (e1, (t2, e2), e3) -> 
+          (* allocate space for result of the if statement *)
+          let result = 
+            L.build_alloca (ltype_of_type struct_table t2) "if-res-ptr" builder
+          in 
+
           (* set aside the result of the condition expr *)
           let (_, bool_val) = expr builder lenv block e1 in 
 
@@ -215,33 +220,36 @@ let translate { main = main;  functions = functions;
 
           (* Create the "then" block *)
           let then_bb = L.append_block context "then" block in
-          let (then_builder, _) = 
-            expr (L.builder_at_end context then_bb) lenv block e2 in
+          let (then_builder, then_res) = 
+            expr (L.builder_at_end context then_bb) lenv block (t2, e2) in
+          let _ = L.build_store then_res result then_builder in 
           let () = add_terminal then_builder branch_instr in 
 
           (* Create the "else" block *)
           let else_bb = L.append_block context "else" block in
-          let (else_builder, _) = 
+          let (else_builder, else_res) = 
             expr (L.builder_at_end context else_bb) lenv block e3 in
+          let _ = L.build_store else_res result else_builder in 
           let () = add_terminal else_builder branch_instr in 
 
           (* Complete the if-then-else block, return should be llvalue *)
           let _ = L.build_cond_br bool_val then_bb else_bb builder in 
-          (L.builder_at_end context merge_bb, bool_val)
+          (* Get the result of either the the or the else block *)
+          let merge_builder = L.builder_at_end context merge_bb in 
+          let result_value = L.build_load result "if-res-val" merge_builder in
+          (merge_builder, result_value)
      | CApply ((_, CVar "printi"), [arg], _) -> 
         let (builder', argument) = expr builder lenv block arg in 
         let instruction = L.build_call  printf_func 
                                         [| int_format_str ; argument |] 
                                         "printi" builder'
         in (builder', instruction)
-        (* L.build_call printf_func [| int_format_str ; (expr builder lenv block arg) |] "printi" builder *)
      | CApply ((_, CVar"printc"), [arg], _) -> 
         let (builder', argument) = expr builder lenv block arg in 
         let instruction = L.build_call  puts_func 
                                         [| argument |] 
                                         "printc" builder'
         in (builder', instruction)
-        (* L.build_call puts_func [| expr builder lenv block arg |] "printc" builder *)
      | CApply ((_, CVar "printb"), [arg], _) -> 
         let (builder', condition) = expr builder lenv block arg in 
         let bool_stringptr = 
@@ -253,38 +261,52 @@ let translate { main = main;  functions = functions;
                                         [| bool_stringptr |] 
                                         "printb" builder'
         in (builder', instruction)
-        (* let bool_stringptr = if expr builder lenv block arg = (L.const_int bool_ty 1) then print_true else print_false *)
-        (* in L.build_call puts_func [| bool_stringptr |] "printb" builder *)
      | CApply (f, args, numFrees) -> 
-        (* Since all normal function application is as struct value, call to the 
+        (* Since all normal function application is as struct value, call to the
            function at member index 0 of the struct *)
         let (builder', applyClosure) = expr builder lenv block f in
         (* List of llvalues representing the actual arguments *)
-        let (_, llargs) = 
-          List.split (List.map (expr builder' lenv block) args) in 
-        (* List of llvalues representing the hidden frees to be passed as arguments *)
+        let (builder'', llargs) = 
+          List.fold_left  (fun (bld, arglist) arg ->
+                              let (bld', llarg) = expr bld lenv block arg in 
+                              (bld', llarg :: arglist)) 
+                          (builder', []) args 
+        in let llargs = List.rev llargs in 
+        (* List of llvalues representing the hidden frees to be 
+           passed as arguments *)
         let llfrees = 
           let rec get_free idx frees = 
             if idx > numFrees 
               then List.rev frees
             else 
               let struct_freeMemPtr = 
-                L.build_struct_gep applyClosure idx "freePtr" builder' in
+                L.build_struct_gep applyClosure idx "freePtr" builder'' in
               let struct_freeMem = 
-                L.build_load struct_freeMemPtr "freeVal" builder' in
+                L.build_load struct_freeMemPtr "freeVal" builder'' in
               let frees' = struct_freeMem :: frees 
               in get_free (idx + 1) frees'
           in get_free 1 []
         in
         (* Get the struct member at index 0, which is the function, call it *)
         let ptrFuncPtr = 
-          L.build_struct_gep applyClosure 0 "function_access" builder' in
-        let funcPtr = L.build_load ptrFuncPtr "function_call" builder' in
+          L.build_struct_gep applyClosure 0 "function_access" builder'' in
+        let funcPtr = L.build_load ptrFuncPtr "function_call" builder'' in
         let instruction = L.build_call  funcPtr
                                         (Array.of_list (llargs @ llfrees))
-                                        "function_result" builder'
-        in (builder', instruction)
-     | CLet _ -> raise (Failure ("TODO - codegen CLET"))
+                                        "function_result" builder''
+        in (builder'', instruction)
+     | CLet (bs, body) -> 
+        (* create each value in bs, and bind it to the name *)
+        let (builder', local_env) = 
+          List.fold_left  (fun (bld, map) (name, (ty, cexp)) -> 
+                              let loc = L.build_alloca (ltype_of_type struct_table ty) name bld in 
+                              let (bld', llcexp) = expr bld lenv block (ty, cexp) in
+                              let _ = L.build_store llcexp loc bld' in 
+                              let map' = StringMap.add name loc map in
+                              (bld', map'))
+                          (builder, StringMap.empty) bs
+        (* Evaulate the body *)
+        in expr builder' local_env block body 
      | CLambda (id, freeargs)-> 
         (match etyp with 
           Tycon (Clo (clo_name, _, _)) -> 
@@ -297,25 +319,28 @@ let translate { main = main;  functions = functions;
             let (fblock, _) = StringMap.find id function_decls in
             let _ = L.build_store fblock struct_fmem builder in 
             (* Set each subsequent field of the frees *)
-            let (_, llFreeArgs) = 
-              List.split (List.map (expr builder lenv block) freeargs) in 
-            (* let llFreeArgs = List.map (expr builder lenv block) freeargs in  *)
+            let (builder', llFreeArgs) = 
+              List.fold_left  (fun (bld, arglist) arg ->
+                                  let (bld', llarg) = expr bld lenv block arg in
+                                  (bld', llarg :: arglist)) 
+                              (builder, []) freeargs 
+            in let llFreeArgs = List.rev llFreeArgs in 
             let numFrees = List.length freeargs in 
             let structFields = 
               let rec generate_field_access idx fields =
                 if idx > numFrees 
                   then List.rev fields 
                 else 
-                  let struct_freeMem = L.build_struct_gep struct_obj idx "freeField" builder in 
+                  let struct_freeMem = 
+                    L.build_struct_gep struct_obj idx "freeField" builder' in 
                   let fields' = struct_freeMem :: fields in 
                   generate_field_access (idx + 1) fields'
               in generate_field_access 1 []
             in
-            let _ =   let set_free arg field = L.build_store arg field builder
+            let _ =   let set_free arg field = L.build_store arg field builder'
                       in List.map2 set_free llFreeArgs structFields
             in 
-            (builder, struct_obj)
-            (* struct_obj *)
+            (builder', struct_obj)
         | _ -> raise (Failure ("codegen: lambda is a non closure type")))
   in 
 
@@ -347,28 +372,6 @@ let translate { main = main;  functions = functions;
   let main_builder' = build_main main_builder main in 
   (* Every function definition needs to end in a ret. Puts a return at end of main *)
   let _ = L.build_ret (L.const_int int_ty 0) main_builder' in
-
-
-
-
-
-
-(*   (* construct the code for each instruction in main (which is a cdefn list) *)
-  let build_main_body = function 
-    | CVal (id, (ty, e)) -> 
-        (* assign a global define of a variable to a value *)
-        let e' = expr main_builder StringMap.empty the_main (ty, e) in 
-        let _ = L.build_store e' (lookup id StringMap.empty) main_builder  in 
-        ()
-    | CExpr e -> let _ = expr main_builder StringMap.empty the_main e in 
-        ()
-  in 
-  let _ = List.map build_main_body main in 
-
-  (* Every function definition needs to end in a ret. Puts a return at end of main *)
-  let _ = L.build_ret (L.const_int int_ty 0) main_builder in
-  (* let _ = add_terminal main_builder (L.build_ret (L.const_int int_ty 0)) in *) *)
-
 
 
 

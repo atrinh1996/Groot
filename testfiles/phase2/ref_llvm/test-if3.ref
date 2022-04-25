@@ -12,18 +12,19 @@ declare i32 @puts(i8*)
 define i32 @main() {
 entry:
   %if-res-ptr = alloca i32
-  br i1 true, label %then, label %else
+  br i1 false, label %then, label %else
 
 merge:                                            ; preds = %else, %then
   %if-res-val = load i32, i32* %if-res-ptr
-  %printi = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt, i32 0, i32 0), i32 %if-res-val)
   ret i32 0
 
 then:                                             ; preds = %entry
-  store i32 1, i32* %if-res-ptr
+  %printi = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt, i32 0, i32 0), i32 24)
+  store i32 %printi, i32* %if-res-ptr
   br label %merge
 
 else:                                             ; preds = %entry
-  store i32 0, i32* %if-res-ptr
+  %printi1 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt, i32 0, i32 0), i32 86)
+  store i32 %printi1, i32* %if-res-ptr
   br label %merge
 }
