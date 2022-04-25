@@ -14,7 +14,7 @@ true: color(always)
 ###############################################################################
 # Enable almost all compiler warnings
 # instructs ocamlopt to not report an interface missing error (70)
-true : warn(+a-4-40-42-70)
+# true : warn(+a-4-40-42-70)
 
 
 # Instruct ocamlbuild to ignore the "printbig.o" file when it's building
