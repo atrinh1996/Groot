@@ -292,7 +292,8 @@ let rec get_constraints (ctx : (ident * tyscheme) list ) (d : defn list) =
 				  	| TypedApply (x, xs) -> TypedApply (expr_only_case x,(List.map expr_only_case xs))
 				  	| TypedLet ((its), x) -> TypedLet (List.map (fun (x, y) -> (x, expr_only_case y)) its, expr_only_case x)
 				  	| TypedLambda ((x, y), z) -> TypedLambda ((x, y), (expr_only_case z))
-				  	(* TODO missing matches here *)
+				 		| TLiteral x -> TLiteral x
+						| TypedVar x -> TypedVar x
 				  in 
 				  if (TYVAR tv = tast_gt) then (gt, updated_tast_tx) 
 					else  (tast_gt, updated_tast_tx))
@@ -321,11 +322,59 @@ let type_infer (ctx : (ident * tyscheme) list ) (ds : defn list) =
 	(* almost -> texpr list *)
 	let almost = List.map (apply_subs subs) tdefns in
 	almost
-	
 
-	(* 
-TAST Types for Reference
 
+
+
+(* Printing code *)	
+let rec string_of_texpr (t, s) = 
+	"[" ^ string_of_typ t ^ ": " ^ string_of_tx s ^ "]"
+and string_of_tx = function
+	| TLiteral v -> string_of_tvalue v
+	| TypedVar n -> n
+	| TypedIf (e1, e2, e3) -> "if " ^ string_of_texpr e1 ^ " then " ^ string_of_texpr e2 ^ " else " ^ string_of_texpr e3
+	| TypedApply (rt, (ft)) -> "(" ^ string_of_texpr rt ^ ", " ^ String.concat " " (List.map string_of_texpr ft) ^ ")"
+	(* | TLet (binds, body) -> "let " ^ String.concat " " (List.map string_of_tvalue (TVal binds)) ^ " in " ^ string_of_texpr body *)
+	| TypedLambda (formals, body) -> String.concat " " (List.map (fun x -> x) (snd formals)) ^ " -> " ^ string_of_texpr body 
+	(* "\\" ^ String.concat " " (List.map string_of_expr (formals)) ^ " -> " ^ string_of_texpr body *)
+and string_of_tvalue = function
+	| TChar c -> string_of_tycon (TChar)
+	| TInt i -> string_of_int i
+	| TBool b -> string_of_bool b
+	| TRoot t -> string_of_ttree t
+and string_of_ttree = function
+	| TLeaf -> "SLeaf"
+	| TBranch (v, l, r) -> "SBranch " ^ string_of_tvalue v ^ " " ^ string_of_ttree l ^ " " ^ string_of_ttree r
+
+let string_of_tdefn = function 
+	| TVal(id, e) -> "(val " ^ id ^ " " ^ string_of_texpr e ^ ")"
+	| TExpr e -> string_of_texpr e
+
+let rec string_of_tprog tdefns =
+	String.concat " " (List.map string_of_tdefn tdefns)
+
+
+(* 
+type gtype =
+  | TYCON of tycon
+  | TYVAR of tyvar
+  | CONAPP of conapp
+and tycon =
+  | TInt                    								 			(** integers [int] *)
+  | TBool                  							  				(** booleans [bool] *)
+  | TChar           								 							(** chars    [char] *)
+  | TArrow of gtype           										(** Function type [s -> t] *)
+    (* How do functions work? A function is encoded as a CONAPP of TArrow 
+       where the TArrow's gtype is the return type and the gtype list 
+       associated with the CONAPP is the types of the arguments *)
+  (* | TTree of gtype * gscheme * gscheme       	(** Trees *) *)
+and tyvar =
+	| TVariable of int          										(** parameter *)
+and conapp = (tycon * gtype list)
+
+type tyscheme = (tyvar list * gtype)
+
+(* TAST Types*)
 type texpr = gtype * tx
 	and tx = 
 		| TLiteral of tvalue
@@ -342,68 +391,12 @@ type texpr = gtype * tx
 		| TRoot    of ttree
 	and ttree =  
 		| TLeaf
-		| TBranch of tvalue * ttree * ttree 
+		| TBranch of tvalue * ttree * ttree
 
 type tdefn = 
 	| TVal of ident * texpr
 	| TExpr of texpr
-type tprog = tdefn list	
-
-
-type conapp = (tycon * gtype list)
-type tyscheme = (tyvar list * gtype)
-type gtype =
-  | TYCON of tycon
-  | TYVAR of tyvar
-  | CONAPP of conapp
-and tycon =
-  | TInt
-  | TBool
-  | TChar
-  | TArrow of gtype
-  | TTree of gtype * gscheme * gscheme
-and tyvar =
-	| TVariable of int 
+	
+type tprog = tdefn list	 
 *)
-
-
-
-
-
-	(* let constraints = List.flatten constraints_l_of_l in *)
-
-
-	(* let subs = solve constraints in
-
-	(* tdefns -> (ident * (gtype * tx)) list *)
-	(* let tdefns = (List.map (fun (x : ident * texpr) -> (x, (texpr_to_gtype x))) tasts) in *)
-
-	List.map (apply_subs subs) tasts, subs *)
-
-
-(* Below lies Nick's futile attempt at printing *)	
-let rec string_of_texpr (t, s) = 
-	"[" ^ string_of_typ t ^ ": " ^ string_of_tx s ^ "]"
-and string_of_tx = function
-	| TLiteral v -> string_of_tvalue v
-	| TypedVar n -> n
-	| TypedIf (e1, e2, e3) -> "if " ^ string_of_texpr e1 ^ " then " ^ string_of_texpr e2 ^ " else " ^ string_of_texpr e3
-	| TypedApply (rt, (ft)) -> "(" ^ string_of_texpr rt ^ ", " ^ String.concat " " (List.map string_of_texpr ft) ^ ")"
-	(* | TLet (binds, body) -> "let " ^ String.concat " " (List.map string_of_tvalue (TVal binds)) ^ " in " ^ string_of_texpr body *)
-	(* | TLambda (formals, body)-> "\\" ^ String.concat " " (List.map string_of_tx formals) ^ " -> " ^ string_of_texpr body *)
-and string_of_tvalue = function
-	| TChar c -> string_of_tycon (TChar)
-	| TInt i -> string_of_int i
-	| TBool b -> string_of_bool b
-	| TRoot t -> string_of_ttree t
-and string_of_ttree = function
-	| TLeaf -> "SLeaf"
-	| TBranch (v, l, r) -> "SBranch " ^ string_of_tvalue v ^ " " ^ string_of_ttree l ^ " " ^ string_of_ttree r
-
-let string_of_tdefn = function 
-	| TVal(id, e) -> "(val " ^ id ^ " " ^ string_of_texpr e ^ ")"
-	| TExpr e -> string_of_texpr e
-
-let rec string_of_tprog tdefns =
-	String.concat " " (List.map string_of_tdefn tdefns)
 
