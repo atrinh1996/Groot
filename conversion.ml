@@ -100,7 +100,12 @@ let freeIn exp n =
    variable environment, the function returns an environment with only 
    the free variables of this lambda. *)
 let improve (xs, e) rho = 
-  StringMap.filter (fun n _ -> freeIn (SLambda (xs, e)) n) rho
+  StringMap.filter 
+    (fun n _ -> 
+        if List.mem n ignores
+          then false
+        else freeIn (SLambda (xs, e)) n) 
+    rho
 
 (* removes any occurrance of things in no_no list from the env (StringMap)
    and returns the new StringMap *)
