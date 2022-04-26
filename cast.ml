@@ -17,11 +17,7 @@ and tycon =
     Intty  
   | Charty 
   | Boolty
-  | Tarrow of ctype * ctype list
-(* a closure to represent a struct, 
-   field 0: function pointer requires the result and args type (Function type) 
-   field 1 - n: other fields need types to represent the frees *)
-  (* | Clo of ctype * ctype list * ctype list *)
+  | Tarrow of ctype 
   | Clo of cname * ctype * ctype list
 and tyvar = 
     Tparam of int
@@ -32,7 +28,8 @@ let intty = Tycon Intty
 let charty = Tycon Charty
 let boolty = Tycon Boolty
 (* let treetype ty = CONAPP () *)
-let funty (ret, args) = Tycon (Tarrow (ret, args))
+(* let funty (ret, args) = Tycon (Tarrow (ret, args)) *)
+let funty (ret, args) = Conapp (Tarrow ret, args)
 let closurety (id, functy, freetys) = 
         Tycon (Clo (id, functy, freetys))
 
@@ -103,7 +100,8 @@ and string_of_tycon = function
     Intty  -> "int"
   | Charty -> "char"
   | Boolty -> "bool"
-  | Tarrow (retty, argsty) -> string_of_ctype retty ^ " (" ^ String.concat " " (List.map string_of_ctype argsty) ^ ")" 
+  | Tarrow (retty) -> string_of_ctype retty 
+                        (* ^ " (" ^ String.concat " " (List.map string_of_ctype argsty) ^ ")"  *)
   | Clo (sname, funty, freetys) -> 
         sname ^ " {\n" 
             ^ string_of_ctype funty ^ "\n"
@@ -112,7 +110,7 @@ and string_of_tycon = function
 and string_of_tyvar = function 
     Tparam n -> string_of_int n
 and string_of_conapp (tyc, tys) = 
-  string_of_tycon tyc ^ " " ^ String.concat " " (List.map string_of_ctype tys)
+  string_of_tycon tyc ^ " (" ^ String.concat " " (List.map string_of_ctype tys) ^ ")"
 
 
 

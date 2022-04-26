@@ -1,4 +1,4 @@
-(* 
+(*
     TAST
     Type inference.  
 *)
@@ -15,7 +15,7 @@ and tycon =
   | TChar 
   | TArrow of gtype 
 and tyvar =
-    | TVariable of int 
+  | TVariable of int 
 and conapp = (tycon * gtype list)
 
 type tyscheme = (tyvar list * gtype)
@@ -25,6 +25,8 @@ let inttype = TYCON TInt
 let chartype = TYCON TChar
 let booltype = TYCON TBool
 
+(* let functiontype resultType formalsTypes = CONAPP (TArrow resultType, formalsTypes) *)
+let funtype resultType formalsTypes = CONAPP (TArrow resultType, formalsTypes)
 
 (* TAST expression *)
 type texpr = gtype * tx
@@ -140,7 +142,7 @@ type sprog = sdefn list
 (* Pretty printing functions *)
 
 (* toString for Sast.gtype *)
-let rec string_of_typ = function
+(* let rec string_of_typ = function
     TYCON ty -> string_of_tycon ty
   | TYVAR tp -> string_of_tyvar tp
   | CONAPP con -> string_of_conapp con
@@ -152,20 +154,11 @@ and string_of_tycon = function
 and string_of_tyvar = function 
     TParam n -> string_of_int n
 and string_of_conapp (tyc, tys) = 
-  string_of_tycon tyc ^ " " ^ String.concat " " (List.map string_of_typ tys)
-
-(* and string_of_tycon = function 
-    "int"       -> "int"
-  | "bool"      -> "bool"
-  | "char"      -> "char"
-  | "tree"      -> "tree"
-  | "function"  -> "function"
-  | t -> "unrecognized_type_" ^ t
-and string_of_tyvar = function 
-    TParam n -> string_of_int n *)
-  (* | _ -> "unrecognized_type_" *)
+  string_of_tycon tyc ^ " " ^ String.concat " " (List.map string_of_typ tys) *)
 
 
+
+(* 
 (* toString for Sast.sexpr *)
 let rec string_of_sexpr (t, s) = 
     "[" ^ string_of_typ t ^ ": " ^ string_of_sx s ^ "]"
@@ -211,4 +204,4 @@ let string_of_sdefn = function
 
 (* toString for Sast.sprog *)
 let string_of_sprog defns = 
-    String.concat "\n" (List.map string_of_sdefn defns) ^ "\n"
+    String.concat "\n" (List.map string_of_sdefn defns) ^ "\n" *)

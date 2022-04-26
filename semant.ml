@@ -6,7 +6,7 @@ fun canonicalize; seems to generate the type variable names;
 *)
 
 open Ast
-open Sast
+open Tast
 
 module StringMap = Map.Make(String)
 
@@ -23,9 +23,9 @@ type func_decl = {
 let () = gamma := 
     let add_prints map (k, v) = 
       StringMap.add k v map 
-    in List.fold_left add_prints !gamma [ ("printi", funtype (inttype, [])); 
-                                               ("printc", funtype (chartype, [])); 
-                                               ("printb", funtype (booltype, [])) ]
+    in List.fold_left add_prints !gamma [("printi", funtype inttype []); 
+                                         ("printc", funtype chartype []); 
+                                         ("printb", funtype booltype []) ]
 
 (* Collection function declarations for built in prints *)
 let built_in_decls = ref StringMap.empty
@@ -61,57 +61,58 @@ let semantic_check (defns) =
 		| Literal(lit)          -> 
       let s = value lit in 
         ((match s with 
-            SInt _  -> inttype
-          | SChar _ -> chartype
-          | SBool _ -> booltype
-          | SRoot _ -> raise (Failure "TODO treetype"))
-        , SLiteral s)
-    | Var(x) -> (try (StringMap.find x gamma, SVar x) with Not_found -> raise (Failure ("not found var " ^ x)))
+            TInt _  -> inttype
+          | TChar _ -> chartype
+          | TBool _ -> booltype
+          | TRoot _ -> raise (Failure "TODO treetype"))
+        , TLiteral s)
+    | Var(x) -> (try (StringMap.find x gamma, TypedVar x) with Not_found -> raise (Failure ("not found var " ^ x)))
     | If(e1, e2, e3)           -> 
         let (t1, e1') = expr id e1 gamma in 
         let (t2, e2') = expr id e2 gamma in 
         let (t3, e3') = expr id e3 gamma in 
-        (t2, SIf ((t1, e1'), (t2, e2'), (t3, e3')))
+        (t2, TypedIf ((t1, e1'), (t2, e2'), (t3, e3')))
     | Apply(f, args)        -> 
         (* let (fty, app) = f in  *)
         (* t is a TArrow  *)
         let (t, f') = expr "" f gamma in 
         (* let () = print_endline ("type of apply expr: " ^ string_of_typ t) in  *)
         let t' = (match t with 
-                    TYCON (TArrow (res, _)) -> res
-                  | _ -> raise (Failure "Sast: applied non-function type")
+                    CONAPP (TArrow res, _) -> res
+                  | _ -> raise (Failure "Tast: applied non-function type")
                   ) in 
         let args' = List.map (fun e -> expr "" e gamma) args in 
-        (t', SApply ((t', f'), args'))
+        (t', TypedApply ((t', f'), args'))
     | Let(bs, body)             -> 
       let bs' = List.map (fun (x, ex) -> (x, expr x ex gamma)) bs in
       let gamma' = List.fold_left (fun map (x, (t, _)) -> StringMap.add x t map) 
                                   gamma bs'  in 
       let (ty, sbody) = expr id body gamma' in 
-      (ty, SLet (bs', (ty, sbody)))
+      (ty, TypedLet (bs', (ty, sbody)))
 
     (* Forces labda to be int type. *)
     | Lambda(formals, body) -> 
-        let formal_list = List.map (fun x -> (inttype, x)) formals in 
-        let (argsty, _) = List.split formal_list in
+        let formal_list = List.fold_left (fun (tys, idents) x -> ((TVariable 1) :: tys, x :: idents)) ([], []) formals in 
+        (* let (argsty, _) = List.split formal_list in *)
         let gamma' = List.fold_left (fun map x -> StringMap.add x inttype map) gamma formals in 
         let (retty, ex) = expr "" body gamma' in 
-        let fty = funtype (retty, argsty) in 
+        let gtys = (List.map (fun elem -> TYVAR elem) (fst formal_list)) in 
+        let fty = funtype retty gtys in 
         let _ = if (id = "") then () 
           else functions := StringMap.add id 
                                           { 
                                             rettyp = inttype;
                                             fname = id;
-                                            formals = formal_list;
+                                            formals = List.combine gtys (snd formal_list);
                                           } 
                                           !functions in 
-        (fty, SLambda (formal_list, (retty, ex)))
+        (fty, TypedLambda (formal_list, (retty, ex)))
   (* Returns the Sast.svalue version fo the given Ast.value *)
   and value = function 
-  	| Char(c)     -> SChar c
-    | Int(i)      -> SInt i
-    | Bool(b)     -> SBool b
-    | Root(_)     -> raise (Failure ("TODO - value to svalue of Root"))
+  	| Char(c)     -> TChar c
+    | Int(i)      -> TInt i
+    | Bool(b)     -> TBool b
+    | Root(_)     -> raise (Failure ("TODO - value to tvalue of Root"))
   in
 
   (* For the given Ast.defn, returns an Sast.sdefn, eventually should call 
@@ -120,8 +121,8 @@ let semantic_check (defns) =
 		| Val (name, e) -> 
 				let e' = expr name e !gamma in
         let () = gamma := StringMap.add name (fst e') !gamma in 
-				SVal(name, e')
-		| Expr e      -> SExpr (expr "" e !gamma)
+				TVal(name, e')
+		| Expr e      -> TExpr (expr "" e !gamma)
 
 
 in List.map check_defn defns 
