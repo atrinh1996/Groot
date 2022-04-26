@@ -38,10 +38,8 @@ let () =
 			| Ast -> print_string (Ast.string_of_prog ast)
 			(* All other action needs to generate an SAST, store in variable sast *)
 			| _ -> 
-				let tast = Infer.type_infer ast in
-					  print_string 
-					  (Tast.string_of_tprog 
-					  tast)
+				let tast = Infer.type_infer ast in 
+				print_string (Tast.string_of_tprog tast)
 					(* match !action with  *)
 				(* in sast *)
 					  (* This option doesn't do anything, just need it to satisfy 

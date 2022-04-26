@@ -83,7 +83,6 @@ and string_of_gencons = function
 (* ty_error msg: reports a type error by raising [Type_error msg]. *)
 (* let type_error msg = raise (Type_error msg) *)
 
-
 (* is_free_type_var: returns false if no type variable is free, else returns the type variable *)
 let rec is_free_type_var var gt = 
   match gt with
@@ -91,6 +90,30 @@ let rec is_free_type_var var gt =
   | TYVAR tvar -> var = tvar
   | CONAPP tcon -> 
     List.fold_left (fun acc x -> is_free_type_var var x || acc) false (snd tcon)
+
+
+let rec ftvs (ty : gtype) = 
+  match ty with
+  | TYVAR t -> [t]
+  | TYCON _ -> []
+  | CONAPP a -> List.fold_left (fun acc x -> acc @ (ftvs x)) [] (snd a)
+
+let tysubst (theta: (tyvar * gtype) list) (t : gtype) (ftvs: tyvar list) =
+match t with
+| TYVAR t -> let (_, tau) = List.find (fun (x : tyvar * gtype) -> (fst x) = t) theta in if (List.exists (fun x -> x = t) ftvs) then tau else TYVAR t 
+| TYCON c -> TYCON c
+| _ -> raise (Type_error "missing case for CONAPP")
+(* | CONAPP a -> CONAPP ((tysubst theta (fst a) ftvs), List.map (fun x -> tysubst theta x ftvs) (snd a)) *)
+
+let rec sub_theta_into_gamma (theta : (tyvar * gtype) list) (gamma : (ident * tyscheme) list) = 
+  match gamma with
+    | [] -> []
+    | (g :: gs) -> 
+      let (name, tysch) = g in
+      let (bound_types, btypes) = tysch in
+      let freetypes = List.filter (fun (x : tyvar) -> List.exists (fun (y : tyvar) -> y = x) bound_types) (ftvs btypes) in
+      let new_btype = tysubst theta btypes freetypes in
+      (name, (bound_types, new_btype)) :: sub_theta_into_gamma theta gs 
 
 
 (* fresh: returns an unused type variable *)
@@ -214,7 +237,17 @@ let rec generate_constraints gctx e =
       (retType, 
         (t1, (CONAPP (TArrow retType, ts2)))::c2, 
         (CONAPP (TArrow retType, ts2), TypedApply(tex1, texs2)))
-    | Let (_, _) -> raise (Type_error "missing case for Let")
+    | Let (bindings, expr) ->
+    	let ctx1, cs = (List.fold_left (fun (running_ctx, running_cons) (id, e) -> 
+    		let new_ty, new_con, _ = generate_constraints ctx e in
+  			((id, ([], new_ty))::running_ctx, new_con @ running_cons)) (ctx, []) bindings) in
+    	let ctx' = sub_theta_into_gamma 
+    	cs
+    	 ctx in
+			let t, c, tex = generate_constraints ctx' expr in
+			(t, 
+				cs @ c, 
+				TypedLet(fs, tex))
     | Lambda (formals, body) -> 
       (* Constrain each formal (string) to fresh type var. fresh returns the
          gtype: TYVAR (TVariable int).
@@ -226,9 +259,6 @@ let rec generate_constraints gctx e =
       let new_context = binding @ ctx in
       let (t, c, tex) = generate_constraints new_context body in
       let formaltys = snd (List.split (snd (List.split binding))) in
-      (* let formal_tyvars_as_gtype = snd (List.split (snd (List.split binding))) in *)
-      (* let formal_tyvars_as_gtype = (List.map (fun (_, (_, x)) -> x) binding) in *)
-      (* let formal_tyvars =          (List.map (fun (_, (_, x)) -> x) binding) in *)
       let typedFormals = List.combine formaltys formals in 
       (CONAPP (TArrow t, formaltys), c,
         (CONAPP (TArrow t, formaltys), TypedLambda (typedFormals, tex)))
@@ -244,37 +274,6 @@ let rec generate_constraints gctx e =
       | Branch _ -> raise (Failure ("Infer TODO: generate constraints for Branch"))
   in constrain gctx e
 
-
-let rec ftvs (ty : gtype) = 
-  match ty with
-  | TYVAR t -> [t]
-  | TYCON _ -> []
-  | CONAPP a -> List.fold_left (fun acc x -> acc @ (ftvs x)) [] (snd a)
-
-(* let subst (theta : (tyvar * gtype) list) (t : gtype) (ftvs: tyvar list) =
-  match t with
-  | TYVAR t -> List.find (fun (x : tyvar * gtype) -> x = (t, TYVAR t)) theta
-  | TYCON c -> (TYCON c, t)
-  | CONAPP a -> (CONAPP a, t) *)
-
-
-let tysubst (theta: (tyvar * gtype) list) (t : gtype) (ftvs: tyvar list) =
-  match t with
-  | TYVAR t -> let (_, tau) = List.find (fun (x : tyvar * gtype) -> (fst x) = t) theta in if (List.exists (fun x -> x = t) ftvs) then tau else TYVAR t 
-  | TYCON c -> TYCON c
-  | _ -> raise (Type_error "missing case for CONAPP")
-  (* | CONAPP a -> CONAPP ((tysubst theta (fst a) ftvs), List.map (fun x -> tysubst theta x ftvs) (snd a)) *)
-
-
-let rec sub_theta_into_gamma (theta : (tyvar * gtype) list) (gamma : (ident * tyscheme) list) = 
-  match gamma with
-    | [] -> []
-    | (g :: gs) -> 
-      let (name, tysch) = g in
-      let (bound_types, btypes) = tysch in
-      let freetypes = List.filter (fun (x : tyvar) -> List.exists (fun (y : tyvar) -> y = x) bound_types) (ftvs btypes) in
-      let new_btype = tysubst theta btypes freetypes in
-      (name, (bound_types, new_btype)) :: sub_theta_into_gamma theta gs 
 
 
 (* get_constraints should resturn a list of tasts *)
