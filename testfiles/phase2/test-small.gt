@@ -1,1 +1,7 @@
-(printi (let ([x 5]) x))
+(val x 42)
+(printi x)
+
+(;
+(val prnt (lambda (n) (printi n)))
+(prnt 9)
+;)

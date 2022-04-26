@@ -20,17 +20,22 @@ let translate { main = main;  functions = functions;
         Intty                -> int_ty
       | Boolty               -> bool_ty
       | Charty               -> char_ty
-      | Tarrow (ret, args)  -> 
-          let llretty = ltype_of_ctype ret in 
-          let llargtys = List.map ltype_of_ctype args in 
-          L.pointer_type (L.function_type llretty (Array.of_list llargtys))
+      | Tarrow ret  -> 
+          (* let llretty =  *)
+          ltype_of_ctype ret 
+          (* in 
+          let llargtys = List.map ltype_of_ctype args in  *)
+          (* L.pointer_type (L.function_type llretty (Array.of_list llargtys)) *)
       | Clo (sname, _, _) -> 
           L.pointer_type (StringMap.find sname struct_table)
     and ltype_of_tyvar = function 
         (* What is this type even? *)
         Tparam _ -> void_ty
-        (* And what types do conapps represent? *)
-    and ltype_of_conapp (tyc, _) = ltype_of_tycon tyc
+        (* And what types do conapps represent? Function type *)
+    and ltype_of_conapp (tyc, ctys) = 
+          let llretty = ltype_of_tycon tyc in 
+          let llargtys = List.map ltype_of_ctype ctys in 
+          L.pointer_type (L.function_type llretty (Array.of_list llargtys))
     in  ltype_of_ctype ty 
   in
 
@@ -130,11 +135,11 @@ let translate { main = main;  functions = functions;
         Intty            -> L.const_int  lltyp 0
       | Boolty           -> L.const_int  lltyp 0
       | Charty           -> L.const_int  lltyp 0
-      | Tarrow (_, _)    -> L.const_pointer_null lltyp
+      | Tarrow _         -> L.const_pointer_null lltyp
       | Clo _            -> L.const_pointer_null lltyp
     and const_tyvar = function 
         Tparam _ -> raise (Failure ("TODO: lltype of TParam"))
-    and const_conapp (tyc, _) = const_tycon tyc
+    and const_conapp (_, _) = L.const_pointer_null lltyp
     in 
     let init = const_typ ty in 
     L.define_global id init the_module
@@ -244,7 +249,7 @@ let translate { main = main;  functions = functions;
                                         [| int_format_str ; argument |] 
                                         "printi" builder'
         in (builder', instruction)
-     | CApply ((_, CVar"printc"), [arg], _) -> 
+     | CApply ((_, CVar "printc"), [arg], _) -> 
         let (builder', argument) = expr builder lenv block arg in 
         let instruction = L.build_call  puts_func 
                                         [| argument |] 
