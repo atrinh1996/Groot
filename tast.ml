@@ -36,11 +36,11 @@ and tx =
     | TypedIf      of texpr * texpr * texpr
     | TypedApply   of texpr * texpr list
     | TypedLet     of (ident * texpr) list * texpr
-    | TypedLambda  of (tyvar list * ident list) * texpr
+    | TypedLambda  of (gtype * ident) list * texpr
+    (* | TypedLambda  of (tyvar list * ident list) * texpr *)
 and tvalue = 
     | TChar    of char
     | TInt     of int
-    (* | Float   of float *)
     | TBool    of bool
     | TRoot    of ttree
 and ttree =  
