@@ -29,7 +29,8 @@ let charty = Tycon Charty
 let boolty = Tycon Boolty
 (* let treetype ty = CONAPP () *)
 (* let funty (ret, args) = Tycon (Tarrow (ret, args)) *)
-let funty (ret, args) = Conapp (Tarrow ret, args)
+let funty (ret, args) = 
+        Conapp (Tarrow ret, args)
 let closurety (id, functy, freetys) = 
         Tycon (Clo (id, functy, freetys))
 
@@ -190,11 +191,11 @@ in String.concat "\n" (List.map string_of_struct structss)
 
 let string_of_cprog { main = main; functions = functions; 
                       rho = rho;   structures = structures } = 
-    print_endline "Main:";
-    print_endline (string_of_main main);
-    print_endline "Functions:";
-    print_endline (string_of_functions functions);
-    print_endline "Rho:";
-    print_endline (string_of_rho rho);
-    print_endline "Structures:";
-    print_endline (string_of_structures structures);
+    "Main:\n" ^
+    string_of_main main ^ "\n\n" ^
+    "Functions:\n" ^
+    string_of_functions functions ^ "\n\n" ^
+    "Rho:\n" ^
+    string_of_rho rho ^ "\n\n" ^
+    "Structures:\n" ^
+    string_of_structures structures ^ "\n\n" 

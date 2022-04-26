@@ -1,2 +1,7 @@
+(val x 42)
+(printi x)
+
+(;
 (val prnt (lambda (n) (printi n)))
 (prnt 9)
+;)

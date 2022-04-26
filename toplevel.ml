@@ -3,7 +3,7 @@ type action =
 	  Ast 
 	| Name_Check
 	| Tast 
-	(* | Cast  *)
+	| Cast 
 	(* | LLVM_IR *)
  	(* | Compile *)
 
@@ -16,7 +16,7 @@ let () =
 		("-a", Arg.Unit (set_action Ast), 		"Print the AST (default)");
 		("-n", Arg.Unit (set_action Name_Check), 	"Print the AST (name-checking)");
     	("-t", Arg.Unit (set_action Tast), 		"Print the TAST");
-    	(* ("-v", Arg.Unit (set_action Cast), 	"Print the CAST"); *)
+    	("-v", Arg.Unit (set_action Cast), 	"Print the CAST");
     	(* ("-l", Arg.Unit (set_action LLVM_IR), 	"Print the generated LLVM IR"); *)
     	(* ("-c", Arg.Unit (set_action Compile), *)
 			(* "Check and print the generated LLVM IR"); *)
@@ -36,7 +36,7 @@ let () =
 				let ast' = Scope.check ast in 
 				(* let tast = Semant.semantic_check ast' in *)
 				let tast = Infer.type_infer ast' in
-				(* let cast = Conversion.conversion tast in  *)
+				let cast = Conversion.conversion tast in 
 					match !action with 
 				(* in sast *)
 					  (* This option doesn't do anything, just need it to satisfy 
@@ -49,7 +49,7 @@ let () =
 					| Tast -> print_string (Tast.string_of_tprog tast)
 						(* print_endline ("Tast was generated, no pretty print") *)
 						(* print_string (Tast.string_of_tprog tast) *)
-					(* | Cast -> Cast.string_of_cprog cast *)
+					| Cast -> print_string (Cast.string_of_cprog cast)
 					(* action - print the llvm module. Codegen.translate produces the llmodule
 					     from the given SAST called sast and then Llvm.string_of_llmodule converts it to string.
 					     Here is the RHS code: 
