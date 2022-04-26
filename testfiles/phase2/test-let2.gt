@@ -1,0 +1,2 @@
+(val x (let ([a 5]) (lambda () a)))
+(printi (x))

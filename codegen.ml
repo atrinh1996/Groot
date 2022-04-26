@@ -244,7 +244,7 @@ let translate { main = main;  functions = functions;
                                         [| int_format_str ; argument |] 
                                         "printi" builder'
         in (builder', instruction)
-     | CApply ((_, CVar"printc"), [arg], _) -> 
+     | CApply ((_, CVar "printc"), [arg], _) -> 
         let (builder', argument) = expr builder lenv block arg in 
         let instruction = L.build_call  puts_func 
                                         [| argument |] 

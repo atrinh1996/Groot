@@ -1,12 +1,78 @@
-(* Semantically-checked Abstract Syntax Tree and functions for printing it *)
+(* 
+    TAST
+    Type inference.  
+*)
 
 open Ast
 
-(* TYPES *)
-(* type tycon = string  *)
-(* type tyvar = TParam of int *)
-
 type gtype =
+  | TYCON of tycon
+  | TYVAR of tyvar
+  | CONAPP of conapp
+and tycon =
+  | TInt 
+  | TBool 
+  | TChar 
+  | TArrow of gtype 
+and tyvar =
+    | TVariable of int 
+and conapp = (tycon * gtype list)
+
+type tyscheme = (tyvar list * gtype)
+
+
+let inttype = TYCON TInt 
+let chartype = TYCON TChar
+let booltype = TYCON TBool
+
+
+(* TAST expression *)
+type texpr = gtype * tx
+and tx = 
+    | TLiteral of tvalue
+    | TypedVar     of ident
+    | TypedIf      of texpr * texpr * texpr
+    | TypedApply   of texpr * texpr list
+    | TypedLet     of (ident * texpr) list * texpr
+    | TypedLambda  of (tyvar list * ident list) * texpr
+and tvalue = 
+    | TChar    of char
+    | TInt     of int
+    (* | Float   of float *)
+    | TBool    of bool
+    | TRoot    of ttree
+and ttree =  
+    | TLeaf
+    | TBranch of tvalue * ttree * ttree
+
+
+type tdefn = 
+    | TVal of ident * texpr
+    | TExpr of texpr
+
+
+type tprog = tdefn list 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+(* Semantically-checked Abstract Syntax Tree and functions for printing it *)
+
+(* open Ast *)
+
+
+
+(* type gtype =
     TYCON of tycon
   | TYVAR of tyvar
   | CONAPP of conapp 
@@ -22,13 +88,8 @@ and conapp = (tycon * gtype list)
 let inttype = TYCON TInt 
 let chartype = TYCON TChar
 let booltype = TYCON TBool
-(* let treetype ty = CONAPP () *)
 
-(* function type, res is a tycon, args is gtype list *)
-(* let funtype (args, res) = CONAPP (res, args) *)
-
-(* Alt function type: res is a gtype, args is a gtype list*)
-let funtype (res, args) = TYCON (TArrow (res, args))
+let funtype (res, args) = TYCON (TArrow (res, args)) *)
 
 
 
@@ -51,7 +112,7 @@ let funtype (args, res) =
 
 
 (* NOTE: SEXPR is a tupe of SAST.gtype * SEXPRESSION (sx) *)
-type sexpr = gtype * sx
+(* type sexpr = gtype * sx
 and sx = 
     SLiteral of svalue
   | SVar     of ident
@@ -66,15 +127,15 @@ and svalue =
   | SRoot    of stree
 and stree =  
     SLeaf
-  | SBranch of svalue * stree * stree
+  | SBranch of svalue * stree * stree *)
   (* NOTE: the sastSBranch  does not store sexpr, not directly analogous to AST Branch *)
 
-type sdefn = 
+(* type sdefn = 
   | SVal of ident * sexpr
   | SExpr of sexpr
 
 type sprog = sdefn list
-
+ *)
 
 (* Pretty printing functions *)
 

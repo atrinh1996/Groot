@@ -15,6 +15,9 @@ let prerho env =
                                     ("printb", (0, boolty)); 
                                     ("printc", (0, charty)); ]
 
+(* list of variable names that get ignored/are not to be considered frees *)
+let ignores = ["printi"; "printb"; "printc"; "+"]
+
 (* partial cprog to return from this module *)
 let res = 
 {
@@ -98,9 +101,15 @@ let freeIn exp n =
 
 (* Given the formals list and body of a lambda (xs, e), and a 
    variable environment, the function returns an environment with only 
-   the free variables of this lambda. *)
+   the free variables of this lambda. The environment of frees shall
+   not inculde the names of built-in functions and primitives *)
 let improve (xs, e) rho = 
-  StringMap.filter (fun n _ -> freeIn (SLambda (xs, e)) n) rho
+  StringMap.filter 
+    (fun n _ -> 
+        if List.mem n ignores
+          then false
+        else freeIn (SLambda (xs, e)) n) 
+    rho
 
 (* removes any occurrance of things in no_no list from the env (StringMap)
    and returns the new StringMap *)
