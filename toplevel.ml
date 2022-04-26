@@ -3,9 +3,9 @@ type action =
 	  Ast 
 	| Name_Check
 	| Tast 
-	| Cast 
-	| LLVM_IR
- 	| Compile
+	(* | Cast  *)
+	(* | LLVM_IR *)
+ 	(* | Compile *)
 
 
 
@@ -16,10 +16,10 @@ let () =
 		("-a", Arg.Unit (set_action Ast), 		"Print the AST (default)");
 		("-n", Arg.Unit (set_action Name_Check), 	"Print the AST (name-checking)");
     	("-t", Arg.Unit (set_action Tast), 		"Print the TAST");
-    	("-v", Arg.Unit (set_action Cast), 	"Print the CAST");
-    	("-l", Arg.Unit (set_action LLVM_IR), 	"Print the generated LLVM IR");
-    	("-c", Arg.Unit (set_action Compile),
-			"Check and print the generated LLVM IR");
+    	(* ("-v", Arg.Unit (set_action Cast), 	"Print the CAST"); *)
+    	(* ("-l", Arg.Unit (set_action LLVM_IR), 	"Print the generated LLVM IR"); *)
+    	(* ("-c", Arg.Unit (set_action Compile), *)
+			(* "Check and print the generated LLVM IR"); *)
 	] in
 
 	let usage_msg = "usage: ./toplevel.native [-a|-n|-t|-v|-l|-c] [file.gt]" in
@@ -34,8 +34,9 @@ let () =
 			(* All other action needs to generate an SAST, store in variable sast *)
 			| _ -> 
 				let ast' = Scope.check ast in 
-				let tast = Semant.semantic_check ast' in
-				let cast = Conversion.conversion tast in 
+				(* let tast = Semant.semantic_check ast' in *)
+				let tast = Infer.type_infer ast' in
+				(* let cast = Conversion.conversion tast in  *)
 					match !action with 
 				(* in sast *)
 					  (* This option doesn't do anything, just need it to satisfy 
@@ -45,16 +46,17 @@ let () =
 					  (* action - prints the SAST using sast.
 					     Here is the RHS code: 
 					     print_string (Sast.string_of_sprog sast) *)
-					| Tast -> print_endline ("Tast was generated, no pretty print")
+					| Tast -> print_string (Tast.string_of_tprog tast)
+						(* print_endline ("Tast was generated, no pretty print") *)
 						(* print_string (Tast.string_of_tprog tast) *)
-					| Cast -> Cast.string_of_cprog cast
+					(* | Cast -> Cast.string_of_cprog cast *)
 					(* action - print the llvm module. Codegen.translate produces the llmodule
 					     from the given SAST called sast and then Llvm.string_of_llmodule converts it to string.
 					     Here is the RHS code: 
 					     print_string (Llvm.string_of_llmodule (Codegen.translate sast)) 
 					  *)
-					| LLVM_IR -> print_string (Llvm.string_of_llmodule (Codegen.translate cast))
+					(* | LLVM_IR -> print_string (Llvm.string_of_llmodule (Codegen.translate cast)) *)
 					  (* action - print the llvm module. See above. *)
-					| Compile -> let the_module = Codegen.translate cast in 
+					(* | Compile -> let the_module = Codegen.translate cast in 
 										Llvm_analysis.assert_valid_module the_module;
-										print_string (Llvm.string_of_llmodule the_module)
+										print_string (Llvm.string_of_llmodule the_module) *)
