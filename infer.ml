@@ -5,83 +5,9 @@ module StringMap = Map.Make (String)
 
 exception Type_error of string
 
-(* type gtype =
-  | TYCON of tycon
-  | TYVAR of tyvar
-  | CONAPP of conapp
-and tycon =
-  | TInt                                          (** integers [int] *)
-  | TBool                                         (** booleans [bool] *)
-  | TChar                                         (** chars    [char] *)
-  | TArrow of gtype                               (** Function type [s -> t] *)
-    How do functions work? A function is encoded as a CONAPP of TArrow 
-       where the TArrow's gtype is the return type and the gtype list 
-       associated with the CONAPP is the types of the arguments
-  (* | TTree of gtype * gscheme * gscheme         (** Trees *) *)
-and tyvar =
-  | TVariable of int                              (** parameter *)
-and conapp = (tycon * gtype list)
-
-type tyscheme = (tyvar list * gtype)
-
-
-let functiontype resultType formalsTypes = CONAPP (TArrow resultType, formalsTypes) *)
-
-
-(* TAST Types*)
-(* type texpr = gtype * tx
-  and tx = 
-    | TLiteral     of tvalue
-    | TypedVar     of ident
-    | TypedIf      of texpr * texpr * texpr
-    | TypedApply   of texpr * texpr list
-    | TypedLet     of (ident * texpr) list * texpr
-    | TypedLambda  of (gtype * ident) list * texpr
-    | TypedLambda  of (gtype * ident) list * texpr
-  and tvalue = 
-    | TChar    of char
-    | TInt     of int
-    | TBool    of bool
-    | TRoot    of ttree
-  and ttree =  
-    | TLeaf
-    | TBranch of tvalue * ttree * ttree
-
-type tdefn = 
-  | TVal of ident * texpr
-  | TExpr of texpr
-  
-type tprog = tdefn list  *)
-
-
-
-(* Printing *)
-(* let rec string_of_typ = function
-  | TYCON ty -> string_of_tycon ty
-  | TYVAR tp -> string_of_tyvar tp
-  | CONAPP con -> string_of_conapp con
-and string_of_tycon = function 
-  | TInt -> "int"
-  | TBool -> "bool"
-  | TChar -> "char"
-  | TArrow a -> string_of_typ (a)
-and string_of_tyvar = function 
-  | TVariable n -> "tyvar" ^ string_of_int n
-and string_of_conapp (tyc, tys) = 
-  "conapp: " ^ string_of_tycon tyc ^ " " ^ String.concat " " (List.map string_of_typ tys)
-and string_of_constraints = function
-  | [] -> ""
-  | (f, s)::cs -> "(" ^ string_of_typ f ^ ", " ^ string_of_typ s ^ ") " ^ string_of_constraints cs
-and string_of_gencons = function
-  | [] -> ""
-  | (g, lcons)::gs -> "(" ^ string_of_typ g ^ ", " ^ string_of_constraints lcons ^ ") " ^ string_of_gencons gs *)
-(* End Printing *)
-
-
-
 (* Begin Type Inferencer *)
 (* ty_error msg: reports a type error by raising [Type_error msg]. *)
-(* let type_error msg = raise (Type_error msg) *)
+let type_error msg = raise (Type_error msg)
 
 (* is_free_type_var: returns false if no type variable is free, else returns the type variable *)
 let rec is_free_type_var var gt = 
@@ -212,7 +138,7 @@ and solve (constraints : (gtype * gtype) list) =
 (* (ctx : (ident * tyscheme) list ) *)
 (* type tyscheme = (tyvar list * gtype) *)
 (* generate_constraints:
-    returns: gtype * (gtype * gtype) list * tx                                *)
+    returns: Tast.gtype * (Tast.gtype * Tast.gtype) list * (Tast.gtype * Tast.tx) *)
 let rec generate_constraints gctx e =
   let rec constrain ctx e =
     match e with
@@ -237,17 +163,19 @@ let rec generate_constraints gctx e =
       (retType, 
         (t1, (CONAPP (TArrow retType, ts2)))::c2, 
         (CONAPP (TArrow retType, ts2), TypedApply(tex1, texs2)))
-    | Let (bindings, expr) ->
-    	let ctx1, cs = (List.fold_left (fun (running_ctx, running_cons) (id, e) -> 
-    		let new_ty, new_con, _ = generate_constraints ctx e in
-  			((id, ([], new_ty))::running_ctx, new_con @ running_cons)) (ctx, []) bindings) in
-    	let ctx' = sub_theta_into_gamma 
-    	cs
-    	 ctx in
-			let t, c, tex = generate_constraints ctx' expr in
-			(t, 
-				cs @ c, 
-				TypedLet(fs, tex))
+    | Let (bindings, expr) -> raise (Type_error "missing case for CONAPP")
+      (* let ctx1, cs = List.fold_left (fun (nctx, ncons) (id, e) -> 
+          let new_ty, new_con, _ = generate_constraints ctx e in
+          ([id, ([], new_ty)] @ nctx), 
+          (new_con @ ncons)) 
+        (ctx, []) bindings in
+      (* let ctx' = ctx1 @ ctx in *)
+      (* let tbinds = List.map *)
+      let t, c, tex = generate_constraints ctx1 expr in
+      (t, 
+      (c @ cs), 
+      (t, (TypedLet (bindings, tex)))
+      ) *)
     | Lambda (formals, body) -> 
       (* Constrain each formal (string) to fresh type var. fresh returns the
          gtype: TYVAR (TVariable int).
