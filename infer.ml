@@ -33,7 +33,8 @@ let fresh =
 
 (* sub - updates a list of constraints with any substitutions in theta *)
 let sub (theta : (tyvar * gtype) list) (cns : (gtype * gtype) list) =
-  (* sub1: takes in a single constraint and updates it with any substitutions in theta *)
+  (* sub1 - takes in a single constraint and updates it with any substitutions
+            in theta *)
   let sub1 cn = 
     List.fold_left 
       (fun (acc : (gtype * gtype)) (one_sub : tyvar * gtype) ->
