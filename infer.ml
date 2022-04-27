@@ -114,7 +114,7 @@ let rec solve' c1 =
   | (TYCON _, CONAPP _) -> raise (Type_error "type error: (tycon, conapp")
   | (CONAPP a, TYVAR t) -> solve' (TYVAR t, CONAPP a)
   | (CONAPP _, TYCON _) -> raise (Type_error "type error: (conapp, tycon")
-  | (CONAPP a1, CONAPP a2) -> solve ((List.combine (snd a1) (snd a2)) @ [((TYCON (fst a1), TYCON (fst a2)))])
+  | (CONAPP a1, CONAPP a2) -> solve ((List.combine (snd a1) (snd a2)) @ [(TYCON (fst a1), TYCON (fst a2))])
 
 
 (* solve: *)
@@ -159,11 +159,35 @@ let rec generate_constraints gctx e =
         let t, c, x = generate_constraints ctx e in 
         let ts, cs, xs = acc in (t::ts, c @ cs, x::xs)) 
       ([], c1, []) args in
-      let retType = fresh () in 
+      let retType = (fresh ()) in
       (retType, 
         (t1, (CONAPP (TArrow retType, ts2)))::c2, 
-        (CONAPP (TArrow retType, ts2), TypedApply(tex1, texs2)))
-    | Let (bindings, expr) -> raise (Type_error "missing case for CONAPP")
+        (retType, TypedApply(tex1, texs2)))
+        (* bindings: (Ast.ident * Ast.expr) list *)
+    | Let (bindings, expr) ->
+        let l = List.map (fun (n, e) -> generate_constraints ctx e) bindings in
+          let cns = List.flatten (List.map (fun (_, c, _) -> c) l) in
+            let taus = List.map (fun (t,_, _) -> t) l in
+              let asts = List.map (fun (_, _, a) -> a) l in
+                let names = List.map fst bindings in
+                  let ctx_addition = List.map (fun (n, t) -> (n, ([], t))) (List.combine names taus) in
+                    let new_ctx = ctx_addition @ ctx in
+                      let (b_tau, b_cns, b_tast) = generate_constraints new_ctx expr in
+                        (b_tau, b_cns @ cns, (b_tau, TypedLet((List.combine names asts) , b_tast)))
+
+(*       let tys, cons, texps = 
+        List.fold_left (fun acc (x, e) ->
+          let t, c, x = generate_constraints ctx e in
+          let ts, cs, xs = acc in (t::ts, c @ cs, x::xs))
+        ([], [], []) bindings in
+      let ctx' = List.map (fun (x, e) -> (x, (tys, fresh() ))) bindings in
+      let (t, c, tex) = generate_constraints ctx' expr in
+      (t, cons @ c,(TypedLet(texps, tex)))
+ *)
+
+
+        
+      
       (* let ctx1, cs = List.fold_left (fun (nctx, ncons) (id, e) -> 
           let new_ty, new_con, _ = generate_constraints ctx e in
           ([id, ([], new_ty)] @ nctx), 
