@@ -5,12 +5,8 @@ module StringMap = Map.Make (String)
 
 exception Type_error of string
 
-(* Begin Type Inferencer *)
-(* ty_error msg: reports a type error by raising [Type_error msg]. *)
-let type_error msg = raise (Type_error msg)
-
-
-(* is_free_type_var: returns false if no type variable is free, else returns the type variable *)
+(* is_free_type_var - returns false if no type variable is free, else returns 
+                      the type variable *)
 let rec is_free_type_var var gt = 
   match gt with
   | TYCON _ -> false
@@ -19,7 +15,8 @@ let rec is_free_type_var var gt =
     List.fold_left (fun acc x -> is_free_type_var var x || acc) false (snd tcon)
 
 
-(* ftvs: returns a list of free type variables amongst a collection of gtypes  *)
+(* ftvs - returns a list of free type variables amongst a collection of
+          gtypes *)
 let rec ftvs (ty : gtype) = 
   match ty with
   | TYVAR t -> [t]
@@ -27,33 +24,14 @@ let rec ftvs (ty : gtype) =
   | CONAPP a -> List.fold_left (fun acc x -> acc @ (ftvs x)) [] (snd a)
 
 
-let tysubst (theta: (tyvar * gtype) list) (t : gtype) (ftvs: tyvar list) =
-match t with
-| TYVAR t -> let (_, tau) = List.find (fun (x : tyvar * gtype) -> (fst x) = t) theta in if (List.exists (fun x -> x = t) ftvs) then tau else TYVAR t 
-| TYCON c -> TYCON c
-| _ -> raise (Type_error "missing case for CONAPP")
-(* | CONAPP a -> CONAPP ((tysubst theta (fst a) ftvs), List.map (fun x -> tysubst theta x ftvs) (snd a)) *)
-
-
-let rec sub_theta_into_gamma (theta : (tyvar * gtype) list) (gamma : (ident * tyscheme) list) = 
-  match gamma with
-    | [] -> []
-    | (g :: gs) -> 
-      let (name, tysch) = g in
-      let (bound_types, btypes) = tysch in
-      let freetypes = List.filter (fun (x : tyvar) -> List.exists (fun (y : tyvar) -> y = x) bound_types) (ftvs btypes) in
-      let new_btype = tysubst theta btypes freetypes in
-      (name, (bound_types, new_btype)) :: sub_theta_into_gamma theta gs 
-
-
-(* fresh: returns a fresh gtype variable (integer) *)
+(* fresh - returns a fresh gtype variable (integer) *)
 let fresh =
   let k = ref 0 in
   (* fun () -> incr k; TVariable !k *)
     fun () -> incr k; TYVAR (TVariable !k)
 
 
-(* sub: updates a list of constraints with any substitutions in theta *)
+(* sub - updates a list of constraints with any substitutions in theta *)
 let sub (theta : (tyvar * gtype) list) (cns : (gtype * gtype) list) =
   (* sub1: takes in a single constraint and updates it with any substitutions in theta *)
   let sub1 cn = 
@@ -75,9 +53,9 @@ let sub (theta : (tyvar * gtype) list) (cns : (gtype * gtype) list) =
   List.map sub1 cns
 
 
-(* compose: applies the substitutions in theta1 to theta2 TODO do we have to reverse it? *)
+(* compose - applies the substitutions in theta1 to theta2 *)
 let compose theta1 theta2 =
-  (* sub1: takes in a single substitution in theta1 and applies it to theta 2 *)
+  (* sub1 - takes a single substitution in theta1 and applies it to theta2 *)
   let sub1 cn = 
     List.fold_left 
     (fun (acc : tyvar * gtype) (one_sub : tyvar * gtype) ->
@@ -95,7 +73,7 @@ let compose theta1 theta2 =
   List.map sub1 theta2
 
 
-(* solve': *)
+(* solve' - solves a single constraints *)
 let rec solve' c1 = 
   match c1 with
   | (TYVAR t1, TYVAR t2) -> [(t1, TYVAR t2)]
@@ -104,17 +82,14 @@ let rec solve' c1 =
       if List.fold_left 
         (fun acc x -> (is_free_type_var t x || acc)) false (snd a)
       then raise (Type_error "type error")
-      else [(t, CONAPP a)]
+    else [(t, CONAPP a)]
   | (TYCON c, TYVAR t) -> solve' (TYVAR t, TYCON c)
   | (TYCON (TArrow (TYVAR a)), TYCON b) -> [(a, TYCON b)] 
   | (TYCON b, TYCON (TArrow (TYVAR a))) -> [(a, TYCON b)] 
   | (TYCON c1, TYCON c2) -> 
       if c1 = c2 
       then []
-      else 
-      (* let cone = string_of_tycon c1 in let _ = print_string cone in *)
-      (* let ctwo = string_of_tycon c2 in let _ = print_string ctwo in *)
-      raise (Type_error "type error: (tycon,tycon)")
+    else raise (Type_error "type error: (tycon,tycon)")
   | (TYCON _, CONAPP _) -> raise (Type_error "type error: (tycon, conapp")
   | (CONAPP a, TYVAR t) -> solve' (TYVAR t, CONAPP a)
   | (CONAPP _, TYCON _) -> raise (Type_error "type error: (conapp, tycon")
@@ -123,7 +98,6 @@ let rec solve' c1 =
 
 (* solve: *)
 and solve (constraints : (gtype * gtype) list) =
-(* solver: *) 
   let solver cns  =
     match cns with
     | [] -> []
@@ -135,11 +109,13 @@ and solve (constraints : (gtype * gtype) list) =
 
 
 (* generate_constraints gctx e: 
-    infers the type of expression 'e' and a set of constraints, 'gctx' refers to
-    the global context 'e' can refer to
-  ctx      : (ident * tyscheme) list
+    infers the type of expression 'e' and a generates a set of constraints,
+    'gctx' refers to the global context 'e' can refer to.
+
+  Type References:
+       ctx : (ident * tyscheme) list == ident * (tyvar list * gtype) list
   tyscheme : (tyvar list * gtype)
-  returns  : gtype * (gtype * gtype) list * (gtype * tx) *)
+   returns : gtype * (gtype * gtype) list * (gtype * tx) *)
 let rec generate_constraints gctx e =
   let rec constrain ctx e =
     match e with
@@ -164,7 +140,6 @@ let rec generate_constraints gctx e =
         (retType, 
           (t1, (CONAPP (TArrow retType, ts2)))::c2, 
           (retType, TypedApply(tex1, texs2)))
-        (* bindings: (Ast.ident * Ast.expr) list *)
     | Let (bindings, expr) ->
       let l = List.map (fun (n, e) -> generate_constraints ctx e) bindings in
       let cns = List.flatten (List.map (fun (_, c, _) -> c) l) in
@@ -177,12 +152,7 @@ let rec generate_constraints gctx e =
       let (b_tau, b_cns, b_tast) = generate_constraints new_ctx expr in
       (b_tau, b_cns @ cns, (b_tau, TypedLet((List.combine names asts), b_tast)))
     | Lambda (formals, body) -> 
-      (* Constrain each formal (string) to fresh type var. fresh returns the
-         gtype: TYVAR (TVariable int).
-         binding looks like a ctx:
-              ident * tyscheme == ident * (tyvar list * gtype) *)
       let binding = List.map (fun x -> (x, ([], fresh ()))) formals in
-      (* ctx : Ast.ident * ('a * gtype) *)
       let new_context = binding @ ctx in
       let (t, c, tex) = generate_constraints new_context body in
       let formaltys = snd (List.split (snd (List.split binding))) in
@@ -201,9 +171,10 @@ let rec generate_constraints gctx e =
       | Branch _ -> raise (Failure ("Infer TODO: generate constraints for Branch"))
   in constrain gctx e
 
-(* get_constraints should resturn a list of tasts *)
-(* TAST = [ (ident * (gtype * tx)) ] = [ (ident * texpr) | texpr ] = [ tdefns ] = *)
-(* type tyscheme = (tyvar list * gtype) *)
+
+(* get_constraints - returns a list of Tasts
+        Tast : [ (ident * (gtype * tx)) ] = [ (ident * texpr) | texpr ] = [ tdefns ]
+    tyscheme : (tyvar list * gtype) *)
 let rec get_constraints (ctx : (ident * tyscheme) list ) (d : defn list) =
   match d with
   | [] -> []
@@ -217,51 +188,48 @@ let rec get_constraints (ctx : (ident * tyscheme) list ) (d : defn list) =
     (t, c, TExpr tex) :: get_constraints ctx ds
 
 
-(* input: (tyvar * gtype) list *)
+(*  input: (tyvar * gtype) list *)
 (* return: tdefn -> tdefn *)
-  let apply_subs (sub : (tyvar * gtype) list) = match sub with
-  | [] -> (fun x -> x)
-  | xs -> 
-    let final_ans =
-      (fun tdef -> 
-        (* input: texpr *)
-        (* return: texpr *)
-        let rec expr_only_case (x : texpr) =
-          List.fold_left (fun (tast_gt, tast_tx) (tv, gt) -> 
-            let updated_tast_tx = match tast_tx with
-              | TypedIf (x, y, z) -> 
-                  TypedIf (expr_only_case x, expr_only_case y, expr_only_case z)
-              | TypedApply (x, xs) -> 
-                  TypedApply (expr_only_case x,(List.map expr_only_case xs))
-              | TypedLet ((its), x) -> TypedLet (List.map (fun (x, y) -> 
-                  (x, expr_only_case y)) its, expr_only_case x)
-              | TypedLambda (tyformals, z) -> 
-                  TypedLambda (tyformals, (expr_only_case z))
-              | TLiteral x -> TLiteral x
-              | TypedVar x -> TypedVar x
-            in 
-            if (TYVAR tv = tast_gt) then (gt, updated_tast_tx) 
-            else  (tast_gt, updated_tast_tx)) x xs
-          in
-        match tdef with 
-        | TVal (name, x) -> TVal (name, (expr_only_case x))
-        | TExpr x -> TExpr (expr_only_case x)
-      )
-    in final_ans
+let apply_subs (sub : (tyvar * gtype) list) = match sub with
+| [] -> (fun x -> x)
+| xs -> 
+  let final_ans =
+    (fun tdef -> let rec expr_only_case (x : texpr) =
+      List.fold_left (fun (tast_gt, tast_tx) (tv, gt) -> 
+        let updated_tast_tx = match tast_tx with
+          | TypedIf (x, y, z) -> 
+              TypedIf (expr_only_case x, expr_only_case y, expr_only_case z)
+          | TypedApply (x, xs) -> 
+              TypedApply (expr_only_case x,(List.map expr_only_case xs))
+          | TypedLet ((its), x) -> TypedLet (List.map (fun (x, y) -> 
+              (x, expr_only_case y)) its, expr_only_case x)
+          | TypedLambda (tyformals, z) -> 
+              TypedLambda (tyformals, (expr_only_case z))
+          | TLiteral x -> TLiteral x
+          | TypedVar x -> TypedVar x
+        in 
+        if (TYVAR tv = tast_gt) then (gt, updated_tast_tx) 
+        else  (tast_gt, updated_tast_tx)) x xs in
+      match tdef with 
+      | TVal (name, x) -> TVal (name, (expr_only_case x))
+      | TExpr x -> TExpr (expr_only_case x)
+    )
+  in final_ans
 
 
-(* currently is returning -> Infer.texpr list * (Infer.tyvar * Infer.gtype) list *)
-(*          should return -> tdefn list = (ident * (gtype * tx)) list *)
+(* type_infer
+      input : ( ident | ident * expr ) list
+    returns : ( ident * (gtype * tx) ) list *)
 let type_infer (ds : defn list) =
-    let type_infer' (ctx : (ident * tyscheme) list) =
-      let res = (get_constraints ctx ds) in
-      (* constraints -> gtype list *)
-      let constraints = List.flatten (List.map (fun (_, x, _) -> x) res) in
-      (* tasts -> tdefn list *)
-      let tdefns = (List.map (fun (_, _, x) -> x) res) in
-      (* subs -> (Infer.tyvar * Infer.gtype) list *)
-      let subs = solve constraints in
-      (* almost -> texpr list *)
-      let almost = List.map (apply_subs subs) tdefns in
-      almost
-    in type_infer' []
+  let type_infer' (ctx : (ident * tyscheme) list) =
+    let res = (get_constraints ctx ds) in
+    (* constraints -> gtype list *)
+    let constraints = List.flatten (List.map (fun (_, x, _) -> x) res) in
+    (* tasts -> tdefn list *)
+    let tdefns = (List.map (fun (_, _, x) -> x) res) in
+    (* subs -> (Infer.tyvar * Infer.gtype) list *)
+    let subs = solve constraints in
+    (* almost -> texpr list *)
+    let almost = List.map (apply_subs subs) tdefns in
+    almost
+  in type_infer' []
