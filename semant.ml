@@ -1,9 +1,3 @@
-(*
-fun canonicalize; seems to generate the type variable names;
-	'a through 'z
-	once those are exhausted, then v1 and up, to infinity
-
-*)
 
 open Ast
 open Tast
@@ -127,5 +121,4 @@ let semantic_check (defns) =
 
 in List.map check_defn defns 
 
-(* Probably will map a check-function over the defns (defn list : defs) *)
-(* check-function will take a defn and return an sdefn *)
+

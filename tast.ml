@@ -30,8 +30,7 @@ let chartype = TYCON TChar
 let booltype = TYCON TBool
 let functiontype resultType formalsTypes = 
         CONAPP (TArrow resultType, formalsTypes)
-(* let functiontype resultType formalsTypes = CONAPP (TArrow resultType, formalsTypes) *)
-(* let funtype resultType formalsTypes = CONAPP (TArrow resultType, formalsTypes) *)
+
 
 (* TAST expression *)
 type texpr = gtype * tx

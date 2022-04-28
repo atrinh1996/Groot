@@ -1,4 +1,14 @@
-(* Top-level of the groot compiler: scan & parse input, *)
+
+(* Top-level of the groot compiler: scan & parse input, 
+
+		TODO: generate the resulting AST and generate a SAST from it
+					generate LLVM IR, dump the module
+	*)
+
+(* may not need to use this, but this is how to robustly create unique exception
+   types
+ *)
+
 type action = 
 	  Ast 
 	| Name_Check
@@ -24,6 +34,7 @@ let () =
 			(* "Check and print the generated LLVM IR"); *)
 	] in
 
+
 	let usage_msg = "usage: ./toplevel.native [-a|-n|-t|-m|-v|-l|-c] [file.gt]" in
 	let channel = ref stdin in
 	Arg.parse speclist (fun filename -> channel := open_in filename) usage_msg;
@@ -32,16 +43,15 @@ let () =
 	let ast = Parser.prog Scanner.tokenize lexbuf in 
 		match !action with
 			(* Default action - print the AST using ast *)
-			  Ast     -> print_string (Ast.string_of_prog ast)
+			| Ast -> print_string (Ast.string_of_prog ast)
 			(* All other action needs to generate an SAST, store in variable sast *)
 			| _ -> 
 				let ast' = Scope.check ast in 
 				(* let tast = Semant.semantic_check ast' in *)
 				let tast = Infer.type_infer ast' in
-				(* let mast = Mono.monomorphize tast in *) 
+				let mast = Mono.monomorphize tast in 
 				(* let cast = Conversion.conversion tast in  *)
 					match !action with 
-				(* in sast *)
 					  (* This option doesn't do anything, just need it to satisfy 
 					     the pattern matching for type action. *)
 					  Ast -> ()
