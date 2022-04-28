@@ -1,0 +1,16 @@
+(val retn (lambda (n) n))
+(; (retn 9) ;)
+
+(val test (lambda () 
+		(retn 5)))
+		
+(test)
+
+(;
+(val x 42)
+(printi x)
+
+
+(val prnt (lambda (n) (printi n)))
+(prnt 9)
+;)

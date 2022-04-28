@@ -1,0 +1,3 @@
+(val x 42)
+(val retn (lambda (n m) n))
+(printi (retn x 9))

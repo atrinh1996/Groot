@@ -13,8 +13,8 @@
 #   Edited by Nick Gravel - to support testing groot language
 #
 
-make -q clean
-make -q toplevel.native
+make clean
+make toplevel.native
 
 GROOT="./toplevel.native"
 #GROOT="_build/toplevel.native"
@@ -48,7 +48,7 @@ SignalError() {
 # Compares the outfile with reffile.  Differences, if any, written to difffile
 Compare() {
     genfiles="$genfiles $3"
-    echo diff -b $1 $2 ">" $3 1>&2
+    echo "diff -b $1 $2 > $3 1>&2"
     diff -b "$1" "$2" > "$3" 2>&1 || {
 	SignalError "$1 differs"
 	echo "FAILED $1 differs from $2" 1>&2
@@ -59,8 +59,9 @@ Compare() {
 # Report the command, run it, and report any errors
 Run() {
     echo $* 1>&2
-    eval $* || {
-	SignalError "$1 failed on $*"
+    eval $* ||
+    {
+	SignalError "$1 failed on: $*"
 	return 1
     }
 }
@@ -81,11 +82,15 @@ Check() {
     error=0
     basename=`echo $1 | sed 's/.*\\///
                              s/.gt//'`
-    basedir="`echo $1 | sed 's/\/[^\/]*$//'`/"
+    basedir="`echo $1 | sed 's/\/[^\/]*$//'`"  
 
     # Make stdout, stderr, and diff if not yet created
     mkdir -p "${basedir}/stdout"
+    mkdir -p "${basedir}/ast"
     mkdir -p "${basedir}/diff"
+    mkdir -p "${basedir}/llvm"
+    mkdir -p "${basedir}/exe"
+    mkdir -p "${basedir}/err"
     
     echo -e "\033[1m${basename}:\033[0m"
 
@@ -93,16 +98,31 @@ Check() {
     echo "###### Testing $basename" 1>&2
    
     tstfile="$1"
-    reffile="${basedir}ref/${basename}.ref"
-    outfile="${basedir}stdout/${basename}.out"
-    diffile="${basedir}diff/${basename}.diff"
+
+    refstd="${basedir}/ref_std/${basename}.ref"
+    refllvm="${basedir}/ref_llvm/${basename}.ref"
+    refast="${basedir}/ref_ast/${basename}.ref"
+
+    astfile="${basedir}/ast/${basename}.ast"
+    llvmfile="${basedir}/llvm/${basename}.ll"
+    asmfile="${basedir}/llvm/${basename}.s"
+    outfile="${basedir}/stdout/${basename}.out"
+    errfile="${basedir}/stderr/${basename}.err"
+
+    diffile="${basedir}/diff/${basename}.diff"
 
     genfiles=""
 
     # Run the diff tests, store generated files
-    genfiles="$genfiles ${diffile} ${outfile}" &&
-    Run "$GROOT" "$tstfile" ">" "${outfile}" &&
-    Compare ${outfile} ${reffile} ${diffile}
+    genfiles="$genfiles ${diffile} ${outfile} ${astfile} ${llvmfile}" &&
+    Run "$GROOT" "-a" "$tstfile" ">" "${astfile}"                     &&
+    Run "$GROOT" "-l" "$tstfile" ">" "${llvmfile}"                    &&
+    Run "llc" "-relocation-model=pic" "${llvmfile}"                   &&
+    Run "cc" "-o" "${basedir}/exe/${basename}" "${asmfile}"           && 
+    Run "./${basedir}/exe/${basename} > ${outfile}"                   &&
+    Compare ${astfile} ${refast} ${diffile}                           &&
+    Compare ${llvmfile} ${refllvm} ${diffile}                         &&
+    Compare ${outfile} ${refstd} ${diffile}                           &&
 
     # Report the status and clean up the generated files
     if [ $error -eq 0 ] ; then
@@ -134,9 +154,9 @@ CheckFail() {
     echo "###### Testing $basename" 1>&2
 
     tstfile="$1"
-    reffile="${basedir}ref/${basename}.ref"
-    errfile="${basedir}stderr/${basename}.err"
-    diffile="${basedir}diff/${basename}.diff"
+    reffile="${basedir}/phase1/ref/${basename}.ref"
+    errfile="${basedir}/phase1/stderr/${basename}.err"
+    diffile="${basedir}/phase1/diff/${basename}.diff"
 
     genfiles=""
 
@@ -175,7 +195,7 @@ if [ $# -ge 1 ]
 then
     files=$@
 else
-    files="testfiles/test-*.gt testfiles/fail-*.gt"  # Default Test files
+    files="testfiles/phase2/*.gt"  # Default Test files
 fi
 
 # For each file in the files list

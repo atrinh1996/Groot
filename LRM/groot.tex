@@ -150,7 +150,7 @@
 
 
 
-\begin{document}
+\begin{document} 
 \title{(g)ROOT \\ Language Reference Manual}
 
 \begin{figure}
@@ -336,7 +336,7 @@ solving more complex problems.
 
 
     \subsection{How to read manual}
-    The syntax of the language will be given in BNF-like notation. Non-terminal symbol will be in italic font \emph{like-this}, square brackets [ … ] denote optional components, curly braces \{ … \} denote zero or more repetitions of the enclosed component,  and parentheses ( … ) denote a grouping.
+    The syntax of the language will be given in BNF-like notation. Non-terminal symbol will be in italic font \emph{like-this}, square brackets [ … ] denote optional components, curly braces \{ … \} denote zero or more repetitions of the enclosed component,  and parentheses ( … ) denote a grouping. Note the font, as \texttt{[ ... ]} and \texttt{( ... )} are syntax requirements later in the manual.
 
     \pagebreak
     %% End of Introduction %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -370,11 +370,11 @@ solving more complex problems.
 
         \subsection{Identifiers}
         \label{subsec:id}
-        Identifiers are sequences of letters, digits, and underscore characters (`\_'), starting with a letter. Letters consist of the 26 lowercase and 26 uppercase characters from the ASCII set.
+        Identifiers are sequences of letters, digits, and ASCII characters, starting with a letter. Letters consist of the 26 lowercase and 26 uppercase characters from the ASCII set. Identifiers may not start with an underscore character, and may not be any of the \hyperref[subsec:key]{reserved character sequences}. 
 
         \hspace{1cm}\begin{minipage}[h]{1\textwidth}
         \begin{grammar}
-            <ident> ::= \texttt{$letter$\ (\ $letter$ | $digit$ | \_ \ )}
+            <ident> ::= $letter$\ ( $letter$ | $digit$ | \_ \ )
             
             <letter> ::= \texttt{a...z\ |\ A...Z }
 
@@ -390,7 +390,7 @@ solving more complex problems.
 
             \hspace{1cm}\begin{minipage}[h]{1\textwidth}
             \begin{grammar}
-                <integer-literal> ::= \texttt{[-] $digit$ \{ $digit$ \}}
+                <integer-literal> ::= [\ -\ ] $digit$ \big\{$digit$\big\}
     
                 <digit> ::= \texttt{0...9 }
             \end{grammar}
@@ -403,7 +403,7 @@ solving more complex problems.
 
             \hspace{1cm}\begin{minipage}[h]{1\textwidth}
             \begin{grammar}
-                <boolean-literal> ::= \texttt{\# (\ t |\ f\ )}
+                <boolean-literal> ::= \texttt{\#} (\ \texttt{t} |\ \texttt{f}\ )
             \end{grammar}
             \end{minipage}
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -453,9 +453,14 @@ cld     sib         lambda
 ==      +       &&      >       '
 !=      -       ||      mod     #t
 <=      *       !       (       #f
->=      /       <       )
+>=      /       <       )       anon
 \end{lstlisting}
 \cbend
+
+        \subsection{Syntax}
+        \label{subsec:syn}
+
+        See \hyperref[sec:expr]{Definitions and Expression} for concrete syntax for each definition and expressions, with examples.
 
     \pagebreak
     %% End of Lexical Convention %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -531,24 +536,43 @@ represents the following tree (as drawn in normal binary tree form):
 
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Types}
+\label{sec:types}
+
+    \pagebreak
+    %% End of Values %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Expressions}
+\section{Definitions and Expressions}
 \label{sec:expr}
 
         \hspace{1cm}\begin{minipage}[h]{1\textwidth}
         \begin{grammar}
+            % defn ::= Val
+            <def> ::= \texttt{(}\ \texttt{val} \hyperref[subsec:id]{$ident$} $expr$ \texttt{)}\
+            % defn ::= Expr
+            \alt $expr$
 
+            % expr ::= lit
             <expr> ::= $literal$
+            % expr ::= var
             \alt \hyperref[subsec:id]{$ident$}
+            % expr ::= unary
             \alt \hyperref[subsec:op]{\emph{unary-operator}} $expr$
-            \alt (\ \hyperref[subsec:op]{\emph{binary-operator}} $expr$ $expr$)
-            \alt (\ \hyperref[subsec:id]{$ident$} \emph{expr-list}  )
-            \alt (\ \texttt{val} \hyperref[subsec:id]{$ident$} $expr$  )
-            \alt (\ \texttt{let} \hyperref[subsec:id]{$ident$} $expr$ $expr$  )
-            \alt (\ \texttt{if} $expr$ $expr$ $expr$  )
-            \alt (\ \texttt{lambda} (\ \{$arguments$\} )\ $expr$ )
+            % expr ::= bin
+            \alt \texttt{(}\ \hyperref[subsec:op]{\emph{binary-operator}} $expr$ $expr$ \texttt{)}
+            % expr ::= Application
+            \alt \texttt{(}\ \hyperref[subsec:id]{$ident$} \big\{\emph{expr}\big\} \texttt{)}
+            % expr ::= let
+            \alt \texttt{(}\ \texttt{let} \texttt{(}\  \texttt{[}\hyperref[subsec:id]{$ident$} $expr$\texttt{]}  \big\{\texttt{[}\hyperref[subsec:id]{$ident$} $expr$\texttt{]}\big\} \texttt{)}\ $expr$  \texttt{)}
+            % expr ::= if
+            \alt \texttt{(}\ \texttt{if} $expr$ $expr$ $expr$ \texttt{)}
+            % expr ::= lambda
+            \alt \texttt{(}\ \texttt{lambda} (\ \big\{$arguments$\big\} )\ $expr$ \texttt{)}
 
             <literal> ::=  \hyperref[subsec:intlit]{\emph{integer-literal}} |  \hyperref[subsec:boollit]{\emph{boolean-literal}} | \hyperref[subsec:charlit]{\emph{character}} | \hyperref[subsec:key]{leaf}
 
@@ -568,10 +592,10 @@ represents the following tree (as drawn in normal binary tree form):
         
 
 
-        \subsection{Parenthetical expressions} Parenthetical expressions (so called because they are always within parentheses) include function application, lambda expressions, global and local definitions, binary and unary operations, and if-statements.
+        \subsection{Parenthetical expressions} Parenthetical expressions are always withing parentheses and include function application, lambda expressions, global and local definitions, binary and unary operations, and if-statements. In the above concrete syntax, the parentheses in this font, \texttt{( ... )}, are syntax requirements, rather than denoting a grouping which is given by ( ... )
 
         \subsubsection{Function application}
-        Function application in (g)ROOT always returns a value, and is written as the function \texttt{ID} followed by a list of zero or more expressions, which are its arguments. The arguments are not separated from the ID by parentheses. (g)ROOT has first-class functions, therefore functions can be passed as arguments.
+        Function application in (g)ROOT always returns a value, and is written as the function \texttt{ID} followed by a list of zero or more expressions, which are its arguments. The arguments are not separated from the ID by parentheses. (g)ROOT has first-class functions, therefore functions can be passed as arguments. Currying is allowed.
 
         Example:
 
@@ -579,12 +603,13 @@ represents the following tree (as drawn in normal binary tree form):
 \cbstart
 \begin{lstlisting}
 (foo)
-(foo a b)
+(bar a b)
+((baz x) y)
 \end{lstlisting}
 \cbend
 
         \subsubsection{Lambda Expression}
-        Lambda expressions are accomplished with the \texttt{lambda} keyword, a parentheses-enclosed list of 0 or more identifiers as formal arguments, followed by the expression that uses those arguments.
+        Lambda expressions are accomplished with the \texttt{lambda} keyword, a parentheses-enclosed list of 0 or more identifiers as formal arguments, followed by the expression that may use those arguments and/or any free variables. Nesting of lambda expressions is allowed.
 
         Example:
 
@@ -594,10 +619,16 @@ represents the following tree (as drawn in normal binary tree form):
 (lambda () #t)
 (lambda (x) x)
 (lambda (x y) (+ x y))
+
+(lambda (a) (add2 a b))
+
+(lambda (n) 
+    (lambda (m) 
+        (add2 n m)))
 \end{lstlisting}
 \cbend
 
-        \subsubsection{Global definitions} Global definitions are accomplished using the val keyword, followed by an identifier, followed by the expression which is to be bound to that value.
+        \subsubsection{Global definitions} Global definitions are accomplished using the \texttt{val} keyword, followed by an identifier, followed by the expression which is to be bound to that value.
 
         Example:
 
@@ -610,17 +641,18 @@ represents the following tree (as drawn in normal binary tree form):
 \end{lstlisting}
 \cbend
 
-        Calling a global definition with a preexisting identifier will re-bind that identifier to the new value - currently this is always allowed at the top level, though type-checking may be implemented to ensure it is always of the same type as the previous value.
+        Calling a global definition with a preexisting identifier will re-bind that identifier to the new value - onlys allowed at the top level, and new definition must always of the same type as the previous definition.
 
-        \subsubsection{Local definitions} Local definitions are accomplished with the \texttt{let} keyword, followed by the identifier and the expression to be bound to it, followed by the expression that local variable will be used in. 
+        \subsubsection{Local definitions} Local definitions are found with the \texttt{let} expressions, which is the \texttt{let} keyword followed by the identifier(s) and the expression(s) to be bound to it, followed by the expression that local variable may be used. Let expressions must have at least one local binding. 
 
         Example:
 
 \cbcolor{dkgreen}
 \cbstart
 \begin{lstlisting}
-(let x 4 (+ 2 x))   (; return 6 ;) 
-(let x 4 x)         (; return 4 ;) 
+(let ([x 4]) (+ 2 x))    (; return 6 ;) 
+(let ([x 4]) x)          (; return 4 ;) 
+(let () y)               (; not allowed! ;)
 \end{lstlisting}
 \cbend
 
@@ -639,7 +671,7 @@ represents the following tree (as drawn in normal binary tree form):
 \cbend
 
         \subsubsection{If-expression}
-        If-expressions are currently the only form of control flow in (g)ROOT, and are always formed with the \texttt{if} keyword followed by three expressions (the \emph{condition}, the \emph{true case} and the \emph{false case}). Omission of the false case is a syntax error, and the expressions are not separated by parentheses, brackets, or keywords.
+        If-expressions are the only form of control flow in (g)ROOT, and are always formed with the \texttt{if} keyword followed by three expressions (the \emph{condition}, the \emph{true case} and the \emph{false case}). Omission of the false case is a syntax error, and the expressions are not separated by parentheses, brackets, or keywords.
         
         Example:
 
@@ -664,15 +696,7 @@ represents the following tree (as drawn in normal binary tree form):
 -(+ 3 4)
 -(if #t 2 3)
 -x
-\end{lstlisting}
-\cbend
-        
 
-        Example:
-
-\cbcolor{dkgreen}
-\cbstart
-\begin{lstlisting}
 !#t
 !x
 !(expr)

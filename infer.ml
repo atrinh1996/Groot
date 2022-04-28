@@ -1,3 +1,4 @@
+
 open Ast
 open Tast
 
@@ -5,14 +6,17 @@ module StringMap = Map.Make (String)
 
 exception Type_error of string
 
-(* is_free_type_var - returns false if no type variable is free, else returns 
-                      the type variable *)
+
+
+
+
 let rec is_free_type_var var gt = 
   match gt with
   | TYCON _ -> false
   | TYVAR tvar -> var = tvar
   | CONAPP tcon -> 
     List.fold_left (fun acc x -> is_free_type_var var x || acc) false (snd tcon)
+
 
 
 (* ftvs - returns a list of free type variables amongst a collection of
@@ -54,6 +58,7 @@ let sub (theta : (tyvar * gtype) list) (cns : (gtype * gtype) list) =
   List.map sub1 cns
 
 
+
 (* compose - applies the substitutions in theta1 to theta2 *)
 let compose theta1 theta2 =
   (* sub1 - takes a single substitution in theta1 and applies it to theta2 *)
@@ -74,7 +79,7 @@ let compose theta1 theta2 =
   List.map sub1 theta2
 
 
-(* solve' - solves a single constraints *)
+(* solve': *)
 let rec solve' c1 = 
   match c1 with
   | (TYVAR t1, TYVAR t2) -> [(t1, TYVAR t2)]
@@ -83,7 +88,7 @@ let rec solve' c1 =
       if List.fold_left 
         (fun acc x -> (is_free_type_var t x || acc)) false (snd a)
       then raise (Type_error "type error")
-    else [(t, CONAPP a)]
+      else [(t, CONAPP a)]
   | (TYCON c, TYVAR t) -> solve' (TYVAR t, TYCON c)
   | (TYCON (TArrow (TYVAR a)), TYCON b) -> [(a, TYCON b)] 
   | (TYCON b, TYCON (TArrow (TYVAR a))) -> [(a, TYCON b)] 
@@ -95,6 +100,7 @@ let rec solve' c1 =
   | (CONAPP a, TYVAR t) -> solve' (TYVAR t, CONAPP a)
   | (CONAPP _, TYCON _) -> raise (Type_error "type error: (conapp, tycon")
   | (CONAPP a1, CONAPP a2) -> solve ((List.combine (snd a1) (snd a2)) @ [(TYCON (fst a1), TYCON (fst a2))])
+
 
 
 (* solve: *)
@@ -165,6 +171,7 @@ let rec generate_constraints gctx e =
       let (t, c, tex) = generate_constraints new_context body in
       let formaltys = snd (List.split (snd (List.split binding))) in
       let typedFormals = List.combine formaltys formals in 
+
       (CONAPP (TArrow t, formaltys), 
       c,
       (CONAPP (TArrow t, formaltys), TypedLambda (typedFormals, tex))
@@ -182,6 +189,39 @@ let rec generate_constraints gctx e =
   in constrain gctx e
 
 
+let rec ftvs (ty : gtype) = 
+  match ty with
+  | TYVAR t -> [t]
+  | TYCON _ -> []
+  | CONAPP a -> List.fold_left (fun acc x -> acc @ (ftvs x)) [] (snd a)
+
+(* let subst (theta : (tyvar * gtype) list) (t : gtype) (ftvs: tyvar list) =
+  match t with
+  | TYVAR t -> List.find (fun (x : tyvar * gtype) -> x = (t, TYVAR t)) theta
+  | TYCON c -> (TYCON c, t)
+  | CONAPP a -> (CONAPP a, t) *)
+
+
+let tysubst (theta: (tyvar * gtype) list) (t : gtype) (ftvs: tyvar list) =
+  match t with
+  | TYVAR t -> let (_, tau) = List.find (fun (x : tyvar * gtype) -> (fst x) = t) theta in if (List.exists (fun x -> x = t) ftvs) then tau else TYVAR t 
+  | TYCON c -> TYCON c
+  | _ -> raise (Type_error "missing case for CONAPP")
+  (* | CONAPP a -> CONAPP ((tysubst theta (fst a) ftvs), List.map (fun x -> tysubst theta x ftvs) (snd a)) *)
+
+
+let rec sub_theta_into_gamma (theta : (tyvar * gtype) list) (gamma : (ident * tyscheme) list) = 
+  match gamma with
+    | [] -> []
+    | (g :: gs) -> 
+      let (name, tysch) = g in
+      let (bound_types, btypes) = tysch in
+      let freetypes = List.filter (fun (x : tyvar) -> List.exists (fun (y : tyvar) -> y = x) bound_types) (ftvs btypes) in
+      let new_btype = tysubst theta btypes freetypes in
+      (name, (bound_types, new_btype)) :: sub_theta_into_gamma theta gs 
+
+
+
 (* get_constraints - returns a list of Tasts
         Tast : [ (ident * (gtype * tx)) ] = [ (ident * texpr) | texpr ] = [ tdefns ]
     tyscheme : (tyvar list * gtype) *)
@@ -196,6 +236,7 @@ let rec get_constraints (ctx : (ident * tyscheme) list ) (d : defn list) =
   | Expr e :: ds ->
     let (t, c, tex) = generate_constraints ctx e in 
     (t, c, TExpr tex) :: get_constraints ctx ds
+
 
 
 (*  input: (tyvar * gtype) list *)
@@ -243,3 +284,4 @@ let type_infer (ds : defn list) =
     let almost = List.map (apply_subs subs) tdefns in
     almost
   in type_infer' []
+

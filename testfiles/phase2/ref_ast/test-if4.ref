@@ -1,0 +1,8 @@
+(val x 1997)
+(val retx (lambda () x))
+(printi (retx ))
+(val n 2014)
+(val retn (lambda () n))
+(printi (retn ))
+(printi (if #t (retn ) (retx )))
+(if #t (printi (retx )) (printi (retn )))

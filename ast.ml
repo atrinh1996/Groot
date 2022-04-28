@@ -3,41 +3,30 @@
 (* Type of Variable Names *)
 type ident = string
 
-(* type primop = Add | Sub | Mul | Div | Mod | Eq | Neq 
-            | Lt  | Gt  | Leq | Geq | And | Or *)
 
-(* type 'a env = (ident * 'a) list *) (* What is this? *)
 
-(* Groot Expressions *)
-type expr = 
-  | Literal of value
-  | Var     of ident
-  | If      of expr * expr * expr
-  | Apply   of expr * expr list
-  | Let     of (ident * expr) list * expr
-  | Lambda  of ident list * expr
-and value = 
-  | Char    of char
-  | Int     of int
-  | Bool    of bool
-  | Root    of tree
-  (*| Float   of float*)
-  (* | Closure of ident list * expr * (unit -> value env) *)
-  (* not sure abt this? *)
-  (*| Primitive of primop * value list -> value*)
-and tree =  
-  | Leaf
-  | Branch of expr * tree * tree
-  (* TODO: maybe change "value * tree * tree" *)
-  (* Perhaps in the SAST, this is a value *)
 
-(* Top-Level Definitions *)
+(* mutuallly recursive expression * value types *)
+type expr = Literal of value
+          | Var     of ident
+          | If      of expr * expr * expr
+          | Apply   of expr * expr list
+          | Let     of (ident * expr) list * expr
+          | Lambda  of ident list * expr
+and value = Char    of char
+          | Int     of int
+          (*| Float   of float*)
+          | Bool    of bool
+          | Root    of tree
+and tree =  Leaf
+          | Branch of expr * tree * tree
+
+
 type defn = 
   | Val  of ident * expr
   | Expr of expr
-(*| Define of ident * ident list * expr*)
-(* fn name, arg names, body*)
-(*| Use of ident*)
+
+
 
 (* short for program, analogous to main *)
 type prog = defn list
@@ -46,14 +35,7 @@ type prog = defn list
 
 (* Pretty printing functions *)
 
-(* toString for Ast.typ *)
-(* let string_of_typ = function
-    | TInt -> "int"
-    | TChar -> "char"
-    | TBool -> "bool"
-    | TTree -> "TREE"
-    | TVar i -> "typPARAM"
- *)
+
 (* toString for Ast.expr *)
 let rec string_of_expr = function
     | Literal(lit) -> string_of_value lit
@@ -62,8 +44,8 @@ let rec string_of_expr = function
         "(if "  ^ string_of_expr condition ^ " " 
                 ^ string_of_expr true_branch ^ " " 
                 ^ string_of_expr false_branch ^ ")"
-    | Apply(func, args) ->
-        "(" ^ string_of_expr func ^ " " 
+    | Apply(f, args) ->
+        "(" ^ string_of_expr f ^ " " 
             ^ String.concat " " (List.map string_of_expr args) ^ ")"
     | Let(binds, body)   ->
         let string_of_binding = function
@@ -77,7 +59,7 @@ let rec string_of_expr = function
 
 (* toString for Ast.value *)
 and string_of_value = function
-    | Char(c)     -> String.make 1 c
+    | Char(c)     -> "'" ^ String.make 1 c ^ "'"
     | Int(i)      -> string_of_int i
     | Bool(b)     -> if b then "#t" else "#f"
     | Root(tr)    -> string_of_tree tr
@@ -100,4 +82,4 @@ let string_of_defn = function
 
 (* toString for Ast.prog *)
 let string_of_prog defns = 
-    String.concat "\n" (List.map string_of_defn defns) ^ "\n"
+    String.concat "\n" (List.map string_of_defn defns) ^ "\n" 

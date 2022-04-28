@@ -31,6 +31,7 @@ let booltype = TYCON TBool
 let functiontype resultType formalsTypes = 
         CONAPP (TArrow resultType, formalsTypes)
 
+
 (* TAST expression *)
 type texpr = gtype * tx
 and tx = 
@@ -73,7 +74,7 @@ and string_of_tycon = function
   | TChar -> "char"
   | TArrow (retty) -> string_of_ttype retty 
 and string_of_tyvar = function
-  | TVariable n -> string_of_int n
+  | TVariable n -> "'" ^ string_of_int n
 and string_of_conapp (tyc, tys) = 
     string_of_tycon tyc ^ " (" ^ String.concat " " (List.map string_of_ttype tys) ^ ")"
 
