@@ -11,7 +11,7 @@ type cname = string
 
 type ctype = 
     Tycon of tycon
-  | Tyvar of tyvar
+  (* | Tyvar of tyvar *)
   | Conapp of conapp 
 and tycon =  
     Intty  
@@ -19,8 +19,8 @@ and tycon =
   | Boolty
   | Tarrow of ctype 
   | Clo of cname * ctype * ctype list
-and tyvar = 
-    Tparam of int
+(* and tyvar = 
+    Tparam of int *)
 and conapp = (tycon * ctype list)
 
 
@@ -95,7 +95,7 @@ type cprog =
 (* Pretty Print *)
 let rec string_of_ctype = function 
     Tycon ty -> string_of_tycon ty
-  | Tyvar tp -> string_of_tyvar tp
+  (* | Tyvar tp -> string_of_tyvar tp *)
   | Conapp con -> string_of_conapp con
 and string_of_tycon = function
     Intty  -> "int"
@@ -108,8 +108,8 @@ and string_of_tycon = function
             ^ string_of_ctype funty ^ "\n"
             ^ String.concat "\n" (List.map string_of_ctype freetys)
         ^ "\n} ;; "
-and string_of_tyvar = function 
-    Tparam n -> string_of_int n
+(* and string_of_tyvar = function 
+    Tparam n -> string_of_int n *)
 and string_of_conapp (tyc, tys) = 
   string_of_tycon tyc ^ " (" ^ String.concat " " (List.map string_of_ctype tys) ^ ")"
 

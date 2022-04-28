@@ -17,7 +17,7 @@ let () =
 		("-a", Arg.Unit (set_action Ast), 		"Print the AST (default)");
 		("-n", Arg.Unit (set_action Name_Check), 	"Print the AST (name-checking)");
     	("-t", Arg.Unit (set_action Tast), 		"Print the TAST");
-    	("-m", Arg.Unit (set_action Cast), 	"Print the MAST");
+    	("-m", Arg.Unit (set_action Mast), 	"Print the MAST");
     	(* ("-v", Arg.Unit (set_action Cast), 	"Print the CAST"); *)
     	(* ("-l", Arg.Unit (set_action LLVM_IR), 	"Print the generated LLVM IR"); *)
     	(* ("-c", Arg.Unit (set_action Compile), *)
@@ -38,7 +38,7 @@ let () =
 				let ast' = Scope.check ast in 
 				(* let tast = Semant.semantic_check ast' in *)
 				let tast = Infer.type_infer ast' in
-				let mast = Mono.monomorphize tast in 
+				(* let mast = Mono.monomorphize tast in *) 
 				(* let cast = Conversion.conversion tast in  *)
 					match !action with 
 				(* in sast *)
@@ -52,7 +52,8 @@ let () =
 					| Tast -> print_string (Tast.string_of_tprog tast)
 						(* print_endline ("Tast was generated, no pretty print") *)
 						(* print_string (Tast.string_of_tprog tast) *)
-					| Mast -> print_string (Mast.string_of_mprog mast)
+					| Mast -> let mast = Mono.monomorphize tast in
+						print_string (Mast.string_of_mprog mast)
 					(* | Cast -> print_string (Cast.string_of_cprog cast) *)
 					(* action - print the llvm module. Codegen.translate produces the llmodule
 					     from the given SAST called sast and then Llvm.string_of_llmodule converts it to string.

@@ -214,7 +214,7 @@ let rec generate_constraints gctx e =
       let retType = fresh () in 
       (retType, 
         (t1, (CONAPP (TArrow retType, ts2)))::c2, 
-        (CONAPP (TArrow retType, ts2), TypedApply(tex1, texs2)))
+        (retType, TypedApply(tex1, texs2)))
     | Let (_, _) -> raise (Type_error "missing case for Let")
     | Lambda (formals, body) -> 
       let is_nested_lambda = function  

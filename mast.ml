@@ -1,18 +1,18 @@
 (* MAST -- monomorphized AST where pholymorphism is removed *)
 module StringMap = Map.Make(String)
+
 type mname = string 
 
 type mtype = 
     Mtycon of mtycon
-  | Mtyvar of mtyvar
+  | Mtyvar of int
   | Mconapp of mconapp 
 and mtycon =  
     MIntty  
   | MCharty 
   | MBoolty
   | MTarrow of mtype 
-and mtyvar =  int 
-and mconapp = (tycon * mtype list)
+and mconapp = (mtycon * mtype list)
 
 let integerTy  = Mtycon MIntty 
 let characterTy = Mtycon MCharty
@@ -43,7 +43,9 @@ type mdefn =
   | MExpr     of mexpr
 
 
-type polyty_env = mtype StringMap.t
+(* type polyty_env = (mexpr * mtype list) StringMap.t *)
+type polyty_env = mexpr StringMap.t
+
 type mprog = mdefn list 
 
 
@@ -55,12 +57,13 @@ type mprog = mdefn list
 let rec string_of_mtype = function 
     Mtycon ty -> string_of_mtycon ty
   | Mconapp con -> string_of_mconapp con
+  | _ -> "Error: polymorphic tyvar"
 and string_of_mtycon = function 
-  | TInt -> "int"
-  | TBool -> "bool"
-  | TChar -> "char"
-  | TArrow (retty) -> string_of_mtype retty 
-and string_of_conapp (tyc, tys) = 
+  | MIntty -> "int"
+  | MBoolty -> "bool"
+  | MCharty -> "char"
+  | MTarrow (retty) -> string_of_mtype retty 
+and string_of_mconapp (tyc, tys) = 
     string_of_mtycon tyc ^ " (" ^ String.concat " " (List.map string_of_mtype tys) ^ ")"
 
 

@@ -14,7 +14,7 @@ let translate { main = main;  functions = functions;
   let ltype_of_type (struct_table : L.lltype StringMap.t) (ty : ctype) = 
     let rec ltype_of_ctype = function
         Tycon ty -> ltype_of_tycon ty
-      | Tyvar tp -> ltype_of_tyvar tp
+      (* | Tyvar tp -> ltype_of_tyvar tp *)
       | Conapp con -> ltype_of_conapp con
     and ltype_of_tycon = function 
         Intty                -> int_ty
@@ -28,9 +28,9 @@ let translate { main = main;  functions = functions;
           (* L.pointer_type (L.function_type llretty (Array.of_list llargtys)) *)
       | Clo (sname, _, _) -> 
           L.pointer_type (StringMap.find sname struct_table)
-    and ltype_of_tyvar = function 
+    (* and ltype_of_tyvar = function  *)
         (* What is this type even? *)
-        Tparam _ -> void_ty
+        (* Tparam _ -> void_ty *)
         (* And what types do conapps represent? Function type *)
     and ltype_of_conapp (tyc, ctys) = 
           let llretty = ltype_of_tycon tyc in 
@@ -410,7 +410,7 @@ let translate { main = main;  functions = functions;
     let build_ret t = 
       let rec ret_of_typ = function
           Tycon ty    -> ret_of_tycon ty
-        | Tyvar tp    -> ret_of_tyvar tp
+        (* | Tyvar tp    -> ret_of_tyvar tp *)
         | Conapp con  -> ret_of_conapp con
       and ret_of_tycon = function 
           Intty       -> L.build_ret result
@@ -418,8 +418,8 @@ let translate { main = main;  functions = functions;
         | Charty      -> L.build_ret result
         | Tarrow _    -> L.build_ret result
         | Clo _       -> L.build_ret result
-      and ret_of_tyvar = function 
-          Tparam _ -> raise (Failure ("TODO: ret of TParam"))
+      (* and ret_of_tyvar = function 
+          Tparam _ -> raise (Failure ("TODO: ret of TParam")) *)
       and ret_of_conapp (tyc, _) = ret_of_tycon tyc
       in ret_of_typ t
     in 
