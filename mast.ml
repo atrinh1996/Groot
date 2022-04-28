@@ -1,23 +1,24 @@
 (* MAST -- monomorphized AST where pholymorphism is removed *)
-
+module StringMap = Map.Make(String)
 type mname = string 
 
 type mtype = 
     Mtycon of mtycon
+  | Mtyvar of mtyvar
   | Mconapp of mconapp 
 and mtycon =  
     MIntty  
   | MCharty 
   | MBoolty
   | MTarrow of mtype 
+and mtyvar =  int 
 and mconapp = (tycon * mtype list)
 
 let integerTy  = Mtycon MIntty 
 let characterTy = Mtycon MCharty
 let booleanTy = Mtycon MBoolty
+let functionTy (ret, args) = Mconapp (MTarrow ret, args)
 
-let functionTy (ret, args) = 
-        Mconapp (MTarrow ret, args)
 
 
 type mexpr = mtype * mx
@@ -41,6 +42,8 @@ type mdefn =
   | MVal      of mname * mexpr
   | MExpr     of mexpr
 
+
+type polyty_env = mtype StringMap.t
 type mprog = mdefn list 
 
 

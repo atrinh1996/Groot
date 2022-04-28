@@ -217,19 +217,17 @@ let rec generate_constraints gctx e =
         (CONAPP (TArrow retType, ts2), TypedApply(tex1, texs2)))
     | Let (_, _) -> raise (Type_error "missing case for Let")
     | Lambda (formals, body) -> 
-      (* Constrain each formal (string) to fresh type var. fresh returns the
-         gtype: TYVAR (TVariable int).
-         binding looks like a ctx:
-              ident * tyscheme ==     ident (tyvar list * gtype) *)
+      let is_nested_lambda = function  
+      | Lambda _ -> true
+      | _ -> false in
+      if is_nested_lambda body then raise (Type_error "type error: nested lambda")
+      else 
       let binding = List.map (fun x -> (x,   ([],        fresh () ))) formals in
       (* let binding_as_gtype = List.map (fun (x, (y, z)) -> (x, (y, TYVAR z))) binding in *)
       (* ctx : Ast.ident * ('a * gtype) *)
       let new_context = binding @ ctx in
       let (t, c, tex) = generate_constraints new_context body in
       let formaltys = snd (List.split (snd (List.split binding))) in
-      (* let formal_tyvars_as_gtype = snd (List.split (snd (List.split binding))) in *)
-      (* let formal_tyvars_as_gtype = (List.map (fun (_, (_, x)) -> x) binding) in *)
-      (* let formal_tyvars =          (List.map (fun (_, (_, x)) -> x) binding) in *)
       let typedFormals = List.combine formaltys formals in 
       (CONAPP (TArrow t, formaltys), c,
         (CONAPP (TArrow t, formaltys), TypedLambda (typedFormals, tex)))
