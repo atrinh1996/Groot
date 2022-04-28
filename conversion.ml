@@ -11,12 +11,23 @@ open Cast
 let prerho env = 
   let add_prints map (k, v) =
     StringMap.add k [v] map
-  in List.fold_left add_prints env [("printi", (0, intty)); 
-                                    ("printb", (0, boolty)); 
-                                    ("printc", (0, charty)); ]
+  in List.fold_left add_prints env [("printi", (0, intty));   ("printb", (0, boolty)); 
+                                    ("printc", (0, charty));  ("+", (0, intty));
+                                    ("-", (0, intty));        ("*", (0, intty));
+                                    ("/", (0, intty));        ("mod", (0, intty));
+                                    ("<", (0, boolty));       (">", (0, boolty)); 
+                                    ("<=", (0, boolty));      (">=", (0, boolty));
+                                    ("!=i", (0, boolty));     ("=i", (0, boolty));
+                                    ("&&", (0, boolty));      ("||", (0, boolty)); 
+                                    ("not", (0, boolty))                            ]
 
 (* list of variable names that get ignored/are not to be considered frees *)
-let ignores = ["printi"; "printb"; "printc"; "+"]
+let ignores = [ "printi"; "printb"; "printc"; 
+                "+"; "-"; "*"; "/"; "mod";
+                "<"; ">"; ">="; "<="; 
+                "!=i"; "=i"; 
+                "&&"; "||"; "not"            ]
+
 
 (* partial cprog to return from this module *)
 let res = 

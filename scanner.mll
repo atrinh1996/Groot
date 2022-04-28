@@ -28,7 +28,7 @@ let chrcode = digit+
 (* let ident = ['!'-'~']+ *)
 
 (* all visible characters, excluding ()'[]\;{}| *)
-let ident = ['!'-'&' '*'-':' '<'-'Z' '^'-'z' '~']+
+let ident = ['!'-'&' '*'-':' '<'-'Z' '^'-'z' '~' '|']+
 (* let ident = ['a'-'z' 'A'-'Z' '0'-'9' '_']+ *)
 (* ['a'-'z' 'A'-'Z' '0'-'9' '_']* *)
 

@@ -7,6 +7,27 @@ module StringMap = Map.Make (String)
 exception Type_error of string
 
 
+(*initializes inbuilt functions with their types - used as list past to type_infer' in last line of infer.ml
+    structure: (id * (tvar list, function type))
+    function type built by passing the return type and the list of formal types to Tast.functiontype *)
+let built_in_functions = [("printb", ([TVariable (-1)], Tast.functiontype inttype [booltype]));
+                          ("printi", ([TVariable (-2)], Tast.functiontype inttype [inttype]));
+                          ("printc", ([TVariable (-3)], Tast.functiontype inttype [chartype]));
+                          ("+",      ([TVariable (-4)], Tast.functiontype inttype [inttype; inttype]));
+                          ("-",      ([TVariable (-4)], Tast.functiontype inttype [inttype; inttype]));
+                          ("/",      ([TVariable (-4)], Tast.functiontype inttype [inttype; inttype]));
+                          ("*",      ([TVariable (-4)], Tast.functiontype inttype [inttype; inttype]));
+                          ("mod",    ([TVariable (-4)], Tast.functiontype inttype [inttype; inttype]));
+                          ("<",      ([TVariable (-5)], Tast.functiontype booltype [inttype; inttype]));
+                          (">",      ([TVariable (-5)], Tast.functiontype booltype [inttype; inttype]));
+                          ("<=",     ([TVariable (-5)], Tast.functiontype booltype [inttype; inttype]));
+                          (">=",     ([TVariable (-5)], Tast.functiontype booltype [inttype; inttype]));
+                          ("=i",     ([TVariable (-5)], Tast.functiontype booltype [inttype; inttype]));
+                          ("!=i",    ([TVariable (-5)], Tast.functiontype booltype [inttype; inttype]));
+                          ("&&",     ([TVariable (-6)], Tast.functiontype booltype [booltype; booltype]));
+                          ("||",     ([TVariable (-6)], Tast.functiontype booltype [booltype; booltype]));
+                          ("not",    ([TVariable (-7)], Tast.functiontype booltype [booltype]));
+                         (* ("-",      ([TVariable (-2)], Tast.functiontype inttype [inttype]))   *)          ] 
 
 
 
@@ -283,5 +304,5 @@ let type_infer (ds : defn list) =
     (* almost -> texpr list *)
     let almost = List.map (apply_subs subs) tdefns in
     almost
-  in type_infer' []
+  in type_infer' built_in_functions
 
