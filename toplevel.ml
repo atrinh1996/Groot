@@ -49,7 +49,7 @@ let () =
 				let ast' = Scope.check ast in 
 				(* let tast = Semant.semantic_check ast' in *)
 				let tast = Infer.type_infer ast' in
-				let mast = Mono.monomorphize tast in 
+				(* let mast = Mono.monomorphize tast in  *)
 				(* let cast = Conversion.conversion tast in  *)
 					match !action with 
 					  (* This option doesn't do anything, just need it to satisfy 

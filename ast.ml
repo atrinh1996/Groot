@@ -6,24 +6,6 @@ type ident = string
 
 
 
-(* Groot Expressions *)
-type expr = 
-  | Literal of value
-  | Var     of ident
-  | If      of expr * expr * expr
-  | Apply   of expr * expr list
-  | Let     of (ident * expr) list * expr
-  | Lambda  of ident list * expr
-and value = 
-  | Char    of char
-  | Int     of int
-  | Bool    of bool
-  | Root    of tree
-and tree =  
-  | Leaf
-  | Branch of expr * tree * tree
-
-
 (* mutuallly recursive expression * value types *)
 type expr = Literal of value
           | Var     of ident

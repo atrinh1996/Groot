@@ -189,7 +189,6 @@ let rec generate_constraints gctx e =
   in constrain gctx e
 
 
-<<<<<<< HEAD
 let rec ftvs (ty : gtype) = 
   match ty with
   | TYVAR t -> [t]
