@@ -246,17 +246,14 @@ let rec sub_theta_into_gamma (theta : (tyvar * gtype) list) (gamma : (ident * ty
 (* get_constraints - returns a list of Tasts
         Tast : [ (ident * (gtype * tx)) ] = [ (ident * texpr) | texpr ] = [ tdefns ]
     tyscheme : (tyvar list * gtype) *)
-let rec get_constraints (ctx : (ident * tyscheme) list ) (d : defn list) =
+let rec get_constraints (ctx : (ident * tyscheme) list ) (d : defn) =
   match d with
-  | [] -> []
-  | Val (name, e) :: ds -> 
+  | Val (name, e) -> 
     let (t, c, tex) = generate_constraints ctx e in
-    let new_ctx = (name, (List.filter (fun (x : tyvar) -> 
-      List.exists (fun (y : tyvar) -> y = x) (ftvs t)) (ftvs t), t))::ctx in
-    (t, c, (TVal (name, tex))) :: (get_constraints new_ctx ds)
-  | Expr e :: ds ->
+    (t, c, (TVal (name, tex)))
+  | Expr e ->
     let (t, c, tex) = generate_constraints ctx e in 
-    (t, c, TExpr tex) :: get_constraints ctx ds
+    (t, c, TExpr tex)
 
 
 
@@ -288,21 +285,39 @@ let apply_subs (sub : (tyvar * gtype) list) = match sub with
     )
   in final_ans
 
+let update_ctx ctx defn =
+match defn with
+| TVal (name, (gt, tx)) -> 
+  (name, (List.filter (fun (x : tyvar) -> List.exists (fun (y : tyvar) -> y = x) (ftvs gt)) (ftvs gt), gt))::ctx
+| _ -> ctx
 
 (* type_infer
       input : ( ident | ident * expr ) list
     returns : ( ident * (gtype * tx) ) list *)
-let type_infer (ds : defn list) =
-  let type_infer' (ctx : (ident * tyscheme) list) =
-    let res = (get_constraints ctx ds) in
+let type_infer (ds : defn list) = 
+let rec infer_defns ctx defn = match defn with
+| [] -> []
+| d :: ds -> 
+    (* get the constraints for the defn *)
+    let (t, c, tex) = (get_constraints ctx d) in
     (* constraints -> gtype list *)
-    let constraints = List.flatten (List.map (fun (_, x, _) -> x) res) in
+    let constraints = c in
     (* tasts -> tdefn list *)
-    let tdefns = (List.map (fun (_, _, x) -> x) res) in
+    let tdefn = tex in
     (* subs -> (Infer.tyvar * Infer.gtype) list *)
     let subs = solve constraints in
-    (* almost -> texpr list *)
-    let almost = List.map (apply_subs subs) tdefns in
-    almost
-  in type_infer' built_in_functions
+    (* apply subs to tdefns *)
+    let tdefns = apply_subs subs tdefn in
+    (* update ctx *)
+    let ctx' = update_ctx ctx tdefns in
+    (* recurse *)
+    (tdefns :: infer_defns ctx' ds)
+in
+infer_defns built_in_functions ds
+
+(* type_infer_file
+      input : ( ident | ident * expr ) list
+    returns : ( ident * (gtype * tx) ) list *)
+
+  
 
