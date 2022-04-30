@@ -7,41 +7,47 @@ module StringMap = Map.Make (String)
 exception Type_error of string
 
 
-(*initializes inbuilt functions with their types - used as list past to type_infer' in last line of infer.ml
-    structure: (id * (tvar list, function type))
-    function type built by passing the return type and the list of formal types to Tast.functiontype *)
-let built_in_functions = [("printb", ([TVariable (-1)], Tast.functiontype inttype [booltype]));
-                          ("printi", ([TVariable (-2)], Tast.functiontype inttype [inttype]));
-                          ("printc", ([TVariable (-3)], Tast.functiontype inttype [chartype]));
-                          ("+",      ([TVariable (-4)], Tast.functiontype inttype [inttype; inttype]));
-                          ("-",      ([TVariable (-4)], Tast.functiontype inttype [inttype; inttype]));
-                          ("/",      ([TVariable (-4)], Tast.functiontype inttype [inttype; inttype]));
-                          ("*",      ([TVariable (-4)], Tast.functiontype inttype [inttype; inttype]));
-                          ("mod",    ([TVariable (-4)], Tast.functiontype inttype [inttype; inttype]));
-                          ("<",      ([TVariable (-5)], Tast.functiontype booltype [inttype; inttype]));
-                          (">",      ([TVariable (-5)], Tast.functiontype booltype [inttype; inttype]));
-                          ("<=",     ([TVariable (-5)], Tast.functiontype booltype [inttype; inttype]));
-                          (">=",     ([TVariable (-5)], Tast.functiontype booltype [inttype; inttype]));
-                          ("=i",     ([TVariable (-5)], Tast.functiontype booltype [inttype; inttype]));
-                          ("!=i",    ([TVariable (-5)], Tast.functiontype booltype [inttype; inttype]));
-                          ("&&",     ([TVariable (-6)], Tast.functiontype booltype [booltype; booltype]));
-                          ("||",     ([TVariable (-6)], Tast.functiontype booltype [booltype; booltype]));
-                          ("not",    ([TVariable (-7)], Tast.functiontype booltype [booltype]));
-                         (* ("-",      ([TVariable (-2)], Tast.functiontype inttype [inttype]))   *)          ] 
+(* prims - initializes context with built-in functions with their types *)
+(* prims : (id * tyvar) list * (tycon * gtype list) *)
+let prims = 
+[
+  ("printb", ([TVariable (-1)], Tast.functiontype inttype [booltype]));
+  ("printi", ([TVariable (-2)], Tast.functiontype inttype [inttype]));
+  ("printc", ([TVariable (-3)], Tast.functiontype inttype [chartype]));
+  ("+",      ([TVariable (-4)], Tast.functiontype inttype [inttype; inttype]));
+  ("-",      ([TVariable (-4)], Tast.functiontype inttype [inttype; inttype]));
+  ("/",      ([TVariable (-4)], Tast.functiontype inttype [inttype; inttype]));
+  ("*",      ([TVariable (-4)], Tast.functiontype inttype [inttype; inttype]));
+  ("mod",    ([TVariable (-4)], Tast.functiontype inttype [inttype; inttype]));
+  ("<",      ([TVariable (-5)], Tast.functiontype booltype [inttype; inttype]));
+  (">",      ([TVariable (-5)], Tast.functiontype booltype [inttype; inttype]));
+  ("<=",     ([TVariable (-5)], Tast.functiontype booltype [inttype; inttype]));
+  (">=",     ([TVariable (-5)], Tast.functiontype booltype [inttype; inttype]));
+  ("=i",     ([TVariable (-5)], Tast.functiontype booltype [inttype; inttype]));
+  ("!=i",    ([TVariable (-5)], Tast.functiontype booltype [inttype; inttype]));
+  ("&&",     ([TVariable (-6)], Tast.functiontype booltype [booltype; booltype]));
+  ("||",     ([TVariable (-6)], Tast.functiontype booltype [booltype; booltype]));
+  ("not",    ([TVariable (-7)], Tast.functiontype booltype [booltype]));
+  (* ("-",      ([TVariable (-2)], Tast.functiontype inttype [inttype]))   *)
+] 
 
 
-
-let rec is_free_type_var var gt = 
+(* is_ftv - returns true if 'gt' is equal to free type variable 'var' 
+    (i.e. 'gt' is a type variable and 'var' is a free type variable). For the
+    conapp case, we recurse over the conapp's gtype list searching for any free
+    type variables. When this function returns true it means the type variable
+    is matching *)
+let rec is_ftv (var : tyvar) (gt : gtype) = 
   match gt with
   | TYCON _ -> false
-  | TYVAR tvar -> var = tvar
+  | TYVAR v -> v = var
   | CONAPP tcon -> 
-    List.fold_left (fun acc x -> is_free_type_var var x || acc) false (snd tcon)
+    List.fold_left (fun acc x -> is_ftv var x || acc) false (snd tcon)
 
 
 
-(* ftvs - returns a list of free type variables amongst a collection of
-          gtypes *)
+(* ftvs - returns a list of free type variables amongst a collection of gtypes *)
+(* returns : tyvar list *)
 let rec ftvs (ty : gtype) = 
   match ty with
   | TYVAR t -> [t]
@@ -50,81 +56,88 @@ let rec ftvs (ty : gtype) =
 
 
 (* fresh - returns a fresh gtype variable (integer) *)
+(* returns : tyvar *)
 let fresh =
   let k = ref 0 in
   (* fun () -> incr k; TVariable !k *)
     fun () -> incr k; TYVAR (TVariable !k)
 
 
-(* sub - updates a list of constraints with any substitutions in theta *)
+(* sub - updates a list of constraints with substitutions in theta *)
 let sub (theta : (tyvar * gtype) list) (cns : (gtype * gtype) list) =
-  (* sub1 - takes in a single constraint and updates it with any substitutions
-            in theta *)
-  let sub1 cn = 
-    List.fold_left 
-      (fun (acc : (gtype * gtype)) (one_sub : tyvar * gtype) ->
-        match acc with
-        | (TYVAR t1, TYVAR t2) -> 
-          if (fst one_sub = t1) then (snd one_sub, snd acc)
-          else if (fst one_sub = t2) then (fst acc, snd one_sub)
-          else acc
-        | (TYVAR t1, _) -> 
-          if (fst one_sub = t1) then (snd one_sub, snd acc)
-          else acc
-        | (_, TYVAR t2) -> 
-          if (fst one_sub = t2) then (fst acc, snd one_sub)
-          else acc
-      | (_, _) -> acc)
-      cn theta in 
-  List.map sub1 cns
+  (* sub_one - takes in single constraint and updates it with substitution in theta *)
+  let sub_one (cn : gtype * gtype) = 
+    (* acc : cn    : gtype * gtype *)
+    (*   x : theta : (tyvar * gtype) list *)
+    List.fold_left (fun ((c1, c2) : gtype * gtype) ((tv, gt) : tyvar * gtype) ->
+      match (c1, c2) with
+      | (TYVAR t1, TYVAR t2) -> 
+        (* TODO - do we want to replace fst acc *)
+        if (tv = t1) then (gt, c2)
+        else if (tv = t2) then (c1, gt)
+        else (c1, c2)
+      | (TYVAR t1, _) -> 
+        if (tv = t1) then (gt, c2)
+        else (c1, c2)
+      | (_, TYVAR t2) -> 
+        if (tv = t2) then (c1, gt)
+        else (c1, c2)
+      | (_, _) -> (c1, c2))
+    cn theta in 
+  List.map sub_one cns
 
 
 
 (* compose - applies the substitutions in theta1 to theta2 *)
 let compose theta1 theta2 =
-  (* sub1 - takes a single substitution in theta1 and applies it to theta2 *)
-  let sub1 cn = 
+  (* sub_one - takes a single substitution in theta1 and applies it to theta2 *)
+  let sub_one cn = 
     List.fold_left 
     (fun (acc : tyvar * gtype) (one_sub : tyvar * gtype) ->
       match acc, one_sub with
-      | (a1, TYVAR a2), (s1, TYVAR _) -> 
-          if a1 = s1 then (s1, snd acc)
-          else if s1 = a2 then (a1, snd one_sub)
-          else acc
-      | (a1, a2), (s1, TYVAR _) -> 
-          if (a1 = s1) then (s1, a2)
-          else acc
-      | (_,_), _ -> acc
-    )
-    cn theta1 in 
-  List.map sub1 theta2
+      | (a1, TYVAR a2), (s1, TYVAR s2) -> 
+        if s1 = a1 then (s1, TYVAR a2)
+        else if s1 = a2 then (a1, TYVAR s2)
+        else acc
+      | (a1, a2), (s1, TYVAR s2) -> 
+        if (a1 = s1) then (s1, a2)
+        else acc
+      | (a1, a2), (s1, s2) -> 
+        if (a1 = s1) then (s1, s2)
+        else acc
+      (* | (_,_), _ -> acc *) (* TODO - changed to make more explicit *)
+    ) cn theta1 in 
+  List.map sub_one theta2
 
 
-(* solve': *)
-let rec solve' c1 = 
-  match c1 with
+(* solve': solves a single constraint 'c' *)
+let rec solve' (c : gtype * gtype)  = 
+  match c with
   | (TYVAR t1, TYVAR t2) -> [(t1, TYVAR t2)]
-  | (TYVAR t, TYCON c) -> [(t, TYCON c)]
-  | (TYVAR t, CONAPP a) ->  
-      if List.fold_left 
-        (fun acc x -> (is_free_type_var t x || acc)) false (snd a)
+  | (TYVAR t1, TYCON t2) -> [(t1, TYCON t2)]
+  | (TYVAR t1, CONAPP t2) -> 
+    if is_ftv t1 (CONAPP t2) then raise (Type_error "type error: type variable is not free in type constructor")
+    else [(t1, (CONAPP t2))]
+      (* if List.fold_left 
+        (fun acc x -> (is_ftv t x || acc)) false (snd a)
       then raise (Type_error "type error")
-      else [(t, CONAPP a)]
-  | (TYCON c, TYVAR t) -> solve' (TYVAR t, TYCON c)
-  | (TYCON (TArrow (TYVAR a)), TYCON b) -> [(a, TYCON b)] 
-  | (TYCON b, TYCON (TArrow (TYVAR a))) -> [(a, TYCON b)] 
-  | (TYCON c1, TYCON c2) -> 
-      if c1 = c2 
-      then []
-    else raise (Type_error "type error: (tycon,tycon)")
-  | (TYCON _, CONAPP _) -> raise (Type_error "type error: (tycon, conapp")
-  | (CONAPP a, TYVAR t) -> solve' (TYVAR t, CONAPP a)
-  | (CONAPP _, TYCON _) -> raise (Type_error "type error: (conapp, tycon")
-  | (CONAPP a1, CONAPP a2) -> solve ((List.combine (snd a1) (snd a2)) @ [(TYCON (fst a1), TYCON (fst a2))])
+      else [(t, CONAPP a)] *)
+  | (TYCON t1, TYVAR t2) -> solve' (TYVAR t2, TYCON t1)
+  | (TYCON (TArrow (TYVAR t1)), TYCON t2) -> [(t1, TYCON t2)] 
+  | (TYCON t1, TYCON (TArrow (TYVAR t2))) -> [(t2, TYCON t1)] 
+  | (TYCON t1, TYCON t2) -> 
+    if t1 = t2 then []
+    else raise (Type_error ("type error: type constructor mismatch" ^ string_of_tycon t1 ^ " != " ^ string_of_tycon t2))
+  | (TYCON t1, CONAPP t2) -> raise (Type_error ("type error: type constructor mismatch" ^ string_of_tycon t1 ^ " != " ^ string_of_conapp t2))
+  | (CONAPP t1, TYVAR t2) -> solve' (TYVAR t2, CONAPP t1)
+  | (CONAPP t1, TYCON t2) -> raise (Type_error ("type error: type constructor mismatch" ^ string_of_conapp t1 ^ " != " ^ string_of_tycon t2))
+  | (CONAPP t1, CONAPP t2) -> solve ((List.combine (snd t1) (snd t2)) @ [(TYCON (fst t1), TYCON (fst t2))])
 
 
 
-(* solve: *)
+(* solve - solves a list of constraints, calls 'solver' to iterate through the
+           constraint list, once constraint list has been iterated 'compose' is
+           called to tie 'theta1' and 'theta2' together, returns theta *)
 and solve (constraints : (gtype * gtype) list) =
   let solver cns  =
     match cns with
@@ -163,14 +176,14 @@ let rec generate_constraints gctx e =
         let ts2, c2, texs2 = List.fold_left (fun acc e -> 
           let t, c, x = generate_constraints ctx e in 
           let ts, cs, xs = acc in (t::ts, c @ cs, x::xs)) 
-        ([], c1, []) args in
+        ([], c1, []) (List.rev args) in   (* reverse args to maintain arg order *)
         let retType = (fresh ()) in
         (retType, 
           (t1, (CONAPP (TArrow retType, ts2)))::c2, 
           (retType, TypedApply(tex1, texs2)))
     | Let (bindings, expr) ->
       let l = List.map (fun (n, e) -> generate_constraints ctx e) bindings in
-      let cns = List.flatten (List.map (fun (_, c, _) -> c) l) in
+      let cns = List.concat (List.map (fun (_, c, _) -> c) l) in
       let taus = List.map (fun (t,_, _) -> t) l in
       let asts = List.map (fun (_, _, a) -> a) l in
       let names = List.map fst bindings in
@@ -209,12 +222,6 @@ let rec generate_constraints gctx e =
       | Branch _ -> raise (Failure ("Infer TODO: generate constraints for Branch"))
   in constrain gctx e
 
-
-let rec ftvs (ty : gtype) = 
-  match ty with
-  | TYVAR t -> [t]
-  | TYCON _ -> []
-  | CONAPP a -> List.fold_left (fun acc x -> acc @ (ftvs x)) [] (snd a)
 
 (* let subst (theta : (tyvar * gtype) list) (t : gtype) (ftvs: tyvar list) =
   match t with
@@ -313,7 +320,7 @@ let rec infer_defns ctx defn = match defn with
     (* recurse *)
     (tdefns :: infer_defns ctx' ds)
 in
-infer_defns built_in_functions ds
+infer_defns prims ds
 
 (* type_infer_file
       input : ( ident | ident * expr ) list
