@@ -269,12 +269,25 @@ let rec generate_constraints gctx e =
   | TYCON c -> (TYCON c, t)
   | CONAPP a -> (CONAPP a, t) *)
 
+(* let rec tysubst (one_sub: (tyvar * gtype)) (t : gtype) =
+  match one_sub, t with
+  | (x, y), (TYVAR z)  -> if x = z then y else (TYVAR z)
+  | (x, y), (TYCON c)  -> 
+    (match c with 
+    | TArrow retty -> TYCON (TArrow (tysubst one_sub retty))
+    | _ -> (TYCON c))
+  | (x, y), (CONAPP (a, bs)) -> CONAPP (((fun (TYCON x) -> x)
+    (tysubst one_sub (TYCON a))), ((List.map (tysubst one_sub)) bs)) *)
 
 let rec tysubst (one_sub: (tyvar * gtype)) (t : gtype) =
   match one_sub, t with
   | (x, y), (TYVAR z)  -> if x = z then y else (TYVAR z)
-  | (x, y), (TYCON c)  -> (TYCON c)
-  | (x, y), (CONAPP (a, bs)) -> CONAPP (a, (List.map (tysubst one_sub)) bs)
+  | (x, y), (TYCON c)  -> 
+    (match c with 
+    | TArrow retty -> TYCON (TArrow (tysubst one_sub retty))
+    | _ -> (TYCON c))
+  | (x, y), (CONAPP (a, bs)) -> CONAPP (((fun (TYCON x) -> x)
+    (tysubst one_sub (TYCON a))), ((List.map (tysubst one_sub)) bs))
 
 (* get_constraints - returns a list of Tasts
         Tast : [ (ident * (gtype * tx)) ] = [ (ident * texpr) | texpr ] = [ tdefns ]
@@ -311,7 +324,8 @@ match sub with
             | TypedIf (x, y, z) -> 
                 TypedIf (expr_only_case x, expr_only_case y, expr_only_case z)
             | TypedApply (x, xs) -> 
-                TypedApply (expr_only_case x,(List.map expr_only_case xs))
+                let txs = List.map expr_only_case xs in
+                TypedApply (expr_only_case x, txs)
             | TypedLet ((its), x) -> TypedLet (List.map (fun (x, y) -> 
                 (x, expr_only_case y)) its, expr_only_case x)
             | TypedLambda (tyformals, body) -> 
@@ -321,9 +335,10 @@ match sub with
             | TypedVar x -> TypedVar x
           in
           let temp = (tysubst (tv, gt) tast_gt, updated_tast_tx) in
-          let () = print_endline (":=APPLYSUBS_ANON=: texpr " ^ string_of_texpr temp) in temp) x xs in
+        let () = print_endline (":=APPLYSUBS_ANON=: texpr " ^ string_of_texpr temp) in temp) x xs in
       match tdef with 
       | TVal (name, x) -> TVal (name, (expr_only_case x))
+        (* Do we need to do anything with updating context here? *)
       | TExpr x -> TExpr (expr_only_case x)
     )
   in final_ans
