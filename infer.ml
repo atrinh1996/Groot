@@ -278,16 +278,22 @@ let rec generate_constraints gctx e =
     | _ -> (TYCON c))
   | (x, y), (CONAPP (a, bs)) -> CONAPP (((fun (TYCON x) -> x)
     (tysubst one_sub (TYCON a))), ((List.map (tysubst one_sub)) bs)) *)
+let tycon_to_gtype gt = function
+  | TYCON c -> c
+  | TYVAR t -> raise (Type_error ("the variable " ^ string_of_tyvar t ^ " has type tyvar but an expression was exprected of type tycon"))
+  | CONAPP a -> raise (Type_error ("the constructor " ^ string_of_conapp a ^ " has type conapp but an expression was exprected of type tycon"))
+
 
 let rec tysubst (one_sub: (tyvar * gtype)) (t : gtype) =
   match one_sub, t with
   | (x, y), (TYVAR z)  -> if x = z then y else (TYVAR z)
-  | (x, y), (TYCON c)  -> 
-    (match c with 
-    | TArrow retty -> TYCON (TArrow (tysubst one_sub retty))
-    | _ -> (TYCON c))
-  | (x, y), (CONAPP (a, bs)) -> CONAPP (((fun (TYCON x) -> x)
+  | (x, y), (TYCON (TArrow retty))  -> TYCON (TArrow (tysubst one_sub retty))
+  | (x, y), (TYCON c)  -> TYCON c
+  | (x, y), (CONAPP (a, bs)) ->
+    let ty = (tycon_to_gtype x) in
+    CONAPP ((ty
     (tysubst one_sub (TYCON a))), ((List.map (tysubst one_sub)) bs))
+
 
 (* get_constraints - returns a list of Tasts
         Tast : [ (ident * (gtype * tx)) ] = [ (ident * texpr) | texpr ] = [ tdefns ]
@@ -300,7 +306,7 @@ let rec get_constraints (ctx : (ident * tyscheme) list ) (d : defn) =
     (t, c, (TVal (name, tex)))
   | Expr e ->
     let (t, c, tex) = generate_constraints ctx e in 
-    (t, c, TExpr tex)
+    (t, c, TExpr t)
 
 (*  input: (tyvar * gtype) list *)
 (* return: tdefn -> tdefn *)
