@@ -1,13 +1,13 @@
 
 (* Top-level of the groot compiler: scan & parse input, 
 
-		TODO: generate the resulting AST and generate a SAST from it
-					generate LLVM IR, dump the module
-	*)
+   		TODO: generate the resulting AST and generate a SAST from it
+   					generate LLVM IR, dump the module
+   	*)
 
 (* may not need to use this, but this is how to robustly create unique exception
    types
- *)
+*)
 
 type action = 
 	  Ast 
