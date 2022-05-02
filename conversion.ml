@@ -48,10 +48,10 @@ let rec ofMtype = function
   | Mtyvar _    -> raise (Failure "Closure: cannot close with a polymorphic type")
   | Mconapp con  -> Conapp (ofConapp con)
 and ofTycon = function 
-    TInt        -> Intty
-  | TBool       -> Boolty
-  | TChar       -> Charty
-  | TArrow retty -> Tarrow (ofMtype retty)
+    MIntty        -> Intty
+  | MBoolty       -> Boolty
+  | MCharty       -> Charty
+  | MTarrow retty -> Tarrow (ofMtype retty)
 and ofConapp (tyc, tys) = (ofTycon tyc, List.map ofMtype tys)
 
 
@@ -157,8 +157,8 @@ let newFuntype  (origTyp : mtype) (newRet : ctype)
 
 
 (* Converts given sexpr to cexpr, and returns the cexpr *)
-let rec mexprToCexpr ((ty, e) : texpr) (env : var_env) =
-  let rec exp ((typ, ex) : texpr) = match ex with
+let rec mexprToCexpr ((ty, e) : mexpr) (env : var_env) =
+  let rec exp ((typ, ex) : mexpr) = match ex with
     | MLiteral v -> (ofMtype typ, CLiteral (value v))
     | MVar s     -> 
         (* In case s is a name of a define, get the closure type *)

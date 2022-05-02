@@ -118,38 +118,32 @@ let compose theta1 theta2 =
 (* solve': solves a single constraint 'c' *)
 let rec solve' (c : gtype * gtype)  = 
   match c with
-  | (TYVAR t1, TYVAR t2) -> let () = print_endline "HERE1" in [(t1, TYVAR t2)]
-  | (TYVAR t1, TYCON t2) -> 
-    let () = print_endline (":=SOLVE=: (TYVAR t1, TYCON t2) = " ^ Tast.string_of_constraint c ^ " -> (" ^ Tast.string_of_tyvar t1 ^ ", " ^ Tast.string_of_ttype (TYCON t2) ^ ")") in
-    [(t1, TYCON t2)]
+  | (TYVAR t1, TYVAR t2) -> [(t1, TYVAR t2)]
+  | (TYVAR t1, TYCON t2) -> [(t1, TYCON t2)]
   | (TYVAR t1, CONAPP t2) -> 
-    let () = print_endline "HERE3" in
-    if is_ftv t1 (CONAPP t2) then raise (Type_error "type error: type variable is not free in type constructor")
+    if is_ftv t1 (CONAPP t2) 
+      then raise (Type_error "type error: type variable is not free in type constructor")
     else [(t1, (CONAPP t2))]
-      (* if List.fold_left 
-        (fun acc x -> (is_ftv t x || acc)) false (snd a)
-      then raise (Type_error "type error")
-      else [(t, CONAPP a)] *) (* TODO - changed to make more compact - gave is_ftv a conapp case *)
-  | (TYCON t1, TYVAR t2) -> let () = 
-      print_endline (":=SOLVE=: (TYCON t1, TYVAR t2) = " ^ Tast.string_of_constraint c ^ " -> (" ^ Tast.string_of_tyvar t2 ^ ", " ^ Tast.string_of_tycon t1 ^ ")") in 
-      solve' (TYVAR t2, TYCON t1)
-  | (TYCON (TArrow (TYVAR t1)), TYCON t2) -> let () = print_endline "HERE5" in [(t1, TYCON t2)] 
-  | (TYCON t1, TYCON (TArrow (TYVAR t2))) -> 
-    let () = print_endline (":=SOLVE=: (TYCON t1, TYCON (TArrow (TYVAR t2))) = " ^ Tast.string_of_constraint c ^ " -> (" ^ Tast.string_of_tyvar t2 ^ ", " ^ Tast.string_of_tycon t1 ^ ")") in 
-    [(t2, TYCON t1)] 
+  | (TYCON t1, TYVAR t2) -> solve' (TYVAR t2, TYCON t1)
+  | (TYCON (TArrow (TYVAR t1)), TYCON t2) -> [(t1, TYCON t2)] 
+  | (TYCON t1, TYCON (TArrow (TYVAR t2))) -> [(t2, TYCON t1)] 
   | (TYCON t1, TYCON t2) -> 
-    let () = print_endline (":=SOLVE=: (TYCON t1, TYCON t2) = " ^ Tast.string_of_constraint c ^ " -> (if (" ^ Tast.string_of_tycon t1 ^ " = " ^ Tast.string_of_tycon t2 ^ ") then [] else \"type error: type constructor mismatch " ^ string_of_tycon t1 ^ " != " ^ string_of_tycon t2 ^ "\"") in
     if t1 = t2 then []
-    else raise (Type_error ("type error: type constructor mismatch " ^ string_of_tycon t1 ^ " != " ^ string_of_tycon t2))
-  | (TYCON t1, CONAPP t2) -> raise (Type_error ("type error: type constructor mismatch " ^ string_of_tycon t1 ^ " != " ^ string_of_conapp t2))
-  | (CONAPP t1, TYVAR t2) -> let () = print_endline "HERE8" in solve' (TYVAR t2, CONAPP t1)
-  | (CONAPP t1, TYCON t2) -> raise (Type_error ("type error: type constructor mismatch " ^ string_of_conapp t1 ^ " != " ^ string_of_tycon t2))
+    else raise (Type_error ("type error: type constructor mismatch " 
+                ^ string_of_tycon t1 ^ " != " ^ string_of_tycon t2))
+  | (TYCON t1, CONAPP t2) -> 
+      raise (Type_error ("type error: type constructor mismatch " 
+              ^ string_of_tycon t1 ^ " != " ^ string_of_conapp t2))
+  | (CONAPP t1, TYVAR t2) -> solve' (TYVAR t2, CONAPP t1)
+  | (CONAPP t1, TYCON t2) -> 
+      raise (Type_error ("type error: type constructor mismatch " 
+              ^ string_of_conapp t1 ^ " != " ^ string_of_tycon t2))
   | (CONAPP t1, CONAPP t2) -> 
     match t1, t2 with 
-    | ((TArrow t1, tys1), (TArrow t2, tys2)) ->
-      let () = print_endline (":=SOLVE=: (CONAPP t1, CONAPP t2) = " ^ Tast.string_of_constraint c ^ " -> solve [" ^ String.concat ", " (List.map (string_of_ttype) tys1) ^ "] U [" ^ String.concat ", " (List.map string_of_ttype tys2) ^ "] @ [" ^ string_of_ttype t1 ^ ", " ^ string_of_ttype t2 ^ "]") in
-      solve ((t1, t2) :: (List.combine tys1 tys2))
-    | _ -> raise (Type_error ("type error: type constructor mismatch " ^ string_of_conapp t1 ^ " != " ^ string_of_conapp t2))
+    | ((TArrow t1, tys1), (TArrow t2, tys2)) -> 
+        solve ((t1, t2) :: (List.combine tys1 tys2))
+    | _ -> raise (Type_error ("type error: type constructor mismatch " 
+                  ^ string_of_conapp t1 ^ " != " ^ string_of_conapp t2))
 
 
 
@@ -161,11 +155,9 @@ and solve (constraints : (gtype * gtype) list) =
     match cns with
     | [] -> []
     | cn :: cns ->  
-      let theta1 = solve' cn in
-      let () = print_endline (":=SOLVE=: current cn: " ^ Tast.string_of_constraint cn) in
-      let () = print_endline (":=SOLVE=: theta1: " ^ string_of_subs theta1) in
-      let theta2 = solve (sub theta1 cns) in
-      (compose theta2 theta1) @ theta2
+        let theta1 = solve' cn in
+        let theta2 = solve (sub theta1 cns) in
+        (compose theta2 theta1) @ theta2
   in solver constraints 
 
 
@@ -182,49 +174,36 @@ let rec generate_constraints gctx e =
     match e with
     | Literal e -> value e
     | Var name -> 
-      (* DEBUG *)
-      let () = print_endline (":=GENCONS=: (var) name: " ^ name) in 
-      let (_, (_, tau)) = List.find (fun x -> fst x = name) ctx in
-      (* DEBUG *)
-      let () = print_endline (":=GENCONS=: (var) tau: " ^ string_of_ttype tau) in
-      (tau, [], (tau, (TypedVar name)))
+        let (_, (_, tau)) = List.find (fun x -> fst x = name) ctx in
+        (tau, [], (tau, (TypedVar name)))
     | If (e1, e2, e3) -> 
-      let (t1, c1, tex1) = generate_constraints gctx e1 in (* TODO - change 'gctx' to 'ctx'? *)
-      let (t2, c2, tex2) = generate_constraints gctx e2 in (* TODO - change 'gctx' to 'ctx'? *)
-      let (t3, c3, tex3) = generate_constraints gctx e3 in (* TODO - change 'gctx' to 'ctx'? *)
-      let c = [(TYCON TBool, t1); (t3, t2)] @ c1 @ c2 @ c3 in
-      let tex = TypedIf(tex1, tex2, tex3) in
-      (t3, c, (t3, tex))
+        let (t1, c1, tex1) = generate_constraints gctx e1 in
+        let (t2, c2, tex2) = generate_constraints gctx e2 in
+        let (t3, c3, tex3) = generate_constraints gctx e3 in
+        let c = [(booltype, t1); (t3, t2)] @ c1 @ c2 @ c3 in
+        let tex = TypedIf(tex1, tex2, tex3) in
+        (t3, c, (t3, tex))
     | Apply (f, args) ->
-      let t1, c1, tex1 = generate_constraints ctx f in
-      (* DEBUG *)
-      let () = print_endline(":=GENCONS=: (apply) t1: " ^ string_of_ttype t1) in
-      let () = print_endline(":=GENCONS=: (apply) c1: " ^ string_of_constraints c1) in
-      let () = print_endline(":=GENCONS=: (apply) tex1: " ^ string_of_texpr tex1) in
-      let ts2, c2, texs2 = List.fold_left (fun acc e -> 
-        let t, c, x = generate_constraints ctx e in 
-        let ts, cs, xs = acc in (t::ts, c @ cs, x::xs)) 
-      ([], c1, []) (List.rev args) in   (* reverse args to maintain arg order *)
-      let retType = (fresh ()) in
-      (* DEBUG *)
-      let () = print_endline(":=GENCONS=: (apply) ts2: [(" ^ String.concat "), (" (List.map string_of_ttype ts2) ^ ")]") in
-      let () = print_endline(":=GENCONS=: (apply) c2: " ^ string_of_constraints c2) in
-      let () = print_endline(":=GENCONS=: (apply) texs2: [(" ^ String.concat "), (" (List.map string_of_texpr texs2) ^ ")]") in
-      let () = print_endline (":=GENCONS=: (apply) retType: " ^ string_of_ttype retType) in
-      (retType, 
-        (t1, Tast.functiontype retType ts2) :: c2, 
-        (retType, TypedApply(tex1, texs2)))
+        let t1, c1, tex1 = generate_constraints ctx f in
+        let ts2, c2, texs2 = List.fold_left (fun acc e -> 
+          let t, c, x = generate_constraints ctx e in 
+          let ts, cs, xs = acc in (t::ts, c @ cs, x::xs)) 
+        ([], c1, []) (List.rev args) in   (* reverse args to maintain arg order *)
+        let retType = (fresh ()) in
+        (retType, 
+          (t1, Tast.functiontype retType ts2) :: c2, 
+          (retType, TypedApply(tex1, texs2)))
     | Let (bindings, expr) ->
-      let l = List.map (fun (n, e) -> generate_constraints ctx e) bindings in
-      let cns = List.concat (List.map (fun (_, c, _) -> c) l) in
-      let taus = List.map (fun (t,_, _) -> t) l in
-      let asts = List.map (fun (_, _, a) -> a) l in
-      let names = List.map fst bindings in
-      let ctx_addition = List.map (fun (n, t) -> 
-        (n, ([], t))) (List.combine names taus) in
-      let new_ctx = ctx_addition @ ctx in
-      let (b_tau, b_cns, b_tast) = generate_constraints new_ctx expr in
-      (b_tau, b_cns @ cns, (b_tau, TypedLet((List.combine names asts), b_tast)))
+        let l = List.map (fun (n, e) -> generate_constraints ctx e) bindings in
+        let cns = List.concat (List.map (fun (_, c, _) -> c) l) in
+        let taus = List.map (fun (t,_, _) -> t) l in
+        let asts = List.map (fun (_, _, a) -> a) l in
+        let names = List.map fst bindings in
+        let ctx_addition = List.map (fun (n, t) -> 
+          (n, ([], t))) (List.combine names taus) in
+        let new_ctx = ctx_addition @ ctx in
+        let (b_tau, b_cns, b_tast) = generate_constraints new_ctx expr in
+        (b_tau, b_cns @ cns, (b_tau, TypedLet((List.combine names asts), b_tast)))
     | Lambda (formals, body) -> 
       (* check for nested lambdas - if nested lambda throw type error *)
       let is_nested_lambda = function
@@ -236,30 +215,21 @@ let rec generate_constraints gctx e =
       let binding = List.map (fun x -> (x, ([], fresh ()))) formals in
       let new_context = binding @ ctx in
       let (t, c, tex) = generate_constraints new_context body in
-      (* DEBUG *)
-      let () = print_endline (":=GENCONS=: (lambda)   t: " ^ string_of_ttype t) in
-      let () = print_endline (":=GENCONS=: (lambda)   c: " ^ string_of_constraints c) in
-      let () = print_endline (":=GENCONS=: (lambda) tex: " ^ string_of_texpr tex) in
       let (ids, tyschms) = List.split binding in
-      let () = print_endline(":=GENCONS=: (lambda) tychms: " ^ String.concat ", " (List.map string_of_tyscheme tyschms)) in
       let (tvs, formaltys) = List.split tyschms in
-      (* let formaltys = snd (List.split (snd (List.split binding))) in  *)
-      let () = print_endline (":=GENCONS=: (lambda) tvs: " ^ String.concat ", " (List.map string_of_tyvar (List.flatten tvs))) in
       let typedFormals = List.combine formaltys formals in
-      let () = print_endline (":=GENCONS=: (lambda) typedFormals: " ^ String.concat ", " (List.map string_of_tyformals typedFormals)) in
-      ((Tast.functiontype t formaltys), c,                                 (* TODO - why? *)
-      (* (CONAPP (TArrow t, formaltys), c,                                 TODO - WHY? *)
+      ((Tast.functiontype t formaltys), c, 
         (Tast.functiontype t formaltys, TypedLambda (typedFormals, tex)))
-    and value v =  
-      match v with
-      | Int e  -> (TYCON TInt, [], (TYCON TInt, TLiteral (TInt e)))
-      | Char e -> (TYCON TChar, [], (TYCON TChar, TLiteral (TChar e)))
-      | Bool e -> (TYCON TBool, [], (TYCON TBool, TLiteral (TBool e)))
-      | Root t -> tree t
-    and tree t = 
-      match t with 
-      | Leaf -> raise (Failure ("Infer TODO: generate constraints for Leaf"))
-      | Branch _ -> raise (Failure ("Infer TODO: generate constraints for Branch"))
+  and value v =  
+    match v with
+    | Int  e -> (inttype,  [], (inttype,  TLiteral (TInt e)))
+    | Char e -> (chartype, [], (chartype, TLiteral (TChar e)))
+    | Bool e -> (booltype, [], (booltype, TLiteral (TBool e)))
+    | Root t -> tree t
+  and tree t = 
+    match t with 
+    | Leaf -> raise (Failure ("Infer TODO: generate constraints for Leaf"))
+    | Branch _ -> raise (Failure ("Infer TODO: generate constraints for Branch"))
   in constrain gctx e
 
 
@@ -280,8 +250,12 @@ let rec generate_constraints gctx e =
     (tysubst one_sub (TYCON a))), ((List.map (tysubst one_sub)) bs)) *)
 let tycon_to_gtype gt = function
   | TYCON c -> c
-  | TYVAR t -> raise (Type_error ("the variable " ^ string_of_tyvar t ^ " has type tyvar but an expression was exprected of type tycon"))
-  | CONAPP a -> raise (Type_error ("the constructor " ^ string_of_conapp a ^ " has type conapp but an expression was exprected of type tycon"))
+  | TYVAR t -> 
+    raise (Type_error ("the variable " ^ string_of_tyvar t 
+            ^ " has type tyvar but an expression was exprected of type tycon"))
+  | CONAPP a -> 
+      raise (Type_error ("the constructor " ^ string_of_conapp a 
+            ^ " has type conapp but an expression was exprected of type tycon"))
 
 
 let rec tysubst (one_sub: (tyvar * gtype)) (t : gtype) =
@@ -306,12 +280,11 @@ let rec get_constraints (ctx : (ident * tyscheme) list ) (d : defn) =
     (t, c, (TVal (name, tex)))
   | Expr e ->
     let (t, c, tex) = generate_constraints ctx e in 
-    (t, c, TExpr t)
+    (t, c, TExpr tex)
 
 (*  input: (tyvar * gtype) list *)
 (* return: tdefn -> tdefn *)
 let apply_subs (sub : (tyvar * gtype) list) =
-  let () = print_endline (":=APPLYSUBS=: " ^ string_of_subs sub) in
 match sub with
 | [] -> (fun x -> x)
 | xs ->
@@ -323,8 +296,6 @@ match sub with
         List.fold_left 
         (* anon fun - takes one texpr and takes one substitution and subs substitution into the texpr *)
         (fun (tast_gt, tast_tx) (tv, gt) -> 
-          let () = print_endline (":=APPLYSUBS_ANON=:   sub: " ^ string_of_subs [(tv, gt)]) in
-          (* let () = print_endline (":=APPLYSUBS_ANON=: texpr:" ^ string_of_texpr (tast_gt, tast_tx)) in *)
           (* updated_tast_tx - matches texpr with tx and recurses on expressions *)
           let updated_tast_tx = match tast_tx with
             | TypedIf (x, y, z) -> 
@@ -340,8 +311,7 @@ match sub with
             | TLiteral x -> TLiteral x
             | TypedVar x -> TypedVar x
           in
-          let temp = (tysubst (tv, gt) tast_gt, updated_tast_tx) in
-        let () = print_endline (":=APPLYSUBS_ANON=: texpr " ^ string_of_texpr temp) in temp) x xs in
+          let temp = (tysubst (tv, gt) tast_gt, updated_tast_tx) in temp) x xs in
       match tdef with 
       | TVal (name, x) -> TVal (name, (expr_only_case x))
         (* Do we need to do anything with updating context here? *)
@@ -352,13 +322,8 @@ match sub with
 let update_ctx ctx tydefn =
 match tydefn with
 | TVal (name, (gt, tx)) -> 
-  let () = print_endline (":=UPDATECTX=: (tval) id: " ^ name ^ " gt: " ^ string_of_ttype gt ^ " tx: " ^ string_of_tx tx) in
-  (name, (List.filter (fun x -> List.exists (fun y -> y = x) (ftvs gt)) (ftvs gt), gt))::ctx
-| TExpr (x, tx) -> 
-  (* DEBUG *)
-  let () = print_endline (":=UPDATECTX=: (texpr) x: " ^ String.concat ", " (List.map string_of_tyvar (ftvs x))) in
-  ctx
-  (* (tx, (List.filter (fun x -> List.exists (fun y -> y = x) (ftvs x)) (ftvs x), x))::ctx *)
+    (name, (List.filter (fun x -> List.exists (fun y -> y = x) (ftvs gt)) (ftvs gt), gt))::ctx
+| TExpr (x, tx) -> ctx
 
 
 (* type_infer
@@ -369,26 +334,13 @@ let rec infer_defns ctx defn = match defn with
 | [] -> []
 | d :: ds -> 
   (* get the constraints for the defn *)
-  let (t, c, tex) = (get_constraints ctx d) in
-  (* constraints -> gtype list *)
-  let constraints = c in
-  (* DEBUG *)
-  let () = print_endline(":=INFER=: cons: " ^ (string_of_constraints constraints)) in 
-  (* tasts -> tdefn list *)
-  let tdefn = tex in
-  (* DEBUG *)
-  let () = print_endline(":=INFER=: tdefn: " ^ (string_of_tdefn tdefn)) in 
-  (* subs -> (Infer.tyvar * Infer.gtype) list *)
+  let (t, constraints, tdefn) = (get_constraints ctx d) in
   let subs = solve constraints in
   (* DEBUG *)
-  let () = print_endline(":=INFER=: subs: " ^ (string_of_subs subs)) in
   (* apply subs to tdefns *)
-  let tdefns = ((apply_subs subs) tdefn) in 
-  let () = print_endline (":=INFER=: ctx: " ^ string_of_context ctx ^ "\n") in
+  let tdefns = ((apply_subs subs) tdefn) in
   (* update ctx *)
   let ctx' = update_ctx ctx tdefns in
-  (* DEBUG *)
-  let () = print_endline (":=INFER=: ctx': " ^ string_of_context ctx') in
   (* recurse *)
   (tdefns :: infer_defns ctx' ds) in 
 infer_defns prims ds

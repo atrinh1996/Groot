@@ -19,7 +19,7 @@ let translate { main = main;  functions = functions;
     and ltype_of_tycon = function 
         Intty                -> int_ty
       | Boolty               -> bool_ty
-      | Charty               -> char_ty
+      | Charty               -> char_ptr_ty (* char_ty *)
       | Tarrow ret  -> 
           (* let llretty =  *)
           ltype_of_ctype ret 
@@ -129,7 +129,7 @@ let translate { main = main;  functions = functions;
     let lltyp = ltype_of_type struct_table ty in 
     let rec const_typ = function 
         Tycon ty    -> const_tycon ty
-      | Tyvar tp    -> const_tyvar tp
+      (* | Tyvar tp    -> const_tyvar tp *)
       | Conapp con  -> const_conapp con
     and const_tycon = function 
         Intty            -> L.const_int  lltyp 0
@@ -137,8 +137,8 @@ let translate { main = main;  functions = functions;
       | Charty           -> L.const_int  lltyp 0
       | Tarrow _         -> L.const_pointer_null lltyp
       | Clo _            -> L.const_pointer_null lltyp
-    and const_tyvar = function 
-        Tparam _ -> raise (Failure ("TODO: lltype of TParam"))
+(*     and const_tyvar = function 
+        Tparam _ -> raise (Failure ("TODO: lltype of TParam")) *)
     and const_conapp (_, _) = L.const_pointer_null lltyp
     in 
     let init = const_typ ty in 

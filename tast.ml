@@ -14,9 +14,9 @@ type gtype =
   | TYVAR of tyvar
   | CONAPP of conapp
 and tycon =
-  | TInt 
-  | TBool 
-  | TChar 
+  | TyInt 
+  | TyBool 
+  | TyChar 
   | TArrow of gtype 
 and tyvar =
   | TVariable of int 
@@ -25,9 +25,9 @@ and conapp = (tycon * gtype list)
 type tyscheme = (tyvar list * gtype)
 
 
-let inttype = TYCON TInt 
-let chartype = TYCON TChar
-let booltype = TYCON TBool
+let inttype = TYCON TyInt 
+let chartype = TYCON TyChar
+let booltype = TYCON TyBool
 let functiontype resultType formalsTypes = 
   CONAPP (TArrow resultType, formalsTypes)
 
@@ -69,9 +69,9 @@ let rec string_of_ttype = function
   | TYVAR tp -> string_of_tyvar tp
   | CONAPP con -> string_of_conapp con
 and string_of_tycon = function 
-  | TInt -> "int"
-  | TBool -> "bool"
-  | TChar -> "char"
+  | TyInt -> "int"
+  | TyBool -> "bool"
+  | TyChar -> "char"
   | TArrow (retty) -> string_of_ttype retty 
 and string_of_tyvar = function
   | TVariable n -> "'" ^ string_of_int n
