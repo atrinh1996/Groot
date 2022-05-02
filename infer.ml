@@ -40,7 +40,7 @@ let rec is_ftv (var : tyvar) (gt : gtype) =
   match gt with
   | TYCON _ -> false
   | TYVAR v -> v = var
-  | CONAPP (t, gtlst) ->
+  | CONAPP (_, gtlst) ->
       (* if any x in gtlst is ftv this returns true, else returns false *)
       List.fold_left (fun acc x -> is_ftv var x || acc) false gtlst
 
@@ -50,7 +50,7 @@ let rec ftvs (ty : gtype) =
   match ty with
   | TYVAR t -> [ t ]
   | TYCON _ -> []
-  | CONAPP (t, gtlst) -> List.fold_left (fun acc x -> acc @ ftvs x) [] gtlst
+  | CONAPP (_, gtlst) -> List.fold_left (fun acc x -> acc @ ftvs x) [] gtlst
 
 (* fresh - returns a fresh gtype variable (integer) *)
 let fresh =
@@ -86,8 +86,8 @@ let compose theta1 theta2 =
             if s1 = a1 then (s1, TYVAR a2)
             else if s1 = a2 then (a1, TYVAR s2)
             else acc
-        | (a1, a2), (s1, TYVAR s2) -> if a1 = s1 then (s1, a2) else acc
-        | (a1, a2), (s1, s2) -> if a1 = s1 then (s1, s2) else acc)
+        | (a1, a2), (s1, TYVAR _) -> if a1 = s1 then (s1, a2) else acc
+        | (a1, _), (s1, s2) -> if a1 = s1 then (s1, s2) else acc)
       cn theta1
   in
   List.map sub_one theta2
@@ -187,7 +187,7 @@ let rec generate_constraints gctx e =
           (t1, Tast.functiontype retType ts2) :: c2,
           (retType, TypedApply (tex1, texs2)) )
     | Let (bindings, expr) ->
-        let l = List.map (fun (n, e) -> generate_constraints ctx e) bindings in
+        let l = List.map (fun (_, e) -> generate_constraints ctx e) bindings in
         let cns = List.concat (List.map (fun (_, c, _) -> c) l) in
         let taus = List.map (fun (t, _, _) -> t) l in
         let asts = List.map (fun (_, _, a) -> a) l in
@@ -202,8 +202,8 @@ let rec generate_constraints gctx e =
         let binding = List.map (fun x -> (x, ([], fresh ()))) formals in
         let new_context = binding @ ctx in
         let t, c, tex = generate_constraints new_context body in
-        let ids, tyschms = List.split binding in
-        let tvs, formaltys = List.split tyschms in
+        let _, tyschms = List.split binding in
+        let _, formaltys = List.split tyschms in
         let typedFormals = List.combine formaltys formals in
         ( Tast.functiontype t formaltys,
           c,
@@ -224,13 +224,13 @@ let rec generate_constraints gctx e =
 
 (* gimme_tycon_gtype - sort of a hack function that we made to solve the bug we
    came across in applying substitutions, called in tysubst *)
-let gimme_tycon_gtype gt = function
-  | TYCON c -> c
-  | TYVAR t -> 
-    raise (Type_error ("the variable " ^ string_of_tyvar t 
+let gimme_tycon_gtype _ = function
+  | TYCON x -> x
+  | TYVAR x -> 
+    raise (Type_error ("the variable " ^ string_of_tyvar x
             ^ " has type tyvar but an expression was exprected of type tycon"))
-  | CONAPP a -> 
-      raise (Type_error ("the constructor " ^ string_of_conapp a 
+  | CONAPP x -> 
+      raise (Type_error ("the constructor " ^ string_of_conapp x 
             ^ " has type conapp but an expression was exprected of type tycon"))
 
 
@@ -239,16 +239,16 @@ let gimme_tycon_gtype gt = function
 let rec tysubst (one_sub : tyvar * gtype) (t : gtype) =
   match (one_sub, t) with
   | (x, y), TYVAR z -> if x = z then y else TYVAR z
-  | (x, y), TYCON (TArrow retty) -> TYCON (TArrow (tysubst one_sub retty))
-  | (x, y), TYCON c -> TYCON c
-  | (x, y), CONAPP (a, bs) ->
+  | _, TYCON (TArrow retty) -> TYCON (TArrow (tysubst one_sub retty))
+  | _, TYCON c -> TYCON c
+  | (x, _), CONAPP (a, bs) ->
       let tycn = gimme_tycon_gtype x in
       CONAPP (tycn (tysubst one_sub (TYCON a)), (List.map (tysubst one_sub)) bs)
 
 (* get_constraints - returns a list of Tasts
         Tast : [ (ident * (gtype * tx)) ] = [ (ident * texpr) | texpr ] = [ tdefns ]
     tyscheme : (tyvar list * gtype) *)
-let rec get_constraints (ctx : (ident * tyscheme) list) (d : defn) =
+let get_constraints (ctx : (ident * tyscheme) list) (d : defn) =
   match d with
   | Val (name, e) ->
       let t, c, tex = generate_constraints ctx e in
@@ -299,9 +299,9 @@ match sub with
    there are no unbound type variables and tha *)
 let update_ctx ctx tydefn =
 match tydefn with
-| TVal (name, (gt, tx)) -> 
+| TVal (name, (gt, _)) -> 
     (name, (List.filter (fun x -> List.exists (fun y -> y = x) (ftvs gt)) (ftvs gt), gt))::ctx
-| TExpr (x, tx) -> ctx
+| TExpr _ -> ctx
 
 
 (* type_infer
@@ -314,7 +314,7 @@ let type_infer (ds : defn list) =
     | [] -> []
     | d :: ds ->
         (* get the constraints for the defn *)
-        let t, cs, tex = get_constraints ctx d in
+        let _, cs, tex = get_constraints ctx d in
         (* subs -> (Infer.tyvar * Infer.gtype) list *)
         let subs = solve cs in
         (* apply subs to tdefns *)

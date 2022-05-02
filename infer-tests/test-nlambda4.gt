@@ -1,0 +1,3 @@
+(val retn (lambda (n m) n)) 
+(val testAB (lambda (a) (lambda (b) (retn a b))))
+((testAB 4) #t)
