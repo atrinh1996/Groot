@@ -3,7 +3,7 @@
 # Stephen Edwards for his Compilers course at Columbia University.
 
 
-DEPENDS=toplevel.ml ast.ml tast.ml parser.mly scanner.mll diagnostic.ml infer.ml mast.ml mono.ml
+DEPENDS=toplevel.ml ast.ml tast.ml parser.mly scanner.mll diagnostic.ml infer.ml mast.ml mono.ml codegen.ml
 # cast.ml conversion.ml 
 # semant.ml
 

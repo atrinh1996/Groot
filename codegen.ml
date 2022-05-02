@@ -266,6 +266,73 @@ let translate { main = main;  functions = functions;
                                         [| bool_stringptr |] 
                                         "printb" builder'
         in (builder', instruction)
+      (* BINOP PRIMITIVES - Int and Boolean Algebra *)
+     | CApply ((_, CVar "+"), arg1::[arg2], _) -> 
+        let (builder', e1) = expr builder lenv block arg1 in 
+        let (builder'', e2) = expr builder' lenv block arg2 in 
+        let instruction = L.build_add e1 e2 "+" builder''
+        in (builder'', instruction)
+     | CApply ((_, CVar "-"), arg1::[arg2], _) -> 
+        let (builder', e1) = expr builder lenv block arg1 in 
+        let (builder'', e2) = expr builder' lenv block arg2 in 
+        let instruction = L.build_sub e1 e2 "-" builder''
+        in (builder'', instruction)
+     | CApply ((_, CVar "/"), arg1::[arg2], _) -> 
+        let (builder', e1) = expr builder lenv block arg1 in 
+        let (builder'', e2) = expr builder' lenv block arg2 in 
+        let instruction = L.build_sdiv e1 e2 "/" builder''
+        in (builder'', instruction)
+     | CApply ((_, CVar "*"), arg1::[arg2], _) -> 
+        let (builder', e1) = expr builder lenv block arg1 in 
+        let (builder'', e2) = expr builder' lenv block arg2 in 
+        let instruction = L.build_mul e1 e2 "*" builder''
+        in (builder'', instruction)
+     | CApply ((_, CVar "mod"), arg1::[arg2], _) -> 
+        let (builder', e1) = expr builder lenv block arg1 in 
+        let (builder'', e2) = expr builder' lenv block arg2 in 
+        let instruction = L.build_srem e1 e2 "mod" builder''
+        in (builder'', instruction)
+     | CApply ((_, CVar "&&"), arg1::[arg2], _) -> 
+        let (builder', e1) = expr builder lenv block arg1 in 
+        let (builder'', e2) = expr builder' lenv block arg2 in 
+        let instruction = L.build_and e1 e2 "&&" builder''
+        in (builder'', instruction)
+     | CApply ((_, CVar "||"), arg1::[arg2], _) -> 
+        let (builder', e1) = expr builder lenv block arg1 in 
+        let (builder'', e2) = expr builder' lenv block arg2 in 
+        let instruction = L.build_or e1 e2 "||" builder''
+        in (builder'', instruction)
+      (* BINOP PRIMITIVES - Comparisons *)
+     | CApply ((_, CVar "<"), arg1::[arg2], _) -> 
+        let (builder', e1) = expr builder lenv block arg1 in 
+        let (builder'', e2) = expr builder' lenv block arg2 in 
+        let instruction = L.build_icmp L.Icmp.Slt e1 e2 "<" builder''
+        in (builder'', instruction)
+     | CApply ((_, CVar ">"), arg1::[arg2], _) -> 
+        let (builder', e1) = expr builder lenv block arg1 in 
+        let (builder'', e2) = expr builder' lenv block arg2 in 
+        let instruction = L.build_icmp L.Icmp.Sgt e1 e2 ">" builder''
+        in (builder'', instruction)
+     | CApply ((_, CVar "<="), arg1::[arg2], _) -> 
+        let (builder', e1) = expr builder lenv block arg1 in 
+        let (builder'', e2) = expr builder' lenv block arg2 in 
+        let instruction = L.build_icmp L.Icmp.Sle e1 e2 "<=" builder''
+        in (builder'', instruction)
+     | CApply ((_, CVar ">="), arg1::[arg2], _) -> 
+        let (builder', e1) = expr builder lenv block arg1 in 
+        let (builder'', e2) = expr builder' lenv block arg2 in 
+        let instruction = L.build_icmp L.Icmp.Sge e1 e2 ">=" builder''
+        in (builder'', instruction)
+     | CApply ((_, CVar "=i"), arg1::[arg2], _) -> 
+        let (builder', e1) = expr builder lenv block arg1 in 
+        let (builder'', e2) = expr builder' lenv block arg2 in 
+        let instruction = L.build_icmp L.Icmp.Eq e1 e2 "=i" builder''
+        in (builder'', instruction)
+     | CApply ((_, CVar "!=i"), arg1::[arg2], _) -> 
+        let (builder', e1) = expr builder lenv block arg1 in 
+        let (builder'', e2) = expr builder' lenv block arg2 in 
+        let instruction = L.build_icmp L.Icmp.Ne e1 e2 "!=i" builder''
+        in (builder'', instruction)
      | CApply (f, args, numFrees) -> 
         (* Since all normal function application is as struct value, call to the
            function at member index 0 of the struct *)
