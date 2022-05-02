@@ -57,7 +57,7 @@ type mprog = mdefn list
 let rec string_of_mtype = function 
     Mtycon ty -> string_of_mtycon ty
   | Mconapp con -> string_of_mconapp con
-  | _ -> "Error: polymorphic tyvar"
+  | Mtyvar i -> "'" ^ string_of_int i
 and string_of_mtycon = function 
   | MIntty -> "int"
   | MBoolty -> "bool"

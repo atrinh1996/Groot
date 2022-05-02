@@ -9,19 +9,30 @@ exception Type_error of string
 
 let type_error msg = raise (Type_error msg)
 
-type gtype = TYCON of tycon | TYVAR of tyvar | CONAPP of conapp
-and tycon = TInt | TBool | TChar | TArrow of gtype
-and tyvar = TVariable of int
-and conapp = tycon * gtype list
+
+type gtype =
+  | TYCON of tycon
+  | TYVAR of tyvar
+  | CONAPP of conapp
+and tycon =
+  | TyInt 
+  | TyBool 
+  | TyChar 
+  | TArrow of gtype 
+and tyvar =
+  | TVariable of int 
+and conapp = (tycon * gtype list)
 
 type tyscheme = tyvar list * gtype
 
-let inttype = TYCON TInt
-let chartype = TYCON TChar
-let booltype = TYCON TBool
 
-let functiontype resultType formalsTypes =
+
+let inttype = TYCON TyInt 
+let chartype = TYCON TyChar
+let booltype = TYCON TyBool
+let functiontype resultType formalsTypes = 
   CONAPP (TArrow resultType, formalsTypes)
+
 
 (* TAST expression *)
 type texpr = gtype * tx
@@ -45,11 +56,10 @@ let rec string_of_ttype = function
   | TYCON ty -> string_of_tycon ty
   | TYVAR tp -> string_of_tyvar tp
   | CONAPP con -> string_of_conapp con
-
-and string_of_tycon = function
-  | TInt -> "int"
-  | TBool -> "bool"
-  | TChar -> "char"
+and string_of_tycon = function 
+  | TyInt -> "int"
+  | TyBool -> "bool"
+  | TyChar -> "char"
   | TArrow (retty) -> string_of_ttype retty 
 and string_of_tyvar = function
   | TVariable n -> "'" ^ string_of_int n

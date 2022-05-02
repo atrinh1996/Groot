@@ -42,19 +42,6 @@ rule tokenize = parse
   | '['                  { LSQUARE }
   | ']'                  { RSQUARE }
 
-(*
-  | '+'                  { PLUS }
-  | '-'                  { MINUS }
-  | '*'                  { TIMES }
-  | '/'                  { DIVIDE }
-  | "mod"                { MOD }
-  | "=="                 { EQ }
-  | "!="                 { NEQ }
-  | "<="                 { LEQ }
-  | ">="                 { GEQ }
-  | '<'                  { LT }
-  | '>'                  { GT }
-*)
   | "tree"               { BRANCH }
   | "leaf"               { LEAF }
   | "if"                 { IF }
@@ -70,16 +57,6 @@ rule tokenize = parse
   | "let"                { LET }
   | "val"                { VAL }
   | ident as id          { ID(id) }
-
-(*
-  | ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']* as lxm { ID(lxm) }
-*)
-
-(*
-  | "&&"                 { AND }
-  | "||"                 { OR }
-  | '!'                  { NOT }
-*)
   | eof                  { EOF }
   | _                    { Diagnostic.error(Diagnostic.lex_error "unrecognized character" lexbuf) }
 

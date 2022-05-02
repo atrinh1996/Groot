@@ -1,10 +1,59 @@
+(;
+(val retn (lambda (n m) n)) 
+
+(val testAB (lambda (a) 
+		(lambda (b) (+ a b))))
+
+
+((testAB 9) 8)
+;)
+
+
+(;
+(val retn (lambda (n m) n))
+
+(printi (retn 2 4))
+(printi (retn 13 #t))
+(printc (retn 'g' 34))
+;)
+
+
 (val retn (lambda (n) n))
-(; (retn 9) ;)
+
+
+
+(printi (retn 42))
+(printc (retn 'c'))
+(printb (retn #t))
+
+(;
+(printb (retn #f))
+(printi (retn 15))
+;)
+
+(;
+(val x 42)
+(val retn (lambda (n) n))
+(val test (lambda () (retn 5)))
+
+
+(retn 5)
+(retn #t)
+(retn 'c')
+;)
+
+
+(;
+(val retn (lambda (n) n))
 
 (val test (lambda () 
 		(retn 5)))
 		
 (test)
+
+(retn #t)
+
+;)
 
 (;
 (val x 42)
@@ -13,4 +62,8 @@
 
 (val prnt (lambda (n) (printi n)))
 (prnt 9)
+;)
+
+(;
+((lambda (n) n) 8)
 ;)
