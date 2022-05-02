@@ -1,0 +1,134 @@
+:=GENCONS=: (var) name: +
+:=GENCONS=: (var) tau: [int int] -> int
+:=GENCONS=: (apply) t1: [int int] -> int
+:=GENCONS=: (apply) c1: [  ]
+:=GENCONS=: (apply) tex1: [[int int] -> int] +
+:=GENCONS=: (var) name: n
+:=GENCONS=: (var) tau: '1
+:=GENCONS=: (apply) ts2: [('1), (int)]
+:=GENCONS=: (apply) c2: [  ]
+:=GENCONS=: (apply) texs2: [(['1] n), ([int] 1)]
+:=GENCONS=: (apply) retType: '2
+:=GENCONS=: (lambda)   t: '2
+:=GENCONS=: (lambda)   c: [ ([int int] -> int, ['1 int] -> '2) ]
+:=GENCONS=: (lambda) tex: ['2] ([[int int] -> int] + [['1] n -> [int] 1])
+:=GENCONS=: (lambda) tychms: ([]:'1)
+:=GENCONS=: (lambda) tvs: 
+:=GENCONS=: (lambda) typedFormals: (n : '1)
+:=INFER=: cons: [ ([int int] -> int, ['1 int] -> '2) ]
+:=INFER=: tdefn: [['1] -> '2] (lambda ('1 n) ['2] ([[int int] -> int] + [['1] n -> [int] 1]))
+:=SOLVE=: (CONAPP t1, CONAPP t2) = ([int int] -> int, ['1 int] -> '2) -> solve [int, int] U ['1, int] @ [int, '2]
+:=SOLVE=: (TYCON t1, TYVAR t2) = (int, '2) -> ('2, int)
+:=SOLVE=: (TYVAR t1, TYCON t2) = ('2, int) -> ('2, int)
+:=SOLVE=: current cn: (int, '2)
+:=SOLVE=: theta1: ('2, int) 
+:=SOLVE=: (TYCON t1, TYVAR t2) = (int, '1) -> ('1, int)
+:=SOLVE=: (TYVAR t1, TYCON t2) = ('1, int) -> ('1, int)
+:=SOLVE=: current cn: (int, '1)
+:=SOLVE=: theta1: ('1, int) 
+:=SOLVE=: (TYCON t1, TYCON t2) = (int, int) -> (if (int = int) then [] else "type error: type constructor mismatch int != int"
+:=SOLVE=: current cn: (int, int)
+:=SOLVE=: theta1: 
+:=SOLVE=: current cn: ([int int] -> int, ['1 int] -> '2)
+:=SOLVE=: theta1: ('2, int) ('1, int) 
+:=INFER=: subs: ('2, int) ('1, int) 
+:=APPLYSUBS=: ('2, int) ('1, int) 
+:=APPLYSUBS_ANON=:   sub: ('2, int) 
+:=APPLYSUBS_ANON=:   sub: ('2, int) 
+:=APPLYSUBS_ANON=:   sub: ('2, int) 
+:=APPLYSUBS_ANON=: texpr ['1] n
+:=APPLYSUBS_ANON=:   sub: ('1, int) 
+:=APPLYSUBS_ANON=: texpr [int] n
+:=APPLYSUBS_ANON=:   sub: ('2, int) 
+:=APPLYSUBS_ANON=: texpr [int] 1
+:=APPLYSUBS_ANON=:   sub: ('1, int) 
+:=APPLYSUBS_ANON=: texpr [int] 1
+:=APPLYSUBS_ANON=:   sub: ('2, int) 
+:=APPLYSUBS_ANON=: texpr [[int int] -> int] +
+:=APPLYSUBS_ANON=:   sub: ('1, int) 
+:=APPLYSUBS_ANON=: texpr [[int int] -> int] +
+:=APPLYSUBS_ANON=: texpr [int] ([[int int] -> int] + [[int] n -> [int] 1])
+:=APPLYSUBS_ANON=:   sub: ('1, int) 
+:=APPLYSUBS_ANON=:   sub: ('2, int) 
+:=APPLYSUBS_ANON=: texpr [int] n
+:=APPLYSUBS_ANON=:   sub: ('1, int) 
+:=APPLYSUBS_ANON=: texpr [int] n
+:=APPLYSUBS_ANON=:   sub: ('2, int) 
+:=APPLYSUBS_ANON=: texpr [int] 1
+:=APPLYSUBS_ANON=:   sub: ('1, int) 
+:=APPLYSUBS_ANON=: texpr [int] 1
+:=APPLYSUBS_ANON=:   sub: ('2, int) 
+:=APPLYSUBS_ANON=: texpr [[int int] -> int] +
+:=APPLYSUBS_ANON=:   sub: ('1, int) 
+:=APPLYSUBS_ANON=: texpr [[int int] -> int] +
+:=APPLYSUBS_ANON=: texpr [int] ([[int int] -> int] + [[int] n -> [int] 1])
+:=APPLYSUBS_ANON=: texpr [['1] -> int] (lambda ('1 n) [int] ([[int int] -> int] + [[int] n -> [int] 1]))
+:=APPLYSUBS_ANON=:   sub: ('1, int) 
+:=APPLYSUBS_ANON=:   sub: ('2, int) 
+:=APPLYSUBS_ANON=:   sub: ('2, int) 
+:=APPLYSUBS_ANON=: texpr [int] n
+:=APPLYSUBS_ANON=:   sub: ('1, int) 
+:=APPLYSUBS_ANON=: texpr [int] n
+:=APPLYSUBS_ANON=:   sub: ('2, int) 
+:=APPLYSUBS_ANON=: texpr [int] 1
+:=APPLYSUBS_ANON=:   sub: ('1, int) 
+:=APPLYSUBS_ANON=: texpr [int] 1
+:=APPLYSUBS_ANON=:   sub: ('2, int) 
+:=APPLYSUBS_ANON=: texpr [[int int] -> int] +
+:=APPLYSUBS_ANON=:   sub: ('1, int) 
+:=APPLYSUBS_ANON=: texpr [[int int] -> int] +
+:=APPLYSUBS_ANON=: texpr [int] ([[int int] -> int] + [[int] n -> [int] 1])
+:=APPLYSUBS_ANON=:   sub: ('1, int) 
+:=APPLYSUBS_ANON=:   sub: ('2, int) 
+:=APPLYSUBS_ANON=: texpr [int] n
+:=APPLYSUBS_ANON=:   sub: ('1, int) 
+:=APPLYSUBS_ANON=: texpr [int] n
+:=APPLYSUBS_ANON=:   sub: ('2, int) 
+:=APPLYSUBS_ANON=: texpr [int] 1
+:=APPLYSUBS_ANON=:   sub: ('1, int) 
+:=APPLYSUBS_ANON=: texpr [int] 1
+:=APPLYSUBS_ANON=:   sub: ('2, int) 
+:=APPLYSUBS_ANON=: texpr [[int int] -> int] +
+:=APPLYSUBS_ANON=:   sub: ('1, int) 
+:=APPLYSUBS_ANON=: texpr [[int int] -> int] +
+:=APPLYSUBS_ANON=: texpr [int] ([[int int] -> int] + [[int] n -> [int] 1])
+:=APPLYSUBS_ANON=: texpr [[int] -> int] (lambda (int n) [int] ([[int int] -> int] + [[int] n -> [int] 1]))
+:=INFER=: ctx: 
+=: printb, (['-1], [bool] -> int)
+=: printi, (['-2], [int] -> int)
+=: printc, (['-3], [char] -> int)
+=: +, (['-4], [int int] -> int)
+=: -, (['-4], [int int] -> int)
+=: /, (['-4], [int int] -> int)
+=: *, (['-4], [int int] -> int)
+=: mod, (['-4], [int int] -> int)
+=: <, (['-5], [int int] -> bool)
+=: >, (['-5], [int int] -> bool)
+=: <=, (['-5], [int int] -> bool)
+=: >=, (['-5], [int int] -> bool)
+=: =i, (['-5], [int int] -> bool)
+=: !=i, (['-5], [int int] -> bool)
+=: &&, (['-6], [bool bool] -> bool)
+=: ||, (['-6], [bool bool] -> bool)
+=: not, (['-7], [bool] -> bool)
+
+:=UPDATECTX=: (texpr) x: 
+:=INFER=: ctx': 
+=: printb, (['-1], [bool] -> int)
+=: printi, (['-2], [int] -> int)
+=: printc, (['-3], [char] -> int)
+=: +, (['-4], [int int] -> int)
+=: -, (['-4], [int int] -> int)
+=: /, (['-4], [int int] -> int)
+=: *, (['-4], [int int] -> int)
+=: mod, (['-4], [int int] -> int)
+=: <, (['-5], [int int] -> bool)
+=: >, (['-5], [int int] -> bool)
+=: <=, (['-5], [int int] -> bool)
+=: >=, (['-5], [int int] -> bool)
+=: =i, (['-5], [int int] -> bool)
+=: !=i, (['-5], [int int] -> bool)
+=: &&, (['-6], [bool bool] -> bool)
+=: ||, (['-6], [bool bool] -> bool)
+=: not, (['-7], [bool] -> bool)
+[[int] -> int] (lambda (int n) [int] ([[int int] -> int] + [[int] n -> [int] 1]))

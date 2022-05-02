@@ -1,56 +1,56 @@
-
 open Ast
 open Tast
-
 module StringMap = Map.Make (String)
 
 exception Type_error of string
 
-
-(*initializes inbuilt functions with their types - used as list past to type_infer' in last line of infer.ml
-    structure: (id * (tvar list, function type))
-    function type built by passing the return type and the list of formal types to Tast.functiontype *)
-let built_in_functions = 
+(* prims - initializes context with built-in functions with their types *)
+(* prims : (id * tyvar) list * (tycon * gtype list) *)
+let prims =
   [
-    ("printb", ([TVariable (-1)], Tast.functiontype inttype [booltype]));
-    ("printi", ([TVariable (-2)], Tast.functiontype inttype [inttype]));
-    ("printc", ([TVariable (-3)], Tast.functiontype inttype [chartype]));
-    ("+",      ([TVariable (-4)], Tast.functiontype inttype [inttype; inttype]));
-    ("-",      ([TVariable (-4)], Tast.functiontype inttype [inttype; inttype]));
-    ("/",      ([TVariable (-4)], Tast.functiontype inttype [inttype; inttype]));
-    ("*",      ([TVariable (-4)], Tast.functiontype inttype [inttype; inttype]));
-    ("mod",    ([TVariable (-4)], Tast.functiontype inttype [inttype; inttype]));
-    ("<",      ([TVariable (-5)], Tast.functiontype booltype [inttype; inttype]));
-    (">",      ([TVariable (-5)], Tast.functiontype booltype [inttype; inttype]));
-    ("<=",     ([TVariable (-5)], Tast.functiontype booltype [inttype; inttype]));
-    (">=",     ([TVariable (-5)], Tast.functiontype booltype [inttype; inttype]));
-    ("=i",     ([TVariable (-5)], Tast.functiontype booltype [inttype; inttype]));
-    ("!=i",    ([TVariable (-5)], Tast.functiontype booltype [inttype; inttype]));
-    ("&&",     ([TVariable (-6)], Tast.functiontype booltype [booltype; booltype]));
-    ("||",     ([TVariable (-6)], Tast.functiontype booltype [booltype; booltype]));
-    ("not",    ([TVariable (-7)], Tast.functiontype booltype [booltype]));
-    (* ("-",      ([TVariable (-2)], Tast.functiontype inttype [inttype]))   *)          
-  ] 
+    ("printb", ([ TVariable (-1) ], Tast.functiontype inttype [ booltype ]));
+    ("printi", ([ TVariable (-2) ], Tast.functiontype inttype [ inttype ]));
+    ("printc", ([ TVariable (-3) ], Tast.functiontype inttype [ chartype ]));
+    ("+", ([ TVariable (-4) ], Tast.functiontype inttype [ inttype; inttype ]));
+    ("-", ([ TVariable (-4) ], Tast.functiontype inttype [ inttype; inttype ]));
+    ("/", ([ TVariable (-4) ], Tast.functiontype inttype [ inttype; inttype ]));
+    ("*", ([ TVariable (-4) ], Tast.functiontype inttype [ inttype; inttype ]));
+    ("mod", ([ TVariable (-4) ], Tast.functiontype inttype [ inttype; inttype ]));
+    ("<", ([ TVariable (-5) ], Tast.functiontype booltype [ inttype; inttype ]));
+    (">", ([ TVariable (-5) ], Tast.functiontype booltype [ inttype; inttype ]));
+    ("<=", ([ TVariable (-5) ], Tast.functiontype booltype [ inttype; inttype ]));
+    (">=", ([ TVariable (-5) ], Tast.functiontype booltype [ inttype; inttype ]));
+    ("=i", ([ TVariable (-5) ], Tast.functiontype booltype [ inttype; inttype ]));
+    ( "!=i",
+      ([ TVariable (-5) ], Tast.functiontype booltype [ inttype; inttype ]) );
+    ( "&&",
+      ([ TVariable (-6) ], Tast.functiontype booltype [ booltype; booltype ]) );
+    ( "||",
+      ([ TVariable (-6) ], Tast.functiontype booltype [ booltype; booltype ]) );
+    ("not", ([ TVariable (-7) ], Tast.functiontype booltype [ booltype ]))
+    (* ("-",      ([TVariable (-2)], Tast.functiontype inttype [inttype]))   *);
+  ]
 
-
-
-let rec is_free_type_var var gt = 
+(* is_ftv - returns true if 'gt' is equal to free type variable 'var'
+    (i.e. 'gt' is a type variable and 'var' is a free type variable). For the
+    conapp case, we recurse over the conapp's gtype list searching for any free
+    type variables. When this function returns true it means the type variable
+    is matching *)
+let rec is_ftv (var : tyvar) (gt : gtype) =
   match gt with
   | TYCON _ -> false
-  | TYVAR tvar -> var = tvar
-  | CONAPP tcon -> 
-    List.fold_left (fun acc x -> is_free_type_var var x || acc) false (snd tcon)
+  | TYVAR v -> v = var
+  | CONAPP (t, gtlst) ->
+      (* if any x in gtlst is ftv this returns true, else returns false *)
+      List.fold_left (fun acc x -> is_ftv var x || acc) false gtlst
 
-
-
-(* ftvs - returns a list of free type variables amongst a collection of
-          gtypes *)
-let rec ftvs (ty : gtype) = 
+(* ftvs - returns a list of free type variables amongst a collection of gtypes *)
+(* retty : tyvar list *)
+let rec ftvs (ty : gtype) =
   match ty with
-  | TYVAR t -> [t]
+  | TYVAR t -> [ t ]
   | TYCON _ -> []
-  | CONAPP a -> List.fold_left (fun acc x -> acc @ (ftvs x)) [] (snd a)
-
+  | CONAPP (t, gtlst) -> List.fold_left (fun acc x -> acc @ ftvs x) [] gtlst
 
 (* fresh - returns a fresh gtype variable (integer) *)
 let fresh =
@@ -59,7 +59,7 @@ let fresh =
   fun () -> incr k; TYVAR (TVariable !k)
 
 
-(* sub - updates a list of constraints with any substitutions in theta *)
+(* sub - updates a list of constraints with substitutions in theta *)
 let sub (theta : (tyvar * gtype) list) (cns : (gtype * gtype) list) =
   (* sub1 - takes in a single constraint and updates it with any substitutions
             in theta *)
@@ -129,7 +129,7 @@ let rec solve' c1 =
 
 (* solve: *)
 and solve (constraints : (gtype * gtype) list) =
-  let solver cns  =
+  let solver cns =
     match cns with
     | [] -> []
     | cn :: cns ->  
@@ -151,16 +151,16 @@ let rec generate_constraints gctx e =
   let rec constrain ctx e =
     match e with
     | Literal e -> value e
-    | Var name -> 
-      let (_, (_, tau)) = List.find (fun x -> fst x = name) ctx in
-      (tau, [], (tau, (TypedVar name)))
-    | If (e1, e2, e3) -> 
-      let (t1, c1, tex1) = generate_constraints gctx e1 in
-      let (t2, c2, tex2) = generate_constraints gctx e2 in
-      let (t3, c3, tex3) = generate_constraints gctx e3 in
-      let c = [(TYCON TBool, t1); (t3, t2)] @ c1 @ c2 @ c3 in
-      let tex = TypedIf(tex1, tex2, tex3) in
-      (t3, c, (t3, tex))
+    | Var name ->
+        let _, (_, tau) = List.find (fun x -> fst x = name) ctx in
+        (tau, [], (tau, TypedVar name))
+    | If (e1, e2, e3) ->
+        let t1, c1, tex1 = generate_constraints gctx e1 in
+        let t2, c2, tex2 = generate_constraints gctx e2 in
+        let t3, c3, tex3 = generate_constraints gctx e3 in
+        let c = [ (TYCON TBool, t1); (t3, t2) ] @ c1 @ c2 @ c3 in
+        let tex = TypedIf (tex1, tex2, tex3) in
+        (t3, c, (t3, tex))
     | Apply (f, args) ->
       let t1, c1, tex1 = generate_constraints ctx f in
       let ts2, c2, texs2 = List.fold_left (fun acc e -> 
@@ -249,7 +249,7 @@ let rec sub_theta_into_gamma (theta : (tyvar * gtype) list) (gamma : (ident * ty
 (* get_constraints - returns a list of Tasts
         Tast : [ (ident * (gtype * tx)) ] = [ (ident * texpr) | texpr ] = [ tdefns ]
     tyscheme : (tyvar list * gtype) *)
-let rec get_constraints (ctx : (ident * tyscheme) list ) (d : defn list) =
+let rec get_constraints (ctx : (ident * tyscheme) list) (d : defn) =
   match d with
   | [] -> []
   | Val (name, e) :: ds -> 
@@ -296,16 +296,23 @@ let apply_subs (sub : (tyvar * gtype) list) = match sub with
       input : ( ident | ident * expr ) list
     returns : ( ident * (gtype * tx) ) list *)
 let type_infer (ds : defn list) =
-  let type_infer' (ctx : (ident * tyscheme) list) =
-    let res = (get_constraints ctx ds) in
-    (* constraints -> gtype list *)
-    let constraints = List.flatten (List.map (fun (_, x, _) -> x) res) in
-    (* tasts -> tdefn list *)
-    let tdefns = (List.map (fun (_, _, x) -> x) res) in
-    (* subs -> (Infer.tyvar * Infer.gtype) list *)
-    let subs = solve constraints in
-    (* almost -> texpr list *)
-    let almost = List.map (apply_subs subs) tdefns in
-    almost
-  in type_infer' built_in_functions
+  let rec infer_defns ctx defn =
+    match defn with
+    | [] -> []
+    | d :: ds ->
+        (* get the constraints for the defn *)
+        let t, cs, tex = get_constraints ctx d in
+        (* subs -> (Infer.tyvar * Infer.gtype) list *)
+        let subs = solve cs in
+        (* apply subs to tdefns *)
+        let tdefn = (apply_subs subs) tex in
+        (* update ctx *)
+        let ctx' = update_ctx ctx tdefn in
+        (* recurse *)
+        tdefn :: infer_defns ctx' ds
+  in
+  infer_defns prims ds
 
+(* type_infer
+      input : ( ident | ident * expr ) list
+    returns : ( ident * (gtype * tx) ) list *)
