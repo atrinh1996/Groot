@@ -1,11 +1,23 @@
+(;
+(val retn (lambda (n m) n)) 
+
+(val testAB (lambda (a) 
+		(lambda (b) (+ a b))))
+
+
+((testAB 9) 8)
+;)
+
+
+(;
 (val retn (lambda (n m) n))
 
 (printi (retn 2 4))
 (printi (retn 13 #t))
 (printc (retn 'g' 34))
+;)
 
 
-(;
 (val retn (lambda (n) n))
 
 
@@ -14,6 +26,7 @@
 (printc (retn 'c'))
 (printb (retn #t))
 
+(;
 (printb (retn #f))
 (printi (retn 15))
 ;)
