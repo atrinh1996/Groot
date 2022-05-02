@@ -1,4 +1,11 @@
+(val retn (lambda (n m) n))
 
+(printi (retn 2 4))
+(printi (retn 13 #t))
+(printc (retn 'g' 34))
+
+
+(;
 (val retn (lambda (n) n))
 
 
@@ -9,7 +16,7 @@
 
 (printb (retn #f))
 (printi (retn 15))
-
+;)
 
 (;
 (val x 42)

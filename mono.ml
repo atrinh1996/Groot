@@ -54,12 +54,6 @@ let monomorphize (tdefns : tprog) =
   in
 
 
-  (* Given a function type, returns a list of arg tys *)
-  (* let find_arg_tys (ty : mtype) = match ty with 
-      Mconapp (MTarrow _, args) -> args
-    | _ -> raise (Failure "Non function type")
-  in  *)
-
   (* Takes a name and an polyty_env, and inserts it into the map *)
   let set_aside (id : mname) ((ty, exp) : mexpr) (gamma : polyty_env) = 
     StringMap.add id (ty, exp) gamma
@@ -154,20 +148,11 @@ let monomorphize (tdefns : tprog) =
           let body' = (bodyty', bodyexp') in 
 
           let lambdaExp = MLambda (formals', body') in 
-          (* let () = print_endline ("creating lambda defn") in
-          let () = print_endline (string_of_mdefn (MVal (id, (ty, lambdaExp)))) in  *)
           let pro'' = (MVal (id, (ty, lambdaExp))) :: pro' in 
           (lambdaExp, pro'')
     in
 
     let (exp', prog') = resolve_mx prog exp in 
-    (* let () = print_endline ("printing lambda defn we just added:") in
-    let () = print_endline 
-      (match prog' with 
-        [] -> ""
-      | d :: _ -> string_of_mdefn d
-      ) in  *)
-
     ((ty, exp'), prog')
 
   in 
@@ -179,24 +164,13 @@ let monomorphize (tdefns : tprog) =
   let rec expr (gamma : polyty_env) (prog : mprog) ((ty, ex) : texpr) = match ex with 
     | TLiteral l -> ((ofGtype ty, MLiteral (value l)), prog)
     | TypedVar v -> 
-        (* let () = print_endline ("looking up " ^ v) in *)
         let vartyp = (try fst (lookup v gamma) 
                       with Not_found -> ofGtype ty) in 
         let actualtyp = ofGtype ty in 
         if (isPolymorphic vartyp) && (isFunctionType vartyp)
           then 
-            (* let () = print_endline (v ^ " was an ftype") in *)
             let polyexp = lookup v gamma in 
-            (* let () = print_endline ("resolving a lambda for " ^ v) in *)
             let (_, prog') = resolve prog v actualtyp polyexp in 
-
-            (* let () = print_endline ("VAR: printing the new defn just added:") in *)
-            (* let () = print_endline 
-              (match prog' with 
-                [] -> ""
-              | d :: _ -> string_of_mdefn d
-              ) in  *)
-
             ((actualtyp, MVar v), prog')
         else ((actualtyp, MVar v), prog)
     | TypedIf  (t1, t2, t3) -> 
@@ -205,29 +179,22 @@ let monomorphize (tdefns : tprog) =
         and (mexp3, _) = expr gamma prog t3 in 
         ((fst mexp2, MIf (mexp1, mexp2, mexp3)), prog)
     | TypedApply (f, args) -> 
-        (* let () = print_endline "determining f" in  *)
         let (f', prog') = expr gamma prog f in 
         let (args', prog'') = 
           List.fold_left  (fun (arglst, pro) arg -> 
                             let (arg', pro') = expr gamma pro arg in 
-                            (arg' :: arglst, pro')
-                          ) 
+                            (arg' :: arglst, pro')) 
                           ([], prog') args 
         in 
-
-          (* List.split (List.map (expr gamma prog') args) in  *)
-
-
+        let args' = List.rev args' in 
         ((ofGtype ty, MApply (f', args')), prog'')
     | TypedLet (bs, body) -> raise (Failure "TODO: Mono - ")
     | TypedLambda (formals, body) -> 
         let (formaltys, names) = List.split formals in 
         let formaltys' = List.map ofGtype formaltys in 
         let formals'   = List.combine formaltys' names in 
-
         let (body', prog') = expr gamma prog body in 
        ( (ofGtype ty, MLambda (formals', body')), prog')
-
 
   and value = function 
     | TChar c -> MChar c
@@ -248,39 +215,18 @@ let monomorphize (tdefns : tprog) =
      with the new definition added in.  *)
   let mono ((gamma, prog) : polyty_env * mprog) = function  
       TVal (id, (ty, texp)) -> 
-        (* raise (Failure "TODO: Mono - Val") *)
-        (* 1. Using the TEXPR, get the MEXPR *)
         let ((mty, mexp), prog') = expr gamma prog (ty, texp) in 
-
-        (* 2. Check it is is Polymorphic *)
         if isPolymorphic mty 
-
-          (* 2a. if yes, set_aside *)
           then 
             let gamma' = set_aside id (mty, mexp) gamma in 
             (gamma', prog)
-
-          (* 2b. if not, add to the prog, return the prog *)
-          else 
-          (gamma, MVal (id, (mty, mexp)) :: prog')
+          else (gamma, MVal (id, (mty, mexp)) :: prog')
 
     | TExpr (ty, texp) -> 
-        (* raise (Failure "TODO: Mono - Expr") *)
-        (* 1. Using the TEXPR, get the MEXPR *)
         let ((mty, mexp), prog') = expr gamma prog (ty, texp) in 
-        (* 2. Check it is is Polymorphic *)
         if isPolymorphic mty
-          (* 2a. if yes, toss it *)
           then (gamma, prog')
-          (* 2b. if not, add to the prog, return the prog *)
-          else 
-            (* let () = print_endline ("MEXPR: printing new defn just added:") in
-            let () = print_endline 
-              (match prog' with 
-                [] -> "non added"
-              | d :: _ -> string_of_mdefn d
-              ) in  *)
-          (gamma, MExpr (mty, mexp) :: prog')
+          else (gamma, MExpr (mty, mexp) :: prog')
   in 
 
   let (_, program) = List.fold_left mono (StringMap.empty, []) tdefns 
