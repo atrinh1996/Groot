@@ -126,14 +126,14 @@ Check() {
 
     # Report the status and clean up the generated files
     if [ $error -eq 0 ] ; then
-	if [ $keep -eq 0 ] ; then
-	    rm -f $genfiles
-	fi
-	echo -e "  \033[92mI AM GROOT!\033[0m"
-	echo "###### SUCCESS" 1>&2
+    	if [ $keep -eq 0 ] ; then
+    	    rm -f $genfiles
+    	fi
+    	echo -e "  \033[92mI AM GROOT!\033[0m"
+    	echo "###### SUCCESS" 1>&2
     else
-	echo "###### FAILED" 1>&2
-	globalerror=$error
+    	echo "###### FAILED" 1>&2
+    	globalerror=$error
     fi
 }
 
