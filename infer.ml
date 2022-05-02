@@ -181,13 +181,7 @@ let rec generate_constraints gctx e =
       let (b_tau, b_cns, b_tast) = generate_constraints new_ctx expr in
       (b_tau, b_cns @ cns, (b_tau, TypedLet((List.combine names asts), b_tast)))
     | Lambda (formals, body) ->
-      (* check for nested lambdas - if nested lambda throw type error *)
-      (* let is_nested_lambda = function
-      | Lambda _ -> true
-      | _ -> false in
-      if is_nested_lambda body then raise (Type_error "type error: nested lambda") *)
-      (* if not nested lambda, then continue generating constraints *)
-       let binding = List.map (fun x -> (x, ([], fresh ()))) formals in
+      let binding = List.map (fun x -> (x, ([], fresh ()))) formals in
       let new_context = binding @ ctx in
       let (t, c, tex) = generate_constraints new_context body in
       let (ids, tyschms) = List.split binding in
