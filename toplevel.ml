@@ -64,12 +64,11 @@ let () =
     | Mast -> print_string (Mast.string_of_mprog mast)
     | Cast -> print_string (Cast.string_of_cprog cast)
     (* action - print the llvm module. Codegen.translate produces the llmodule
-       					     from the given SAST called sast and then Llvm.string_of_llmodule converts it to string.
-       					     Here is the RHS code:
-       					     print_string (Llvm.string_of_llmodule (Codegen.translate sast))
-       					  *)
+        from the given SAST called sast and then Llvm.string_of_llmodule converts it to string.
+        Here is the RHS code:
+        print_string (Llvm.string_of_llmodule (Codegen.translate sast))*)
     | LLVM_IR -> print_string (Llvm.string_of_llmodule (Codegen.translate cast))
-(* action - print the llvm module. See above. *)
-(* | Compile -> let the_module = Codegen.translate cast in
-   										Llvm_analysis.assert_valid_module the_module;
-   										print_string (Llvm.string_of_llmodule the_module) *)
+    (* action - print the llvm module. See above. *)
+    (* | Compile -> let the_module = Codegen.translate cast in
+          Llvm_analysis.assert_valid_module the_module;
+          print_string (Llvm.string_of_llmodule the_module) *)
