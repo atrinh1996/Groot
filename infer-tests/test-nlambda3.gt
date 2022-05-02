@@ -1,0 +1,2 @@
+(val retn (lambda (n m) n))
+(val test (lambda (a) (lambda (b) (retn a b))))
