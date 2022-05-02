@@ -32,31 +32,6 @@ and tx =
   | TypedApply   of texpr * texpr list
   | TypedLet     of (ident * texpr) list * texpr
   | TypedLambda  of (gtype * ident) list * texpr
-  (* | TypedLambda  of (tyvar list * ident list) * texpr *)
-and tvalue = 
-  | TChar    of char
-  | TInt     of int
-  | TBool    of bool
-  | TRoot    of ttree
-and ttree =  
-  | TLeaf
-  | TBranch of tvalue * ttree * ttree
-
-
-type tdefn = 
-  | TVal of ident * texpr
-  | TExpr of texpr
-
-
-and tx =
-  | TLiteral of tvalue
-  | TypedVar of ident
-  | TypedIf of texpr * texpr * texpr
-  | TypedApply of texpr * texpr list
-  | TypedLet of (ident * texpr) list * texpr
-  | TypedLambda of (gtype * ident) list * texpr
-
-(* | TypedLambda  of (tyvar list * ident list) * texpr *)
 and tvalue = TChar of char | TInt of int | TBool of bool | TRoot of ttree
 and ttree = TLeaf | TBranch of tvalue * ttree * ttree
 
@@ -80,9 +55,6 @@ and string_of_tyvar = function
   | TVariable n -> "'" ^ string_of_int n
 and string_of_conapp (tyc, tys) = 
   string_of_tycon tyc ^ " (" ^ String.concat " " (List.map string_of_ttype tys) ^ ")"
-
-and string_of_constraints cs =
-  "[ " ^ String.concat " | , | " (List.map string_of_constraint cs) ^ " ]"
 
 and string_of_subs = function
   | [] -> ""
