@@ -18,14 +18,15 @@ let prerho env =
                                     ("<", (0, boolty));       (">", (0, boolty));
                                     ("<=", (0, boolty));      (">=", (0, boolty));
                                     ("!=i", (0, boolty));     ("=i", (0, boolty));
-                                    ("&&", (0, boolty));      ("||", (0, boolty)); 
-                                    ("not", (0, boolty));     ("~", (0, intty))     ]
+                                    ("&&", (0, boolty));      ("||", (0, boolty));
+                                    ("not", (0, boolty))                            ]
 
 (* list of variable names that get ignored/are not to be considered frees *)
-let ignores = [ "printi"; "printb"; "printc"; 
-                "+"; "-"; "*"; "/"; "mod"; "~";
-                "<"; ">"; ">="; "<="; 
-                "!=i"; "=i"; "&&"; "||"; "not" ]
+let ignores = [ "printi"; "printb"; "printc";
+                "+"; "-"; "*"; "/"; "mod";
+                "<"; ">"; ">="; "<=";
+                "!=i"; "=i";
+                "&&"; "||"; "not"            ]
 
 
 (* partial cprog to return from this module *)

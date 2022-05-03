@@ -45,8 +45,8 @@ rule tokenize = parse
   | eof                  { EOF }
   | _                    { Diagnostic.error(Diagnostic.lex_error "unrecognized character" lexbuf) }
 and comment = parse
-  | ";)"               { tokenize lexbuf }
-  | _                  { comment lexbuf }
+  | ";)"                 { tokenize lexbuf }
+  | _                    { comment lexbuf }
 
 (* apostrophe handler *)
 and apos_handler = parse

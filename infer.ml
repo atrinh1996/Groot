@@ -2,8 +2,6 @@ open Ast
 open Tast
 module StringMap = Map.Make (String)
 
-exception Type_error of string
-
 (* prims - initializes context with built-in functions with their types *)
 (* prims : (id * tyvar) list * (tycon * gtype list) *)
 let prims =
@@ -96,9 +94,7 @@ let rec solve' (c : gtype * gtype) =
   | TYVAR t1, TYCON t2 -> [ (t1, TYCON t2) ]
   | TYVAR t1, CONAPP t2 ->
     if is_ftv t1 (CONAPP t2) then
-      raise
-        (Type_error
-           "type error: type variable is not free type in type constructor")
+      Diagnostic.error (Diagnostic.TypeError "type variable is not free type in type constructor")
     else [ (t1, CONAPP t2) ]
   | TYCON t1, TYVAR t2 -> solve' (TYVAR t2, TYCON t1)
   | TYCON (TArrow (TYVAR t1)), TYCON t2 -> [ (t1, TYCON t2) ]
@@ -106,30 +102,26 @@ let rec solve' (c : gtype * gtype) =
   | TYCON t1, TYCON t2 ->
     if t1 = t2 then []
     else
-      raise
-        (Type_error
-           ("type error: type constructor mismatch " ^ string_of_tycon t1
-            ^ " != " ^ string_of_tycon t2))
+      Diagnostic.error (Diagnostic.TypeError
+        ("type constructor mismatch " ^ string_of_tycon t1
+         ^ " != " ^ string_of_tycon t2))
   | TYCON t1, CONAPP t2 ->
-    raise
-      (Type_error
-         ("type error: type constructor mismatch " ^ string_of_tycon t1
-          ^ " != " ^ string_of_conapp t2))
+    Diagnostic.error (Diagnostic.TypeError
+      ("type constructor mismatch " ^ string_of_tycon t1
+      ^ " != " ^ string_of_conapp t2))
   | CONAPP t1, TYVAR t2 -> solve' (TYVAR t2, CONAPP t1)
   | CONAPP t1, TYCON t2 ->
-    raise
-      (Type_error
-         ("type error: type constructor mismatch " ^ string_of_conapp t1
-          ^ " != " ^ string_of_tycon t2))
+    Diagnostic.error (Diagnostic.TypeError
+      ("type constructor mismatch " ^ string_of_conapp t1
+       ^ " != " ^ string_of_tycon t2))
   | CONAPP t1, CONAPP t2 -> (
       match (t1, t2) with
       | (TArrow t1, tys1), (TArrow t2, tys2) ->
         solve ((t1, t2) :: List.combine tys1 tys2)
       | _ ->
-        raise
-          (Type_error
-             ("type error: type constructor mismatch " ^ string_of_conapp t1
-              ^ " != " ^ string_of_conapp t2)))
+        Diagnostic.error (Diagnostic.TypeError
+          ("type constructor mismatch " ^ string_of_conapp t1
+           ^ " != " ^ string_of_conapp t2)))
 
 
 (* solve - solves a list of constraints, calls 'solver' to iterate through the
@@ -213,8 +205,8 @@ let rec generate_constraints gctx e =
     | Root t -> tree t
   and tree t =
     match t with
-    | Leaf -> raise (Failure "Infer TODO: generate constraints for Leaf")
-    | Branch _ -> raise (Failure "Infer TODO: generate constraints for Branch")
+    | Leaf     -> Diagnostic.error (Diagnostic.Unimplemented "contraint generation for Leaf")
+    | Branch _ -> Diagnostic.error (Diagnostic.Unimplemented "contraint generation for Branch")
   in
   constrain gctx e
 
@@ -224,10 +216,10 @@ let rec generate_constraints gctx e =
 let gimme_tycon_gtype _ = function
   | TYCON x -> x
   | TYVAR x ->
-    raise (Type_error ("the variable " ^ string_of_tyvar x
+    Diagnostic.error (Diagnostic.TypeError ("the variable " ^ string_of_tyvar x
                        ^ " has type tyvar but an expression was exprected of type tycon"))
   | CONAPP x ->
-    raise (Type_error ("the constructor " ^ string_of_conapp x
+    Diagnostic.error (Diagnostic.TypeError ("the constructor " ^ string_of_conapp x
                        ^ " has type conapp but an expression was exprected of type tycon"))
 
 

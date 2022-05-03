@@ -80,7 +80,7 @@ let monomorphize (tdefns : tprog) =
     (* Given a function type, returns the list of the types of the arguments *)
     let get_type_of_args = function
         Mconapp (MTarrow _, formaltys) -> formaltys
-      | _ -> raise (Failure "cannot monomorphize non-function type")
+      | _ -> Diagnostic.error (Diagnostic.MonoError "cannot monomorphize non-function type")
     in
 
     let formaltys     = get_type_of_args ty  in (* mono *)
@@ -95,7 +95,7 @@ let monomorphize (tdefns : tprog) =
           let tyvarID =
             (match arg with
                Mtyvar i -> i
-             | _ -> raise (Failure "Mono: non-tyvar substitution"))
+             | _ -> Diagnostic.error (Diagnostic.MonoError "non-tyvar substitution"))
           in
           let rec search_mtype = function
               Mtycon tyc -> Mtycon (search_tycon tyc)
@@ -137,7 +137,7 @@ let monomorphize (tdefns : tprog) =
 
         (MApply ((appty', app'), args'), pro)
 
-      | MLet     _ -> raise (Failure "TODO: Mono - ")
+      | MLet     _ -> Diagnostic.error (Diagnostic.MonoError "monomorphize let")
       | MLambda  (formals, (bodyty, bodyexp)) ->
         let (formaltys, names) = List.split formals in
         let formaltys' = List.map resolve_mty formaltys in
@@ -188,7 +188,7 @@ let monomorphize (tdefns : tprog) =
       in
       let args' = List.rev args' in
       ((ofGtype ty, MApply (f', args')), prog'')
-    | TypedLet (bs, body) -> raise (Failure "TODO: Mono - ")
+    | TypedLet (bs, body) -> Diagnostic.error (Diagnostic.MonoError "typed let")
     | TypedLambda (formals, body) ->
       let (formaltys, names) = List.split formals in
       let formaltys' = List.map ofGtype formaltys in

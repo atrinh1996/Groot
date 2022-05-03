@@ -80,8 +80,8 @@ tree:
 
 let_binding_list:
   | /* nothing */                             { [] }
-  | LSQUARE RSQUARE let_binding_list          { Diagnostic.warning(Diagnostic.parse_warning "empty let binding" 1); $3 } /* NON FATAL */
-  | LSQUARE expr RSQUARE let_binding_list     { Diagnostic.error(Diagnostic.parse_error "let binding must contain id and value" 2) } /* FATAL */
+  | LSQUARE RSQUARE let_binding_list          { Diagnostic.warning (Diagnostic.parse_warning "empty let binding" 1); $3 } /* NON FATAL */
+  | LSQUARE expr RSQUARE let_binding_list     { Diagnostic.error (Diagnostic.parse_error "let binding must contain id and value" 2) } /* FATAL */
   | LSQUARE ID expr RSQUARE let_binding_list  { ($2, $3) :: $5 }
 
 
