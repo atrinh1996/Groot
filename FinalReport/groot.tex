@@ -16,14 +16,24 @@
 % \addtolength{\topmargin}{-.85in}
 % \addtolength{\textheight}{1in}
 
+% Reduce margin
+%
+\addtolength{\oddsidemargin}{-.85in}
+\addtolength{\evensidemargin}{-.85in}
+\addtolength{\textwidth}{1in}
+
+\addtolength{\topmargin}{-.90in}
+\addtolength{\textheight}{1.75in}
+
+
 % Page format commands:
 % Override normal article margins,
 % making the margins smaller
-\setlength{\textwidth}{6.5in}
-\setlength{\textheight}{9in}
-\setlength{\oddsidemargin}{0in}
-\setlength{\evensidemargin}{0in}
-\setlength{\topmargin}{-0.5in}
+% \setlength{\textwidth}{6.5in}
+% \setlength{\textheight}{9in}
+% \setlength{\oddsidemargin}{0in}
+% \setlength{\evensidemargin}{0in}
+% \setlength{\topmargin}{-0.5in}
 
 \setlength{\parindent}{0pt}
 
@@ -67,7 +77,7 @@
 
 % \begin{lstlisting}[...] ... \end{lstlisting}
 \lstset{frame=none,
-    % language=LISP,
+    language=[Objective]Caml,
     aboveskip=3mm,
     belowskip=3mm,
     stepnumber=0, % set to 0 if you don't like line nums
@@ -151,7 +161,7 @@
 
 
 \begin{document} 
-\title{(g)ROOT \\ Language Reference Manual}
+\title{(g)ROOT \\ Final Report}
 
 \begin{figure}
     \centering
@@ -170,189 +180,107 @@
     \pagebreak 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % \section{This is a section heading with number}
-    % \label{sec:start} % section label, use to link withing file
-    %                   % \hyperref[sec:start]{text}
-
-    % This is a bullet list:
-    % \begin{itemize}
-    %     \item Link to \href{https://www.overleaf.com/learn/latex/Hyperlinks}{Overleaf href}
-    %     \item url example: \url{https://canvas.tufts.edu/}
-    %     \item link to aanother labeled section: \hyperref[sec:hello]{Hello World section}
-    % \end{itemize}
-
-    % This is a enumlist (default 1):
-    % \begin{enumerate}
-    %     \item Inline code: \lstinline!(val x 42)! example.
-    %     \item \textsc{Hello World}
-    %     \item \texttt{Hello World}
-    %     \item \textsf{Hello World}
-    %     \item This is \textcolor{red}{very Red}
-    %     \item This is \textcolor{blue}{Bluey}
-    % \end{enumerate}
-
-    % This is enumlist with alph bullets:
-    % \begin{enumerate}[label=\alph*.]
-    %     \item $x^2 = y$
-    %     \item x = y
-    % \end{enumerate}
-
-	% \subsection{Grammar}
 
 
-	% \begin{grammar}
-		
-	% 	<statement> ::= <ident> `=' <expr> 
-	% 	\alt `for' <ident> `=' <expr> `to' <expr> `do' <statement> 
-	% 	\alt `{' <stat-list> `}' 
-	% 	\alt <empty> 
-		
-	% 	<stat-list> ::= <statement> `;' <stat-list> | <statement> 
-		
-	% \end{grammar}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% INTRO %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+\label{sec:INTRO}
+
+\pagebreak
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% INTRO %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-    % %% start on new page
-    % \pagebreak
-    % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-    % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % \section{Hello World}
-%     \label{sec:hello}
-
-%         \subsection{Hello Subsection example}
-%             This is how you include pictures:
-
-%             % \begin{figure}[h]
-%             %     \centering
-%             %     \includegraphics[width=0.7\linewidth]{FILE_PATH}
-%             %     % \caption{} %% optional caption
-%             %     \label{fig:FILE_NAME}
-%             % \end{figure}
-
-%             % \begin{figure}[h]
-%             %     \centering
-%             %     \includegraphics[width=0.2\linewidth]{/images/baby_groot.PNG}
-%             %     \caption{Our little mascot}
-%             %     \label{fig:im_groot}
-%             % \end{figure}
-            
-%             \begin{figure}[h]
-%             	\centering
-%             	\includegraphics[width=0.2\linewidth]{images/gt}
-%             	\caption{}
-%             	\label{fig:babygroot}
-%             \end{figure}
-            
 
 
-%             \subsubsection{Basic Table: This doesn't appeear in contents}
-%             \begin{center}
-%                 \begin{tabular}{|r|c|l|}
-%                     \hline
-%                     hrow1 & hrow2 & hrow3 \\
-%                     \hline
-%                     This is & This is & This is\\
-%                     right-aligned & centered & left aligned \\
-%                     \hline
-%                 \end{tabular}
-%             \end{center}
 
-%             \begin{center}
-%                 \begin{tabular}{l|l|l}
-%                     $\leftarrow$ & $\Leftarrow$ & $\langle x + y \rangle$ \\ 
-%                     $\rightarrow$ & $\Rightarrow$ & $| x |$ \\ 
-%                     $\downarrow$ & $\Downarrow$ & $\| x^2 \|$ \\
-%                     $\leftrightarrow$ & $\uparrow$ & \Bigg( \big( cs107 \big)  \Bigg) \\ 
-%                     $\epsilon$ & $\rho$ & \Bigg[ \big[ cs107 \big] \Bigg] \\
-%                     $\Sigma$ & $\eta$ & \\ 
-%                     $\mu$ & \{ \} & \\
-%                 \end{tabular}
-%             \end{center}
 
-%         \subsection{Another hello subsection example}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TUTORIAL %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Language Tutorial}
+\label{sec:TUTORIAL}
 
-%             \subsubsection{Coding environment without line numbers (default)}
-% \begin{lstlisting}
-% (val add
-%     (lambda (x y) 
-%         (+ x y)))
-% \end{lstlisting}
+\pagebreak
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TUTORIAL %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%             \subsubsection{Coding environment with line numbers (this can be made default)}
-% \begin{lstlisting}[stepnumber=1]
-% (val add
-%     (lambda (x y) 
-%         (+ x y)))
-% \end{lstlisting}
 
-%             \subsubsection{Code side-by-side}
-% \begin{minipage}[h]{0.5\textwidth}
-% \begin{lstlisting}
-% (val who 
-%     (lambda (i am groot) #t)
-% )
-% \end{lstlisting}
-% \end{minipage}
-% \begin{minipage}[h]{0.5\textwidth}
-% \begin{lstlisting}
-% (val were
-%     (lambda (senza) (> 3 0))
-% )
-% \end{lstlisting}
-% \end{minipage}
-%     \pagebreak
-%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LRM %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% LRM OUTLINE STARTS HERE
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Intro}
-\label{sec:intro}
+\section{Language Reference Manual}
+\label{sec:LRM}
+    \subsection{Intro}
+    \label{sec:lrmintro}
 
-At its core, (g)ROOT is a general-purpose functional programming language.
-Its syntax stems from functional languages such as Scheme and other
-languages rooted in the Lisp family of programming languages. What sets Groot
-apart from other programming languages is its native employment of trees.
+    At its core, (g)ROOT is a general-purpose functional programming language.
+    Its syntax stems from functional languages such as Scheme and other
+    languages rooted in the Lisp family of programming languages. What sets Groot
+    apart from other programming languages is its native employment of trees.
 
-Trees are a widely-used, abstract data type that represents a hierarchical branching
-structure, with a root value and subtrees of children. In many general-purpose
-programming languages, trees are not a built-in feature. This forces the
-programmer to implement them from the ground up, which can be a tedious process
-for many beginner to intermediate programmers. Groot's built-in tree syntax
-abstracts this logic away from the programmer, significantly reducing the
-complexity inherent to tree development.
+    Trees are a widely-used, abstract data type that represents a hierarchical branching
+    structure, with a root value and subtrees of children. In many general-purpose
+    programming languages, trees are not a built-in feature. This forces the
+    programmer to implement them from the ground up, which can be a tedious process
+    for many beginner to intermediate programmers. Groot's built-in tree syntax
+    abstracts this logic away from the programmer, significantly reducing the
+    complexity inherent to tree development.
 
-In the Groot programming language, trees are a primitive, immutable type
-consisting of an element, sibling and child or a \textit{leaf}, a value
-representing an empty tree. This allows programmers to easily pass trees between
-functions, akin to passing lists in Lisp-style programming languages. Built-in
-functions are also supplied to accomplish many common tree operations. These
-language features alleviate the burden of implementing, operating, and
-maintaining a tree data structure from the programmer, allowing them to focus on
-solving more complex problems.
+    In the Groot programming language, trees are a primitive, immutable type
+    consisting of an element, sibling and child or a \textit{leaf}, a value
+    representing an empty tree. This allows programmers to easily pass trees between
+    functions, akin to passing lists in Lisp-style programming languages. Built-in
+    functions are also supplied to accomplish many common tree operations. These
+    language features alleviate the burden of implementing, operating, and
+    maintaining a tree data structure from the programmer, allowing them to focus on
+    solving more complex problems.
 
 
-    \subsection{How to read manual}
-    The syntax of the language will be given in BNF-like notation. Non-terminal symbol will be in italic font \emph{like-this}, square brackets [ … ] denote optional components, curly braces \{ … \} denote zero or more repetitions of the enclosed component,  and parentheses ( … ) denote a grouping. Note the font, as \texttt{[ ... ]} and \texttt{( ... )} are syntax requirements later in the manual.
+        \subsubsection{How to read manual}
+        The syntax of the language will be given in BNF-like notation. Non-terminal symbol will be in italic font \emph{like-this}, square brackets [ … ] denote optional components, curly braces \{ … \} denote zero or more repetitions of the enclosed component,  and parentheses ( … ) denote a grouping. Note the font, as \texttt{[ ... ]} and \texttt{( ... )} are syntax requirements later in the manual.
 
     \pagebreak
     %% End of Introduction %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \section{Lexical Convention}
+    \subsection{Lexical Convention}
     \label{sec:lexcon}
         
-        \subsection{Blanks} %%%
+        \subsubsection{Blanks} %%%
         The following characters are considered as \textbf{blanks}: space, horizontal tab (`\texttt{\textbackslash t}'), newline character (`\texttt{\textbackslash n}'), and carriage return (`\texttt{\textbackslash r}'). 
 
         Blanks separate adjacent identifiers, literals, expressions, and keywords. They are otherwise ignored.
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-        \subsection{Comments}
+        \subsubsection{Comments}
         Comments are introduced with two adjact characters \texttt{(;} and terminated by two adjacent characters \texttt{;)}. Nested comments are currently not allowed. Multiline comments are allowed.\\
 
 % \hspace{1cm}\begin{minipage}[h]{1\textwidth}
@@ -368,7 +296,7 @@ solving more complex problems.
 % \end{minipage}
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-        \subsection{Identifiers}
+        \subsubsection{Identifiers}
         \label{subsec:id}
         Identifiers are sequences of letters, digits, and ASCII characters, starting with a letter. Letters consist of the 26 lowercase and 26 uppercase characters from the ASCII set. Identifiers may not start with an underscore character, and may not be any of the \hyperref[subsec:key]{reserved character sequences}. 
 
@@ -384,7 +312,7 @@ solving more complex problems.
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-        \subsection{Integer Literals}
+        \subsubsection{Integer Literals}
         \label{subsec:intlit}
         An integer literal is a decimal, represented by a sequence of one or more digits, optionally preceded by a minus sign. 
 
@@ -397,7 +325,7 @@ solving more complex problems.
             \end{minipage}
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-        \subsection{Boolean Literals}
+        \subsubsection{Boolean Literals}
         \label{subsec:boollit}
         Boolean literals are represented by two adjacent characters; the first is the octothorp character (\texttt{\#}), and it is immediately followed by either the \texttt{t} or the \texttt{f} character. 
 
@@ -408,13 +336,13 @@ solving more complex problems.
             \end{minipage}
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-        \subsection{Character Literals}
+        \subsubsection{Character Literals}
         \label{subsec:charlit}
         Character literals are a single character enclosed by two \textsf{'} (single-quote) characters.
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-        \subsection{Operators}
+        \subsubsection{Operators}
         \label{subsec:op}
         All of the following operators are prefix characters or prefixed characters read as single token. Binary operators are expected to be followed by two expressions, unary operators are expected to be followed by one expression. 
 
@@ -457,7 +385,7 @@ cld     sib         lambda
 \end{lstlisting}
 \cbend
 
-        \subsection{Syntax}
+        \subsubsection{Syntax}
         \label{subsec:syn}
 
         See \hyperref[sec:expr]{Definitions and Expression} for concrete syntax for each definition and expressions, with examples.
@@ -466,11 +394,11 @@ cld     sib         lambda
     %% End of Lexical Convention %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Values}
-\label{sec:values}
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \subsection{Values}
+    \label{sec:values}
 
-    \subsection{Base Values}
+    \paragraph{Base Values}
 
             \subsubsection{Integer numbers}
             Integer values are integer numbers in range from $-2^{32}$ to $2^{32} - 1$, similar to LLVM's integers, and may support a wider range of integer values on other machines, such as $-2^{64}$ to $2^{64} - 1$ on a 64-bit machine.
@@ -481,12 +409,12 @@ cld     sib         lambda
             \subsubsection{Characters}
             Character values are 8-bit integers between 0 and 255, and follow ASCII standard.
 
-        \subsection{Functions}
+        \subsubsection{Functions}
         Functional values are mappings from values to value.
 
         % \subsection{Leaf}
 
-        \subsection{N-Ary Tree Compound Type}
+        \subsubsection{N-Ary Tree Compound Type}
         A core feature of (g)ROOT is its n-ary tree compound value type. Every tree value consists of three components: an element, it's right-immediate sibling, and it's first child. This allows for the convenient implementation of robust recursive algorithms with an arbitrary branching factor.
 
         Every tree value in (g)ROOT may be either a full tree instance with an element, sibling, and child, or a leaf. The leaf value in (g)ROOT represents the nullary, or empty, tree.
@@ -537,8 +465,8 @@ represents the following tree (as drawn in normal binary tree form):
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Types}
-\label{sec:types}
+    \subsection{Types}
+    \label{sec:types}
 
     \pagebreak
     %% End of Values %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -547,8 +475,8 @@ represents the following tree (as drawn in normal binary tree form):
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Definitions and Expressions}
-\label{sec:expr}
+    \subsection{Definitions and Expressions}
+    \label{sec:expr}
 
         \hspace{1cm}\begin{minipage}[h]{1\textwidth}
         \begin{grammar}
@@ -585,14 +513,14 @@ represents the following tree (as drawn in normal binary tree form):
 
         Expressions are values or parenthetical expressions.
 
-        \subsection{Values}
+        \subsubsection{Values}
         see \hyperref[sec:values]{Values}.
 
 
         
 
 
-        \subsection{Parenthetical expressions} Parenthetical expressions are always withing parentheses and include function application, lambda expressions, global and local definitions, binary and unary operations, and if-statements. In the above concrete syntax, the parentheses in this font, \texttt{( ... )}, are syntax requirements, rather than denoting a grouping which is given by ( ... )
+        \subsubsection{Parenthetical expressions} Parenthetical expressions are always withing parentheses and include function application, lambda expressions, global and local definitions, binary and unary operations, and if-statements. In the above concrete syntax, the parentheses in this font, \texttt{( ... )}, are syntax requirements, rather than denoting a grouping which is given by ( ... )
 
         \subsubsection{Function application}
         Function application in (g)ROOT always returns a value, and is written as the function \texttt{ID} followed by a list of zero or more expressions, which are its arguments. The arguments are not separated from the ID by parentheses. (g)ROOT has first-class functions, therefore functions can be passed as arguments. Currying is allowed.
@@ -609,7 +537,7 @@ represents the following tree (as drawn in normal binary tree form):
 \cbend
 
         \subsubsection{Lambda Expression}
-        Lambda expressions are accomplished with the \texttt{lambda} keyword, a parentheses-enclosed list of 0 or more identifiers as formal arguments, followed by the expression that may use those arguments and/or any free variables. Nesting of lambda expressions is allowed.
+        Lambda expressions are accomplished with the \texttt{lambda} keyword, a parentheses-enclosed list of 0 or more identifiers as formal arguments, followed by the expression that may use those arguments and/or any free variables. Nesting of lambda expressions is not allowed.
 
         Example:
 
@@ -621,10 +549,6 @@ represents the following tree (as drawn in normal binary tree form):
 (lambda (x y) (+ x y))
 
 (lambda (a) (add2 a b))
-
-(lambda (n) 
-    (lambda (m) 
-        (add2 n m)))
 \end{lstlisting}
 \cbend
 
@@ -637,7 +561,7 @@ represents the following tree (as drawn in normal binary tree form):
 \begin{lstlisting}
 (val x 4)
 (val y (+ x 5))
-(val foo (lambda (arg) (* arg arg)))
+(val foo (lambda (arg) ( * arg arg)))
 \end{lstlisting}
 \cbend
 
@@ -666,7 +590,7 @@ represents the following tree (as drawn in normal binary tree form):
 (let x 4 
     (let y 5 
         (let z 9 
-            (* x (* y z)))))
+            (+ x (- y z)))))
 \end{lstlisting}
 \cbend
 
@@ -720,10 +644,10 @@ represents the following tree (as drawn in normal binary tree form):
 
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \section{Functions}
+    \subsection{Functions}
     \label{sec:func}
 
-        \subsection{Built-In Functions}
+        \subsubsection{Built-In Functions}
         \textbf{Note}: Throughout this section, the character pair \texttt{tr} is used as shorthand to represent a tree value, an identifier bound to a tree value.
 
         There are four built-in functions which are integral to the tree data type. It is a checked-runtime error to call \texttt{elm, sib, cld} on a \texttt{leaf}:
@@ -759,7 +683,7 @@ represents the following tree (as drawn in normal binary tree form):
             Purpose: constructs a tree value containing the value ELEMENT, with sibling SIBLING and child CHILD
         \end{enumerate}
 
-        \subsection{Standard Library Functions}
+        \subsubsection{Standard Library Functions}
         \textbf{Note}: Throughout this section, the character pair \texttt{tr} is used as shorthand to represent a tree value, an identifier bound to a tree value.
 
         The first set of functions introduced in the standard library allow for programmers to use some of their beloved list functions present in other languages:
@@ -875,8 +799,8 @@ represents the following tree (as drawn in normal binary tree form):
 
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \section{Appendix}
-    \label{sec:app}
+    \subsection{LRM Appendix}
+    \label{sec:lrmapp}
 
 \cbcolor{dkgreen}
 \cbstart
@@ -1131,8 +1055,299 @@ function: (flurry func)
 \cbend
 
     % \pagebreak
-    %% End of Appendix %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% End of LRM Appendix %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\pagebreak
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LRM %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PLAN %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Project Plan}
+\label{sec:PLAN}
+
+\pagebreak
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PLAN %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DESIGN %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Architectural Design}
+\label{sec:DESIGN}
+
+    \begin{figure}[h]
+        \centering
+        \fbox{\includegraphics[width=1.1\linewidth]{images/phases.png}}
+    \end{figure}
+    
+
+\pagebreak
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DESIGN %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TEST %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Test Plan}
+\label{sec:TEST}
+
+\pagebreak
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TEST %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LESSON %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Lessons Learned}
+\label{sec:LESSON}
+
+    \subsection*{Amy Bui}
+        \begin{itemize}
+            \item Takeaway:
+            \item Advice: 
+        \end{itemize}
+    
+    \subsection*{Nickolas Gravel}
+        \begin{itemize}
+            \item Takeaway:
+            \item Advice: 
+        \end{itemize}
+    
+    \subsection*{Sam Russo}
+        \begin{itemize}
+            \item Takeaway:
+            \item Advice: 
+        \end{itemize}
+    
+    \subsection*{Eliza Encherman}
+        \begin{itemize}
+            \item Takeaway:
+            \item Advice: 
+        \end{itemize}
+    
+    \subsection*{Zachary Goldstein}
+        \begin{itemize}
+            \item Takeaway:
+            \item Advice: 
+        \end{itemize}
+
+\pagebreak
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LESSON %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% APPENDIX %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Appendix}
+\label{sec:APPENDIX}
+
+    \subsection{\texttt{ast.ml}}
+    \label{app:ast}
+\begin{lstlisting}
+(* Abstract Syntax Tree (AST) for Groot *)
+(* Type of Variable Names *)
+type ident = string
+
+type expr =
+  | Literal of value
+  | Var     of ident
+  | If      of expr * expr * expr
+  | Apply   of expr * expr list
+  | Let     of (ident * expr) list * expr
+  | Lambda  of ident list * expr
+and value =
+  |Char    of char
+  | Int     of int
+  | Bool    of bool
+  | Root    of tree
+and tree =
+  |Leaf
+  | Branch of expr * tree * tree
+
+type defn =
+  | Val of ident * expr
+  | Expr of expr
+
+type prog = defn list
+
+
+(* Pretty printing functions *)
+(* toString for Ast.expr *)
+let rec string_of_expr = function
+  | Literal(lit) -> string_of_value lit
+  | Var(v) -> v
+  | If(condition, true_branch, false_branch) ->
+    "(if "  ^ string_of_expr condition ^ " "
+    ^ string_of_expr true_branch ^ " "
+    ^ string_of_expr false_branch ^ ")"
+  | Apply(f, args) ->
+    "(" ^ string_of_expr f ^ " "
+    ^ String.concat " " (List.map string_of_expr args) ^ ")"
+  | Let(binds, body)   ->
+    let string_of_binding = function
+        (id, e) -> "[" ^ id ^ " " ^ (string_of_expr e) ^ "]"
+    in
+    "(let (" ^ String.concat " " (List.map string_of_binding binds) ^ ") "
+    ^ string_of_expr body ^ ")"
+  | Lambda(formals, body) ->
+    "(lambda (" ^ String.concat " " formals ^ ") "
+    ^ string_of_expr body ^ ")"
+
+(* toString for Ast.value *)
+and string_of_value = function
+  | Char(c)     -> "'" ^ String.make 1 c ^ "'"
+  | Int(i)      -> string_of_int i
+  | Bool(b)     -> if b then "#t" else "#f"
+  | Root(tr)    -> string_of_tree tr
+
+(* toString for Ast.tree *)
+and string_of_tree = function
+  | Leaf -> "leaf"
+  | Branch(ex, sib, child) ->
+    (* Branch type is given by "tree" string *)
+    "(tree " ^ string_of_expr ex ^ " "
+    ^ string_of_tree sib ^ " "
+    ^ string_of_tree child ^ ")"
+
+(* toString for Ast.defn *)
+let string_of_defn = function
+  | Val(id, e) -> "(val " ^ id ^ " " ^ string_of_expr e ^ ")"
+  | Expr(e)    -> string_of_expr e
+
+(* toString for Ast.prog *)
+let string_of_prog defns =
+    String.concat "\n" (List.map string_of_defn defns) ^ "\n"  
+\end{lstlisting}
+\pagebreak
+
+
+    \subsection{\texttt{scanner.mll}}
+    \label{app:scanner}
+    \pagebreak
+
+
+    \subsection{\texttt{parser.mly}}
+    \label{app:parser}
+    \pagebreak
+
+
+    \subsection{\texttt{scope.ml}}
+    \label{app:scope}
+    \pagebreak
+
+
+
+    \subsection{\texttt{tast.ml}}
+    \label{app:tast}
+    \pagebreak
+
+
+    \subsection{\texttt{infer.ml}}
+    \label{app:infer}
+    \pagebreak
+
+
+    \subsection{\texttt{mast.ml}}
+    \label{app:mast}
+    \pagebreak
+
+
+
+
+    \subsection{\texttt{mono.ml}}
+    \label{app:mono}
+    \pagebreak
+
+
+
+    \subsection{\texttt{cast.ml}}
+    \label{app:cast}
+    \pagebreak
+
+
+    \subsection{\texttt{conversion.ml}}
+    \label{app:conversion}
+    \pagebreak
+
+
+    \subsection{\texttt{llgtype.ml}}
+    \label{app:llgtype}
+    \pagebreak
+
+    \subsection{\texttt{codegen.ml}}
+    \label{app:codegen}
+    \pagebreak
+
+
+
+    \subsection{\texttt{diagnostic.ml}}
+    \label{app:diagnostic}
+    \pagebreak
+
+\pagebreak
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% APPENDIX %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 \end{document}
