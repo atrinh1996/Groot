@@ -103,7 +103,7 @@ let translate { main = main;  functions = functions;
         Tycon (Clo (name, anonFunTy, freetys)) ->
         let v = create_struct name (anonFunTy :: freetys) map
         in StringMap.add name v map
-      | _ -> raise (Failure ("Error: Codegen - lambda a non closure type"))
+      | _ -> Diagnostic.error (Diagnostic.GenerationError "lambda is non-closure type")
     in
     let structs = List.rev structures in
     List.fold_left gen_struct_def StringMap.empty structs
@@ -192,7 +192,8 @@ let translate { main = main;  functions = functions;
     | CInt  i -> L.const_int int_ty i
     (* HAS to be an i1 lltype for the br instructions *)
     | CBool b -> L.const_int bool_ty (if b then 1 else 0)
-    | CRoot _ -> raise (Failure ("TODO - codegen SRoot Literal"))
+    | CRoot _ -> Diagnostic.error (Diagnostic.Unimplemented "codegen SRoot Literal")
+
   in
 
 
@@ -208,7 +209,7 @@ let translate { main = main;  functions = functions;
     | CVar     s  ->
       let varValue =
         (try L.build_load (lookup s lenv) s builder
-         with Not_found -> raise(Failure ("codegen: name not found: " ^ s)))
+         with Not_found -> Diagnostic.error (Diagnostic.Unbound ("name \"" ^ s ^ "\" not found in codegen")))
       in (builder, varValue)
     | CIf (e1, (t2, e2), e3) ->
       (* allocate space for result of the if statement *)
@@ -413,7 +414,7 @@ let translate { main = main;  functions = functions;
            in List.map2 set_free llFreeArgs structFields
          in
          (builder', struct_obj)
-       | _ -> raise (Failure ("codegen: lambda is a non closure type")))
+       | _ -> Diagnostic.error (Diagnostic.GenerationError "lambda is non-closure type"))
   in
 
 

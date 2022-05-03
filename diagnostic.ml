@@ -84,13 +84,21 @@ let parse_warning msg nterm =
 (* end courtesy of *)
 
 exception Unimplemented of string
+exception Unbound of string
 exception EmptyLetBinding
+exception TypeError of string
+exception GenerationError of string
+exception MonoError of string
 let () =
   Printexc.register_printer (function
-      | Unimplemented s  -> Some ((strfx error_fx  "Unimplemented Error: ") ^ s)
-      | ParsingWarning s -> Some ((strfx warning_fx "Parsing Warning: "   ) ^ s)
-      | LexingError s    -> Some ((strfx error_fx  "Lexing Error: "       ) ^ s)
-      | ParsingError s   -> Some ((strfx error_fx  "Parsing Error: "      ) ^ s)
+      | Unimplemented   s -> Some ((strfx error_fx   "Unimplemented Error: ") ^ s)
+      | Unbound         s -> Some ((strfx error_fx   "Unbound Error: "      ) ^ s)
+      | TypeError       s -> Some ((strfx error_fx   "Type Error: "         ) ^ s)
+      | GenerationError s -> Some ((strfx error_fx   "Generation Error: "   ) ^ s)
+      | MonoError       s -> Some ((strfx error_fx   "Mono Error: "         ) ^ s)
+      | ParsingWarning  s -> Some ((strfx warning_fx "Parsing Warning: "    ) ^ s)
+      | LexingError     s -> Some ((strfx error_fx   "Lexing Error: "       ) ^ s)
+      | ParsingError    s -> Some ((strfx error_fx   "Parsing Error: "      ) ^ s)
       | _ -> None)
 
 
