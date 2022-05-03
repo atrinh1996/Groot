@@ -3,7 +3,7 @@
 
 open Mast
 open Cast
-
+module StringMap = Map.Make(String)
 
 (***********************************************************************)
 
