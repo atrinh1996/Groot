@@ -137,7 +137,8 @@ let monomorphize (tdefns : tprog) =
 
         (MApply ((appty', app'), args'), pro)
 
-      | MLet     _ -> Diagnostic.error (Diagnostic.MonoError "monomorphize let")
+      | MLet (bs, body) -> Diagnostic.error (Diagnostic.MonoError "typed let")
+
       | MLambda  (formals, (bodyty, bodyexp)) ->
         let (formaltys, names) = List.split formals in
         let formaltys' = List.map resolve_mty formaltys in
@@ -160,42 +161,47 @@ let monomorphize (tdefns : tprog) =
 
 
 
-  (* Takes a texpr and returns the equivalent mexpr and the prog (list of mdefns) *)
-  let rec expr (gamma : polyty_env) (prog : mprog) ((ty, ex) : texpr) = match ex with
-    | TLiteral l -> ((ofGtype ty, MLiteral (value l)), prog)
+  (* Takes a texpr and returns the equivalent mexpr 
+     and the prog (list of mdefns) *)
+  let rec expr (gamma : polyty_env) (prog : mprog) ((ty, ex) : texpr) = 
+    match ex with
+      TLiteral l -> ((ofGtype ty, MLiteral (value l)), prog)
     | TypedVar v ->
-      let vartyp = (try fst (lookup v gamma)
-                    with Not_found -> ofGtype ty) in
-      let actualtyp = ofGtype ty in
-      if (isPolymorphic vartyp) && (isFunctionType vartyp)
-      then
-        let polyexp = lookup v gamma in
-        let (_, prog') = resolve prog v actualtyp polyexp in
-        ((actualtyp, MVar v), prog')
-      else ((actualtyp, MVar v), prog)
+        let vartyp = (try fst (lookup v gamma)
+                      with Not_found -> ofGtype ty) in
+        let actualtyp = ofGtype ty in
+        if (isPolymorphic vartyp) && (isFunctionType vartyp)
+          then
+            let polyexp = lookup v gamma in
+            let (_, prog') = resolve prog v actualtyp polyexp in
+            ((actualtyp, MVar v), prog')
+        else ((actualtyp, MVar v), prog)
     | TypedIf  (t1, t2, t3) ->
-      let (mexp1, _) = expr gamma prog t1
-      and (mexp2, _) = expr gamma prog t2
-      and (mexp3, _) = expr gamma prog t3 in
-      ((fst mexp2, MIf (mexp1, mexp2, mexp3)), prog)
+        let (mexp1, _) = expr gamma prog t1
+        and (mexp2, _) = expr gamma prog t2
+        and (mexp3, _) = expr gamma prog t3 in
+        ((fst mexp2, MIf (mexp1, mexp2, mexp3)), prog)
     | TypedApply (f, args) ->
-      let (f', prog') = expr gamma prog f in
-      let (args', prog'') =
-        List.fold_left  (fun (arglst, pro) arg ->
-            let (arg', pro') = expr gamma pro arg in
-            (arg' :: arglst, pro'))
-          ([], prog') args
-      in
-      let args' = List.rev args' in
-      ((ofGtype ty, MApply (f', args')), prog'')
-    | TypedLet (bs, body) -> Diagnostic.error (Diagnostic.MonoError "typed let")
+        let (f', prog') = expr gamma prog f in
+        let (args', prog'') =
+          List.fold_left  (fun (arglst, pro) arg ->
+              let (arg', pro') = expr gamma pro arg in
+              (arg' :: arglst, pro'))
+            ([], prog') args
+        in
+        let args' = List.rev args' in
+        ((ofGtype ty, MApply (f', args')), prog'')
+    | TypedLet (bs, body) -> 
+        let binding (x, e) =  let (e', _) = expr gamma prog e in (x, e') in 
+        let bs' = List.map binding bs in 
+        let (body', prog') = expr gamma prog body in 
+        ((ofGtype ty, MLet (bs', body')), prog')
     | TypedLambda (formals, body) ->
-      let (formaltys, names) = List.split formals in
-      let formaltys' = List.map ofGtype formaltys in
-      let formals'   = List.combine formaltys' names in
-      let (body', prog') = expr gamma prog body in
-      ( (ofGtype ty, MLambda (formals', body')), prog')
-
+        let (formaltys, names) = List.split formals in
+        let formaltys' = List.map ofGtype formaltys in
+        let formals'   = List.combine formaltys' names in
+        let (body', prog') = expr gamma prog body in
+        ((ofGtype ty, MLambda (formals', body')), prog')
   and value = function
     | TChar c -> MChar c
     | TInt  i -> MInt i
@@ -212,18 +218,17 @@ let monomorphize (tdefns : tprog) =
      with the new definition added in.  *)
   let mono ((gamma, prog) : polyty_env * mprog) = function
       TVal (id, (ty, texp)) ->
-      let ((mty, mexp), prog') = expr gamma prog (ty, texp) in
-      if isPolymorphic mty
-      then
-        let gamma' = set_aside id (mty, mexp) gamma in
-        (gamma', prog)
-      else (gamma, MVal (id, (mty, mexp)) :: prog')
-
+        let ((mty, mexp), prog') = expr gamma prog (ty, texp) in
+        if isPolymorphic mty
+          then
+            let gamma' = set_aside id (mty, mexp) gamma in
+            (gamma', prog)
+        else (gamma, MVal (id, (mty, mexp)) :: prog')
     | TExpr (ty, texp) ->
-      let ((mty, mexp), prog') = expr gamma prog (ty, texp) in
-      if isPolymorphic mty
-      then (gamma, prog')
-      else (gamma, MExpr (mty, mexp) :: prog')
+        let ((mty, mexp), prog') = expr gamma prog (ty, texp) in
+        if isPolymorphic mty
+          then (gamma, prog')
+        else (gamma, MExpr (mty, mexp) :: prog')
   in
 
   let (_, program) = List.fold_left mono (StringMap.empty, []) tdefns
