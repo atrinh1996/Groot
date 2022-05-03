@@ -1,0 +1,5 @@
+    (let () expr)
+    (let ([]) expr) // Error
+    (let ([e1]) expr) // Error
+    (let ([x1 e1]) expr)
+    (let ([x1 e1] [x2 e2] [x3 e2]) expr)
