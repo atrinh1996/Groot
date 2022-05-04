@@ -1,2 +1,4 @@
-(|| #t #t)
-(|| 88 #t)
+(printb (|| #t #t))
+(printb (|| #t #f))
+(printb (|| #f #t))
+(printb (|| #f #f))

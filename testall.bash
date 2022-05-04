@@ -88,14 +88,6 @@ Check() {
     basename=`echo $1 | sed 's/.*\\///
                              s/.gt//'`
     basedir="`echo $1 | sed 's/\/tests\/[^\/]*$//'`"
-
-    # Make stdout, stderr, and diff if not yet created
-    # mkdir -p "${basedir}/stdout"
-    # mkdir -p "${basedir}/ast"
-    # mkdir -p "${basedir}/diff"
-    # mkdir -p "${basedir}/llvm"
-    # mkdir -p "${basedir}/exe"
-    # mkdir -p "${basedir}/stderr"
     
     echo -e "\033[1m${basename}:\033[0m"
 
@@ -195,37 +187,21 @@ done
 
 shift `expr $OPTIND - 1`
 
-# if [ $# -ge 1 ]
-# then
-#     files=$@
-# else
-#     files="testfiles/phase2/*.gt"  # Default Test files
-# fi
-
 TESTSET_DIR="testsets"
-# echo "HERE"
 
-# For each file in the files list
+# For each testset
 for TESTSET in $TESTSET_DIR/*
 do
-    echo $TESTSET
+    printf '%.s─' $(seq 1 $(tput cols))
+    printf "Testing Testset: $TESTSET\n\n"
+
     WORKDIRS="stdout stderr llvm ast asm exe diff"
 
     for DIR in $WORKDIRS
     do
         rm    -rf $TESTSET/$DIR
         mkdir -p  $TESTSET/$DIR
-        # echo $TESTSET/$DIR
     done
-    # ls $TESTSET
-
-    # mkdir -p "${TESTSET}/stdout"
-    # mkdir -p "${TESTSET}/stderr"
-    # mkdir -p "${TESTSET}/llvm"
-    # mkdir -p "${TESTSET}/ast"
-    # mkdir -p "${TESTSET}/asm"
-    # mkdir -p "${TESTSET}/exe"
-    # mkdir -p "${TESTSET}/diff"
 
     for TEST in $TESTSET/tests/*.gt
     do

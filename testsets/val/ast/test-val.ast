@@ -1,0 +1,6 @@
+(val x y)
+(val x (+ 3 4))
+(val x (if (> x 2) 1 0))
+(val x 'a')
+(val x 1)
+(val x (lambda () 7))

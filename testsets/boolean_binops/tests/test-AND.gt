@@ -1,3 +1,4 @@
-(&& #t #t)
-(&& 88 #t)
-(&& #t somevar)
+(printb (&& #t #t))
+(printb (&& #t #f))
+(printb (&& #f #t))
+(printb (&& #f #f))
