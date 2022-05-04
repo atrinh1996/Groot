@@ -3,10 +3,6 @@
 open Tast
 open Mast
 
-(* Update name to ensure all mono-typed expressions are unique from their
-   siblings. *)
-let secret = "_typed_"
-let count = ref 0
 
 
 (* Function takes a tprog (list of typed definitions),

@@ -40,7 +40,7 @@ let res =
   }
 
 (* name used for anonymous lambda functions *)
-let anon = "anon"
+let anon = "_anon"
 let count = ref 0
 
 (* Converts a gtype to a ctype *)
