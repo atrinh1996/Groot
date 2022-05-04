@@ -3,7 +3,7 @@
 
 open Mast
 open Cast
-
+module StringMap = Map.Make(String)
 
 (***********************************************************************)
 
@@ -11,15 +11,16 @@ open Cast
 let prerho env =
   let add_prints map (k, v) =
     StringMap.add k [v] map
-  in List.fold_left add_prints env [("printi", (0, intty));   ("printb", (0, boolty));
-                                    ("printc", (0, charty));  ("+", (0, intty));
-                                    ("-", (0, intty));        ("*", (0, intty));
-                                    ("/", (0, intty));        ("mod", (0, intty));
-                                    ("<", (0, boolty));       (">", (0, boolty));
-                                    ("<=", (0, boolty));      (">=", (0, boolty));
-                                    ("!=i", (0, boolty));     ("=i", (0, boolty));
-                                    ("&&", (0, boolty));      ("||", (0, boolty));
-                                    ("not", (0, boolty))                            ]
+  in List.fold_left add_prints env 
+     [("printi", (0, intty));   ("printb", (0, boolty));
+      ("printc", (0, charty));  ("+", (0, intty));
+      ("-", (0, intty));        ("*", (0, intty));
+      ("/", (0, intty));        ("mod", (0, intty));
+      ("<", (0, boolty));       (">", (0, boolty));
+      ("<=", (0, boolty));      (">=", (0, boolty));
+      ("!=i", (0, boolty));     ("=i", (0, boolty));
+      ("&&", (0, boolty));      ("||", (0, boolty));
+      ("not", (0, boolty))                            ]
 
 (* list of variable names that get ignored/are not to be considered frees *)
 let ignores = [ "printi"; "printb"; "printc";
@@ -39,13 +40,13 @@ let res =
   }
 
 (* name used for anonymous lambda functions *)
-let anon = "anon"
+let anon = "_anon"
 let count = ref 0
 
 (* Converts a gtype to a ctype *)
 let rec ofMtype = function
     Mtycon ty    -> Tycon (ofTycon ty)
-  | Mtyvar _    -> raise (Failure "Closure: cannot close with a polymorphic type")
+  | Mtyvar _     -> raise (Failure "Closure: closing on polymorphic type")
   | Mconapp con  -> Conapp (ofConapp con)
 and ofTycon = function
     MIntty        -> Intty
@@ -161,38 +162,38 @@ let rec mexprToCexpr ((ty, e) : mexpr) (env : var_env) =
   let rec exp ((typ, ex) : mexpr) = match ex with
     | MLiteral v -> (ofMtype typ, CLiteral (value v))
     | MVar s     ->
-      (* In case s is a name of a define, get the closure type *)
-      let (occurs, ctyp) = find s env in
-      (* to match the renaming convention in svalToCval, and to ignore
-         built in prints *)
-      let vname = if occurs = 0
-        then s
-        else "_" ^ s ^ "_" ^ string_of_int occurs
-      in (ctyp, CVar (vname))
+        (* In case s is a name of a define, get the closure type *)
+        let (occurs, ctyp) = find s env in
+        (* to match the renaming convention in svalToCval, and to ignore
+           built in prints *)
+        let vname = if occurs = 0
+                      then s
+                    else "_" ^ s ^ "_" ^ string_of_int occurs
+        in (ctyp, CVar (vname))
     | MIf (t1, t2, t3) ->
-      let cexp1 = exp t1
-      and cexp2 = exp t2
-      and cexp3 = exp t3 in
-      (fst cexp2, CIf (cexp1, cexp2, cexp3))
+        let cexp1 = exp t1
+        and cexp2 = exp t2
+        and cexp3 = exp t3 in
+        (fst cexp2, CIf (cexp1, cexp2, cexp3))
     | MApply (f, args) ->
-      let (ctyp, f') = exp f in
-      let normalargs = List.map exp args in
-      (* actual type of the function application is the type of the return*)
-      let (retty, freesCount) =
-        (match ctyp with
-           Tycon (Clo (_, functy, freetys)) ->
-           (match functy with
-              Conapp (Tarrow ret, _) -> (ret, List.length freetys)
-            | _ -> raise (Failure "Non-function function type"))
-         | _ -> (intty, 0)) in
-      (retty, CApply ((retty, f'), normalargs, freesCount))
+        let (ctyp, f') = exp f in
+        let normalargs = List.map exp args in
+        (* actual type of the function application is the type of the return*)
+        let (retty, freesCount) =
+          (match ctyp with
+             Tycon (Clo (_, functy, freetys)) ->
+             (match functy with
+                Conapp (Tarrow ret, _) -> (ret, List.length freetys)
+              | _ -> raise (Failure "Non-function function type"))
+           | _ -> (intty, 0)) in
+        (retty, CApply ((retty, f'), normalargs, freesCount))
     | MLet (bs, body) ->
-      let local_env = (List.fold_left (fun map (x, se) ->
-          bindLocal map x se)
-          env bs) in
-      let c_bs = List.map (fun (x, e) -> (x, exp e)) bs in
-      let (ctyp, body') = mexprToCexpr body local_env in
-      (ctyp, CLet (c_bs, (ctyp, body')))
+        let local_env = (List.fold_left (fun map (x, se) ->
+            bindLocal map x se)
+            env bs) in
+        let c_bs = List.map (fun (x, e) -> (x, exp e)) bs in
+        let (ctyp, body') = mexprToCexpr body local_env in
+        (ctyp, CLet (c_bs, (ctyp, body')))
     (* Supose we hit a lambda expression, turn it into a closure *)
     | MLambda (formals, body) -> create_anon_function formals body typ env
   and value = function
@@ -247,8 +248,8 @@ let mvalToCval (id, (ty, e)) =
      the actual frequency the variable name was defined.
      The (0, inttype is a placeholder) *)
   let (occurs, _) = if (isBound id res.rho)
-    then (find id res.rho)
-    else (0, intty) in
+                      then (find id res.rho)
+                    else (0, intty) in
   (* Modify the name to account for the redefinitions, and so old closures
      can access original variable values *)
   let id' = "_" ^ id ^ "_" ^ string_of_int (occurs + 1) in
@@ -268,9 +269,9 @@ let conversion mdefns =
      and sorts it to the appropriate list in a cprog type. *)
   let convert = function
     | MVal (id, (ty, mexp)) ->
-      let cval = mvalToCval (id, (ty, mexp)) in addMain cval
+        let cval = mvalToCval (id, (ty, mexp)) in addMain cval
     | MExpr e ->
-      let cexp = mexprToCexpr e res.rho in addMain (CExpr cexp)
+        let cexp = mexprToCexpr e res.rho in addMain (CExpr cexp)
   in
 
   let _ = List.iter convert mdefns in

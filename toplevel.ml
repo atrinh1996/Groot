@@ -1,23 +1,17 @@
 
 (* Top-level of the groot compiler: scan & parse input,
-
-   		TODO: generate the resulting AST and generate a SAST from it
-   					generate LLVM IR, dump the module
-   	*)
+    build the AST, generate LLVM IR, dump the module, and compile it to C code. *)
 
 (* may not need to use this, but this is how to robustly create unique exception
-   types
-*)
-
+   types *)
 type action =
-    Ast
+  | Ast
   | Name_Check
   | Tast
   | Mast
   | Cast
   | LLVM_IR
   (* | Compile *)
-
 
 
 let () =
@@ -38,7 +32,6 @@ let () =
   let usage_msg = "usage: ./toplevel.native [-a|-n|-t|-m|-v|-l|-c] [file.gt]" in
   let channel = ref stdin in
   Arg.parse speclist (fun filename -> channel := open_in filename) usage_msg;
-
   let lexbuf = Lexing.from_channel !channel in
   let ast = Parser.prog Scanner.tokenize lexbuf in
   match !action with
@@ -52,24 +45,13 @@ let () =
     let cast = Conversion.conversion mast in
     match !action with
     (* This option doesn't do anything, just need it to satisfy
-       					     the pattern matching for type action. *)
-      Ast -> ()
+       the pattern matching for type action. *)
+    | Ast -> ()
     | Name_Check -> print_string (Ast.string_of_prog ast')
-    (* action - prints the SAST using sast.
-       					     Here is the RHS code:
-       					     print_string (Sast.string_of_sprog sast) *)
     | Tast -> print_string (Tast.string_of_tprog tast)
-    (* print_endline ("Tast was generated, no pretty print") *)
-    (* print_string (Tast.string_of_tprog tast) *)
     | Mast -> print_string (Mast.string_of_mprog mast)
     | Cast -> print_string (Cast.string_of_cprog cast)
-    (* action - print the llvm module. Codegen.translate produces the llmodule
-       					     from the given SAST called sast and then Llvm.string_of_llmodule converts it to string.
-       					     Here is the RHS code:
-       					     print_string (Llvm.string_of_llmodule (Codegen.translate sast))
-       					  *)
     | LLVM_IR -> print_string (Llvm.string_of_llmodule (Codegen.translate cast))
-(* action - print the llvm module. See above. *)
-(* | Compile -> let the_module = Codegen.translate cast in
-   										Llvm_analysis.assert_valid_module the_module;
-   										print_string (Llvm.string_of_llmodule the_module) *)
+    (* | Compile -> let the_module = Codegen.translate cast in
+          Llvm_analysis.assert_valid_module the_module;
+          print_string (Llvm.string_of_llmodule the_module) *)

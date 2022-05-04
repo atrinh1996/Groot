@@ -1,1 +1,1 @@
-(lambda (n) (+ 1 1))
+((lambda (y) (if y #t y)) #f)

@@ -1,1 +1,1 @@
-(lambda (n) 1)
+((lambda (x) x) 3)
