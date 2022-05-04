@@ -1,2 +1,0 @@
-(val retn (lambda (n) (lambda (x) (+ x n))))
-(val test (lambda () (retn 5)))

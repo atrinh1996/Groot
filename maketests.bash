@@ -100,6 +100,11 @@ TESTSET_DIR="testsets"
 # For each file in the files list
 for TESTSET in $TESTSET_DIR/*
 do
+
+    # printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' '\d196'
+    printf '%.s─' $(seq 1 $(tput cols))
+    printf "Generating Testset: $TESTSET\n\n"
+
     rm -rf $TESTSET/!(tests)
     mkdir -p "${TESTSET}/ref_stdout"
     mkdir -p "${TESTSET}/ref_stderr"
