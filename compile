@@ -1,0 +1,14 @@
+#! /usr/bin/env bash
+#!/usr/bin/bash
+
+LANG_COMPILER=./toplevel.native
+LLC=llc
+CC=cc
+
+SOURCE=$1
+
+FILENAME=$( echo $SOURCE | cut -d'.' -f-1 | rev | cut -d'/' -f-1 | rev )
+
+$LANG_COMPILER -l $SOURCE > $FILENAME.ll
+$LLC -relocation-model=pic $FILENAME.ll > $FILENAME.s
+$CC $FILENAME.s -o $FILENAME.exe

@@ -5,6 +5,12 @@
 
 DEPENDS=toplevel.ml ast.ml tast.ml parser.mly scanner.mll diagnostic.ml infer.ml mast.ml mono.ml codegen.ml cast.ml conversion.ml 
 
+dev:
+	docker run --rm -it -v `pwd`:/home/dev/workdir -w=/home/dev/workdir zegger/llvm-opam
+
+tests:
+	bash maketests.bash
+
 # IMPORTANT Note from Zach:
 #	the _tags file contains arguments that are ingested by ocamlbuild
 #   and alter it's behavior
