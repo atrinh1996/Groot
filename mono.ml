@@ -185,8 +185,11 @@ let monomorphize (tdefns : tprog) =
     match ex with
       TLiteral l -> ((ofGtype ty, MLiteral (value l)), prog)
     | TypedVar v ->
+        (* let () = print_endline ("looking for: " ^ v) in  *)
         let vartyp = (try fst (lookup v gamma)
-                      with Not_found -> ofGtype ty) in
+                      with Not_found -> 
+                          (* let () = print_endline "didn't find it" in  *)
+                          ofGtype ty) in
         let actualtyp = ofGtype ty in
         if (isPolymorphic vartyp) && (isFunctionType vartyp)
           then
@@ -220,7 +223,14 @@ let monomorphize (tdefns : tprog) =
         let (formaltys, names) = List.split formals in
         let formaltys' = List.map ofGtype formaltys in
         let formals'   = List.combine formaltys' names in
-        let (body', prog') = expr gamma prog body in
+        let gamma' = List.fold_left 
+                        (fun env (ty, name) -> 
+                         if isPolymorphic ty  
+                            then set_aside name (ty, MVar name) env
+                         else env)
+                        gamma
+                        formals' in 
+        let (body', prog') = expr gamma' prog body in
         ((ofGtype ty, MLambda (formals', body')), prog')
   and value = function
     | TChar c -> MChar c
@@ -246,10 +256,77 @@ let monomorphize (tdefns : tprog) =
         else (gamma, MVal (id, (mty, mexp)) :: prog')
     | TExpr (ty, texp) ->
         let ((mty, mexp), prog') = expr gamma prog (ty, texp) in
-        if isPolymorphic mty
+        let () = if isPolymorphic mty then 
+          Diagnostic.warning 
+            (Diagnostic.MonoWarning ("polymorphic type leftover;" 
+                                     ^ " resolving to integers"))
+        else ()
+        in (gamma, MExpr (mty, mexp) :: prog')
+
+        (* if isPolymorphic mty
           then (gamma, prog')
-        else (gamma, MExpr (mty, mexp) :: prog')
+        else (gamma, MExpr (mty, mexp) :: prog') *)
   in
 
-  let (_, program) = List.fold_left mono (StringMap.empty, []) tdefns
-  in List.rev program
+  let (_, program) = List.fold_left mono (StringMap.empty, []) tdefns in 
+
+
+
+
+  (* Bug/Bandaid - unable to resolve polymorphism.
+     Iterate through the current "mono" typed program. 
+     Insert integer type wherever leftover type variables remain *)
+  let buggy_resolve (prog : mprog) (def : mdefn) = 
+
+    (* resolves any remaining polymorphism in an mexpr to integer type *)
+    let rec resolve_expr ((ty, exp) : mexpr) = 
+      (* turns tyvar into int type *)
+      let rec resolve_mty = function 
+        | Mtycon  t -> Mtycon (resolve_tycon t)
+        | Mtyvar  _ -> Mtycon MIntty
+        | Mconapp c -> Mconapp (resolve_conapp c)
+      and resolve_tycon = function
+        | MIntty    -> MIntty
+        | MBoolty   -> MBoolty
+        | MCharty   -> MCharty
+        | MTarrow t -> MTarrow (resolve_mty t)
+      and resolve_conapp (tyc, mtys) = 
+            (resolve_tycon tyc, List.map resolve_mty mtys)
+      in
+
+      (* finds and resolves any nested tyvars to int type *)
+      let resolve_mx = function 
+        | MLiteral l -> MLiteral l
+        | MVar v     -> MVar v
+        | MIf (e1, e2, e3) -> 
+            let r1 = resolve_expr e1 in 
+            let r2 = resolve_expr e2 in 
+            let r3 = resolve_expr e3 in 
+            MIf (r1, r2, r3)
+        | MApply (f, args) -> 
+            let f' = resolve_expr f in 
+            let args' = List.map resolve_expr args in 
+            MApply (f', args')
+        | MLet (bs, body) -> 
+            let bs' = List.map (fun (name, mex) -> (name, resolve_expr mex)) bs in
+            let body' = resolve_expr body in 
+            MLet (bs', body')
+        | MLambda (formals, body) ->
+            let formals' = 
+              List.map (fun (mty, name) -> (resolve_mty mty, name)) formals in 
+            let body' = resolve_expr body in 
+            MLambda (formals', body')
+      in 
+
+      (resolve_mty ty, resolve_mx exp)
+    in
+
+    (* Resolve the given mdefn *)
+    match def with 
+    | MVal (id, ex) -> MVal  (id, resolve_expr ex) :: prog 
+    | MExpr ex      -> MExpr (resolve_expr ex) :: prog 
+  in 
+
+  List.fold_left buggy_resolve [] program
+
+
