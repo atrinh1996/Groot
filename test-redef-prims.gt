@@ -1,0 +1,3 @@
+(val + (lambda (x y) x))
+
+(printi (+ 1 222))

@@ -42,22 +42,29 @@ let () =
   (* All other action needs to generate an SAST, store in variable sast *)
   | _ ->
     let ast' = Scope.check ast in
-    let tast = Infer.type_infer ast' in
-    let mast = Mono.monomorphize tast in
-    let hast = Hof.clean mast in 
-    let cast = Conversion.conversion hast in
-    (* let cast = Conversion.conversion mast in *)
-    (* let hast = Hof.clean cast in *)
     match !action with
     (* This option doesn't do anything, just need it to satisfy
        the pattern matching for type action. *)
     | Ast -> ()
     | Name_Check -> print_string (Ast.string_of_prog ast')
-    | Tast -> print_string (Tast.string_of_tprog tast)
-    | Mast -> print_string (Mast.string_of_mprog mast)
-    | Hast -> print_string (Hast.string_of_hprog hast)
-    | Cast -> print_string (Cast.string_of_cprog cast)
-    | LLVM_IR -> print_string (Llvm.string_of_llmodule (Codegen.translate cast))
-    | Compile -> let the_module = Codegen.translate cast in
-          Llvm_analysis.assert_valid_module the_module;
-          print_string (Llvm.string_of_llmodule the_module) 
+    | _ ->
+      let tast = Infer.type_infer ast' in
+      match !action with
+      | Tast -> print_string (Tast.string_of_tprog tast)
+      | _ ->
+        let mast = Mono.monomorphize tast in
+        match !action with
+        | Mast -> print_string (Mast.string_of_mprog mast)
+        | _ ->
+          let hast = Hof.clean mast in 
+          match !action with
+          | Hast -> print_string (Hast.string_of_hprog hast)
+          | _ ->
+          let cast = Conversion.conversion hast in
+            match !action with
+            | Cast -> print_string (Cast.string_of_cprog cast)
+            | LLVM_IR -> print_string (Llvm.string_of_llmodule (Codegen.translate cast))
+            | Compile -> let the_module = Codegen.translate cast in
+                  Llvm_analysis.assert_valid_module the_module;
+                  print_string (Llvm.string_of_llmodule the_module)
+            | _ -> print_string usage_msg
