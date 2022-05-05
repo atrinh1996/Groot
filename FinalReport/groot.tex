@@ -1193,10 +1193,8 @@ function: (flurry func)
 \label{sec:LESSON}
 
     \subsection*{Amy Bui}
-        \begin{itemize}
-            \item Takeaway:
-            \item Advice: 
-        \end{itemize}
+
+    My main takeaway is that compiler writing, or even writing just a single optimization for a compiler, is a very complicated endeavor. We did not end up with a lot of our original goals and features we intended for our functional language, but the detours we took while exploring this whole other paradigm was very enriching, and I was never bored and always challenged. Everyone should write a compiler at least once before graduating. This was a great project in demonstrating the practical application of the concepts and theory we learnt in 170 and 105, and I'd recommend taking both classes before 107 or at the same time for a more comfortable time. I have a lot of appreciation for people who do research and contribute to the field of functional languages, and the complexity of lambda calculus. My advice to future students is that you should have a burning desire to implement type inferencing and lambda calculus before you settle on a a functional language as your project topic; I never knew how much we took static typing and statment blocks for granted. Or you can get a thrill from just taking on this challenge. 
     
     \subsection*{Nickolas Gravel}
         \begin{itemize}
@@ -1245,6 +1243,7 @@ function: (flurry func)
 
     \subsection{\texttt{ast.ml}}
     \label{app:ast}
+    Author(s): Sam, Eliza, Amy, Nik, Zach
 \begin{lstlisting}
 (* Abstract Syntax Tree (AST) for Groot *)
 (* Type of Variable Names *)
@@ -1325,32 +1324,833 @@ let string_of_prog defns =
 
     \subsection{\texttt{scanner.mll}}
     \label{app:scanner}
+    Author(s): Sam, Eliza, Amy, Nik, Zach
+\begin{lstlisting}
+(* Header *)
+{ open Parser }
+
+(* Regular Expressions *)
+let digit = ['0'-'9']
+let integer = ['-']?['0'-'9']+
+let alpha = ['a'-'z']
+let leaf = ("leaf"|"()")
+let chrcode = digit+
+
+(* all visible characters, excluding ()'[]\;{}| *)
+let ident = ['!'-'&' '*'-':' '<'-'Z' '`'-'z' '~' '|']
+            ['!'-'&' '*'-':' '<'-'Z' '^'-'z' '~' '|']*
+
+
+(* ToKeNiZe *)
+rule tokenize = parse
+  | [' ' '\n' '\t' '\r'] { tokenize lexbuf }
+  | "(;"                 { comment lexbuf }
+  | '('                  { LPAREN }
+  | ')'                  { RPAREN }
+  | '['                  { LSQUARE }
+  | ']'                  { RSQUARE }
+  | "tree"               { BRANCH }
+  | "leaf"               { LEAF }
+  | "if"                 { IF }
+  | "'"                  { apos_handler lexbuf }
+  | integer as ival      { INT(int_of_string ival) }
+  | "#t"                 { BOOL(true) }
+  | "#f"                 { BOOL(false) }
+  | "lambda"             { LAMBDA }
+  | "let"                { LET }
+  | "val"                { VAL }
+  | ident as id          { ID(id) }
+  | eof                  { EOF }
+  | _                    { Diagnostic.error
+                            (Diagnostic.lex_error "unrecognized character" 
+                            lexbuf) }
+and comment = parse
+  | ";)"                 { tokenize lexbuf }
+  | _                    { comment lexbuf }
+
+(* apostrophe handler *)
+and apos_handler = parse
+  | '('[^''']      { tree_builder lexbuf }
+  | '''            { Diagnostic.error
+                    (Diagnostic.lex_error "empty character literal" lexbuf) }
+  | '\\'           { escaped_char_handler lexbuf }
+  | _ as c         { char_builder c lexbuf }
+
+and tree_builder = parse
+  | _ { Diagnostic.error(Diagnostic.Unimplemented "in-place tree syntax") }
+
+and char_builder c = parse
+  | '''   { CHAR(c) }
+  | _ { Diagnostic.error
+          (Diagnostic.lex_error ("character literal contains more " 
+           ^ "than one token") lexbuf) }
+
+and escaped_char_handler = parse
+  | '\\' { char_builder '\\' lexbuf }
+  | '"'  { char_builder '\"' lexbuf  }
+  | '''  { char_builder '\'' lexbuf  }
+  | 'n'  { char_builder '\n' lexbuf  }
+  | 'r'  { char_builder '\r' lexbuf  }
+  | 't'  { char_builder '\t' lexbuf  }
+  | 'b'  { char_builder '\b' lexbuf  }
+  | ' '  { char_builder '\ ' lexbuf  }
+  | chrcode as ord
+         { print_string ord; if int_of_string ord > 255
+           then Diagnostic.error
+                (Diagnostic.lex_error "invalid escape sequence ASCII value" 
+                lexbuf)
+           else char_builder (Char.chr (int_of_string ord)) lexbuf }
+  | _    { Diagnostic.error
+          (Diagnostic.lex_error "unrecognized escape sequence" lexbuf) }
+\end{lstlisting}
     \pagebreak
 
 
     \subsection{\texttt{parser.mly}}
     \label{app:parser}
+    Author(s): Sam, Eliza, Amy, Nik, Zach
+\begin{lstlisting}
+/* Header */
+%{ open Ast %}
+
+/* Tokens */
+%token LPAREN  RPAREN
+%token LSQUARE RSQUARE
+%token PLUS MINUS TIMES DIVIDE MOD
+%token EQ NEQ LT GT LEQ GEQ AND OR NOT
+%token IF
+%token <char> CHAR
+%token <int>  INT
+%token <bool> BOOL
+%token <string> ID
+%token BRANCH LEAF
+%token EOF
+%token LAMBDA LET VAL
+
+/* Precedence */
+%nonassoc OR
+%nonassoc AND
+%nonassoc LT GT
+%nonassoc EQ NEQ
+%nonassoc LEQ GEQ
+%nonassoc PLUS MINUS
+%nonassoc TIMES DIVIDE
+%nonassoc NEG
+%nonassoc NOT
+%nonassoc BRANCH LEAF
+
+
+/* Declarations */
+%start prog
+%type <Ast.prog> prog
+
+%%
+
+prog:
+  | defn_list EOF                 { $1 }
+
+defn_list:
+  | /* nothing */                 { [] }
+  | defn defn_list                { $1 :: $2 }
+
+defn:
+  | expr                          { Expr($1) }
+  | LPAREN VAL ID expr RPAREN     { Val($3, $4) }
+
+formals_opt:
+  | /* nothing */                 { [] }
+  | formal_list                   { $1 }
+
+formal_list:
+  | ID                            { [$1] }
+  | ID formal_list                { $1 :: $2 }
+
+
+/* Rules */
+value:
+  | CHAR                          { Char($1) }
+  | INT                           { Int($1) }
+  | BOOL                          { Bool($1) }
+  | tree                          { Root($1) }
+  /* ! Note: tree is not a token - no need for a ROOT token while scanning */
+
+
+tree:
+  | LEAF                                  { Leaf }
+  | LPAREN BRANCH expr tree tree RPAREN   { Branch($3, $4, $5) }
+
+
+let_binding_list:
+  | /* nothing */                             { [] }
+  | LSQUARE RSQUARE let_binding_list  
+    { Diagnostic.warning (Diagnostic.parse_warning "empty let binding" 1); $3 } 
+    /* NON FATAL */
+  | LSQUARE expr RSQUARE let_binding_list     
+    { Diagnostic.error (Diagnostic.parse_error ("let binding must contain" 
+      ^ " id and value") 2) } /* FATAL */
+  | LSQUARE ID expr RSQUARE let_binding_list  { ($2, $3) :: $5 }
+
+
+expr_list:
+  | /* null */         { [] }
+  | expr expr_list     { $1 :: $2 }
+
+
+expr:
+  | value                                                 { Literal($1) }
+  | ID                                                    { Var($1) }
+  | LPAREN expr expr_list RPAREN                          { Apply($2, $3) }
+  | LPAREN LET LPAREN let_binding_list RPAREN expr RPAREN { Let($4, $6)}
+  | LPAREN IF expr expr expr RPAREN                       { If($3, $4, $5) }
+  | LPAREN LAMBDA LPAREN formals_opt RPAREN expr RPAREN   { Lambda($4, $6) }
+\end{lstlisting}
     \pagebreak
 
 
     \subsection{\texttt{scope.ml}}
     \label{app:scope}
+    Author(s): Amy, Eliza
+\begin{lstlisting}
+(* Name (scope) checks variable names *)
+open Ast
+exception Unbound of string
+
+(* toplevel naming environment, preloaded with built-ins *)
+let nameEnv = List.fold_right List.cons [ "printi"; "printb"; "printc";
+                                              "+"; "-"; "*"; "/"; "mod";
+                                              "<"; ">"; ">="; "<=";
+                                              "!=i"; "=i";
+                                              "&&"; "||"; "not"            ] []
+
+(* Takes and AST and checks if variables are bound in scope.
+    Returns same AST if so, otherwise raises Unbound variable error
+    if a variable is unbound. *)
+let check defns =
+
+  (* Recursively checks the scope of variables names used in an expression *)
+  let rec checkExpr expression rho =
+    let rec exp e = match e with
+        Literal _ -> ()
+      | Var id -> 
+          if List.mem id rho then ()
+          else Diagnostic.error (Diagnostic.Unbound id)
+      | If (e1, e2, e3) ->
+          let (_, _, _) = (exp e1, exp e2, exp e3) in ()
+      | Apply (f, args) ->
+          let _ = exp f in List.iter exp args
+      | Let (bs, body) ->
+          let (xs, es) = List.split bs in
+          let () = List.iter exp es in
+          checkExpr body (List.fold_right List.cons xs rho)
+      | Lambda (formals, body) ->
+          checkExpr body (List.fold_right List.cons formals rho)
+    in exp expression
+  in
+
+  let rec checkDef ds env =
+    match ds with
+      [] -> env
+    | f :: rest ->
+      let env' =
+        (match f with
+            Val (id, exp) ->
+            let () = checkExpr exp env in
+            id :: env
+          | Expr exp -> let () = checkExpr exp env in env)
+      in checkDef rest env'
+  in
+  let _ = checkDef defns nameEnv in
+
+  (* Returns the AST if no error raised *)
+  defns
+\end{lstlisting}
     \pagebreak
 
 
 
     \subsection{\texttt{tast.ml}}
     \label{app:tast}
+    Author(s): Sam, Nik
+\begin{lstlisting}
+(* TAST -- Type inference. *)
+
+open Ast
+
+exception Type_error of string
+let type_error msg = raise (Type_error msg)
+
+type gtype =
+  | TYCON of tycon
+  | TYVAR of tyvar
+  | CONAPP of conapp
+and tycon =
+  | TyInt
+  | TyBool
+  | TyChar
+  | TArrow of gtype
+and tyvar =
+  | TVariable of int
+and conapp = (tycon * gtype list)
+
+type tyscheme = tyvar list * gtype
+
+let inttype = TYCON TyInt
+let chartype = TYCON TyChar
+let booltype = TYCON TyBool
+let functiontype resultType formalsTypes =
+      CONAPP (TArrow resultType, formalsTypes)
+
+
+(* TAST expression *)
+type texpr = gtype * tx
+and tx =
+  | TLiteral     of tvalue
+  | TypedVar     of ident
+  | TypedIf      of texpr * texpr * texpr
+  | TypedApply   of texpr * texpr list
+  | TypedLet     of (ident * texpr) list * texpr
+  | TypedLambda  of (gtype * ident) list * texpr
+and tvalue = TChar of char | TInt of int | TBool of bool | TRoot of ttree
+and ttree = TLeaf | TBranch of tvalue * ttree * ttree
+
+type tdefn = TVal of ident * texpr | TExpr of texpr
+type tprog = tdefn list
+
+(* Pretty printer *)
+
+(* String of gtypes *)
+let rec string_of_ttype = function
+  | TYCON ty -> string_of_tycon ty
+  | TYVAR tp -> string_of_tyvar tp
+  | CONAPP con -> string_of_conapp con
+and string_of_tycon = function
+  | TyInt -> "int"
+  | TyBool -> "bool"
+  | TyChar -> "char"
+  | TArrow (retty) -> string_of_ttype retty
+and string_of_tyvar = function
+  | TVariable n -> "'" ^ string_of_int n
+and string_of_conapp (tyc, tys) =
+string_of_tycon tyc ^ " (" 
+    ^ String.concat " " (List.map string_of_ttype tys) ^ ")"
+
+and string_of_subs = function
+  | [] -> ""
+  | (t1, t2) :: cs ->
+      "(" ^ string_of_tyvar t1 ^ ", " ^ string_of_ttype t2 ^ ") "
+      ^ string_of_subs cs
+
+and string_of_context = function
+  | [] -> ""
+  | (ident, (tvs, gt)) :: ctx ->
+      "\n=: " ^ ident ^ ", (["
+      ^ String.concat ", " (List.map string_of_tyvar tvs)
+      ^ "], " ^ string_of_ttype gt ^ ")" ^ string_of_context ctx
+
+and string_of_tyformals (gt, ident) =
+    "(" ^ ident ^ " : " ^ string_of_ttype gt ^ ")"
+
+(* String of a typed expression (texpr) == (type, t-expression) *)
+let rec string_of_texpr (typ, exp) =
+    "[" ^ string_of_ttype typ ^ "] " ^ string_of_tx exp
+and string_of_tx = function
+    TLiteral v -> string_of_tvalue v
+  | TypedVar id -> id
+  | TypedIf (te1, te2, te3) ->
+    "(if "  ^ string_of_texpr te1 ^ " "
+    ^ string_of_texpr te2 ^ " "
+    ^ string_of_texpr te3 ^ ")"
+  | TypedApply (f, args) ->
+    "(" ^ string_of_texpr f ^ " "
+    ^ String.concat " " (List.map string_of_texpr args) ^ ")"
+  | TypedLet (binds, body) ->
+    let string_of_binding (id, e) =
+      "[" ^ id ^ " " ^ (string_of_texpr e) ^ "]"
+    in
+    "(let ("  ^ String.concat " " (List.map string_of_binding binds) ^ ") "
+    ^ string_of_texpr body ^ ")"
+  | TypedLambda (formals, body) ->
+    let formalStringlist = List.map (fun (ty, x) ->
+        string_of_ttype ty ^ " " ^ x) formals in
+    "(lambda (" ^ String.concat ", "  formalStringlist
+    ^ ") " ^ string_of_texpr body ^ ")"
+
+(* toString for Sast.svalue *)
+and string_of_tvalue = function
+  | TChar c -> String.make 1 c
+  | TInt i -> string_of_int i
+  | TBool b -> if b then "#t" else "#f"
+  | TRoot tr -> string_of_ttree tr
+
+(* toString for Sast.stree *)
+and string_of_ttree = function
+    TLeaf -> "leaf"
+  | TBranch (v, sib, child) ->
+    "(tree " ^ string_of_tvalue v ^ " "
+    ^ string_of_ttree sib ^ " "
+    ^ string_of_ttree child ^ ")"
+
+
+(* String of a typed defn (tdefn) *)
+let string_of_tdefn = function
+  | TVal (id, te) -> "(val " ^ id ^ " " ^ string_of_texpr te ^ ")"
+  | TExpr te    -> string_of_texpr te
+
+
+(* String of the tprog == tdefn list *)
+let string_of_tprog tdefns =
+String.concat "\n" (List.map string_of_tdefn tdefns) ^ "\n"
+\end{lstlisting}
     \pagebreak
 
 
     \subsection{\texttt{infer.ml}}
     \label{app:infer}
+    Author(s): Sam, Eliza, Nik
+\begin{lstlisting}
+open Ast
+open Tast
+module StringMap = Map.Make (String)
+
+(* prims - initializes context with built-in functions with their types *)
+(* prims : (id * tyvar) list * (tycon * gtype list) *)
+let prims =
+  [
+    ("printb",  ([ TVariable (-1) ], Tast.functiontype inttype [ booltype ]));
+    ("printi",  ([ TVariable (-2) ], Tast.functiontype inttype [ inttype ]));
+    ("printc",  ([ TVariable (-3) ], Tast.functiontype inttype [ chartype ]));
+    ("+",       ([ TVariable (-4) ], Tast.functiontype inttype [ inttype; inttype ]));
+    ("-",       ([ TVariable (-4) ], Tast.functiontype inttype [ inttype; inttype ]));
+    ("/",       ([ TVariable (-4) ], Tast.functiontype inttype [ inttype; inttype ]));
+    ("*",       ([ TVariable (-4) ], Tast.functiontype inttype [ inttype; inttype ]));
+    ("mod",     ([ TVariable (-4) ], Tast.functiontype inttype [ inttype; inttype ]));
+    ("<",       ([ TVariable (-5) ], Tast.functiontype booltype [ inttype; inttype ]));
+    (">",       ([ TVariable (-5) ], Tast.functiontype booltype [ inttype; inttype ]));
+    ("<=",      ([ TVariable (-5) ], Tast.functiontype booltype [ inttype; inttype ]));
+    (">=",      ([ TVariable (-5) ], Tast.functiontype booltype [ inttype; inttype ]));
+    ("=i",      ([ TVariable (-5) ], Tast.functiontype booltype [ inttype; inttype ]));
+    ( "!=i",    ([ TVariable (-5) ], Tast.functiontype booltype [ inttype; inttype ]) );
+    ( "&&",     ([ TVariable (-6) ], Tast.functiontype booltype [ booltype; booltype ]) );
+    ( "||",     ([ TVariable (-6) ], Tast.functiontype booltype [ booltype; booltype ]) );
+    ("not",     ([ TVariable (-7) ], Tast.functiontype booltype [ booltype ]));
+    ("~",       ([TVariable (-2)], Tast.functiontype inttype [inttype]))
+  ]
+
+(* is_ftv - returns true if 'gt' is equal to free type variable 'var'
+    (i.e. 'gt' is a type variable and 'var' is a free type variable). For the
+    conapp case, we recurse over the conapp's gtype list searching for any free
+    type variables. When this function returns true it means the type variable
+    is matching *)
+let rec is_ftv (var : tyvar) (gt : gtype) =
+  match gt with
+  | TYCON _ -> false
+  | TYVAR v -> v = var
+  | CONAPP (_, gtlst) ->
+    (* if any x in gtlst is ftv this returns true, else returns false *)
+    List.fold_left (fun acc x -> is_ftv var x || acc) false gtlst
+
+(* ftvs - returns a list of free type variables amongst a collection 
+   of gtypes *)
+(* retty : tyvar list *)
+let rec ftvs (ty : gtype) =
+  match ty with
+  | TYVAR t -> [ t ]
+  | TYCON _ -> []
+  | CONAPP (_, gtlst) -> List.fold_left (fun acc x -> acc @ ftvs x) [] gtlst
+
+(* fresh - returns a fresh gtype variable (integer) *)
+let fresh =
+  let k = ref 0 in
+  (* fun () -> incr k; TVariable !k *)
+  fun () -> incr k; TYVAR (TVariable !k)
+
+
+(* sub - updates a list of constraints with substitutions in theta *)
+let sub (theta : (tyvar * gtype) list) (cns : (gtype * gtype) list) =
+  (* sub_one - takes in single constraint and updates it with substitution in theta *)
+  let sub_one (cn : gtype * gtype) =
+    List.fold_left
+      (fun ((c1, c2) : gtype * gtype) ((tv, gt) : tyvar * gtype) ->
+          match (c1, c2) with
+          | TYVAR t1, TYVAR t2 ->
+            if tv = t1 then (gt, c2) else if tv = t2 then (c1, gt) else (c1, c2)
+          | TYVAR t1, _ -> if tv = t1 then (gt, c2) else (c1, c2)
+          | _, TYVAR t2 -> if tv = t2 then (c1, gt) else (c1, c2)
+          | _, _ -> (c1, c2))
+      cn theta
+  in
+  List.map sub_one cns
+
+(* compose - applies the substitutions in theta1 to theta2 *)
+let compose theta1 theta2 =
+  (* sub_one - takes a single substitution in theta1 and applies it to theta2 *)
+  let sub_one cn =
+    List.fold_left
+      (fun (acc : tyvar * gtype) (one_sub : tyvar * gtype) ->
+          match (acc, one_sub) with
+          | (a1, TYVAR a2), (s1, TYVAR s2) ->
+            if s1 = a1 then (s1, TYVAR a2)
+            else if s1 = a2 then (a1, TYVAR s2)
+            else acc
+          | (a1, a2), (s1, TYVAR _) -> if a1 = s1 then (s1, a2) else acc
+          | (a1, _), (s1, s2) -> if a1 = s1 then (s1, s2) else acc)
+      cn theta1
+  in
+  List.map sub_one theta2
+
+(* solve': solves a single constraint 'c' *)
+let rec solve' (c : gtype * gtype) =
+  match c with
+  | TYVAR t1, TYVAR t2 -> [ (t1, TYVAR t2) ]
+  | TYVAR t1, TYCON t2 -> [ (t1, TYCON t2) ]
+  | TYVAR t1, CONAPP t2 ->
+    if is_ftv t1 (CONAPP t2) then
+      Diagnostic.error (Diagnostic.TypeError "type variable is not free type in type constructor")
+    else [ (t1, CONAPP t2) ]
+  | TYCON t1, TYVAR t2 -> solve' (TYVAR t2, TYCON t1)
+  | TYCON (TArrow (TYVAR t1)), TYCON t2 -> [ (t1, TYCON t2) ]
+  | TYCON t1, TYCON (TArrow (TYVAR t2)) -> [ (t2, TYCON t1) ]
+  | TYCON t1, TYCON t2 ->
+    if t1 = t2 then []
+    else
+      Diagnostic.error (Diagnostic.TypeError
+        ("type constructor mismatch " ^ string_of_tycon t1
+          ^ " != " ^ string_of_tycon t2))
+  | TYCON t1, CONAPP t2 ->
+    Diagnostic.error (Diagnostic.TypeError
+      ("type constructor mismatch " ^ string_of_tycon t1
+      ^ " != " ^ string_of_conapp t2))
+  | CONAPP t1, TYVAR t2 -> solve' (TYVAR t2, CONAPP t1)
+  | CONAPP t1, TYCON t2 ->
+    Diagnostic.error (Diagnostic.TypeError
+      ("type constructor mismatch " ^ string_of_conapp t1
+        ^ " != " ^ string_of_tycon t2))
+  | CONAPP t1, CONAPP t2 -> (
+      match (t1, t2) with
+      | (TArrow t1, tys1), (TArrow t2, tys2) ->
+        solve ((t1, t2) :: List.combine tys1 tys2)
+      | _ ->
+        Diagnostic.error (Diagnostic.TypeError
+          ("type constructor mismatch " ^ string_of_conapp t1
+            ^ " != " ^ string_of_conapp t2)))
+
+
+(* solve - solves a list of constraints, calls 'solver' to iterate through the
+            constraint list, once constraint list has been iterated 'compose' is
+            called to tie 'theta1' and 'theta2' together, returns theta *)
+and solve (constraints : (gtype * gtype) list) =
+  let solver cns =
+    match cns with
+    | [] -> []
+    | cn :: cns ->
+      let theta1 = solve' cn in
+      let theta2 = solve (sub theta1 cns) in
+      (compose theta2 theta1) @ theta2
+  in solver constraints
+
+
+(* generate_constraints gctx e:
+      infers the type of expression 'e' and a generates a set of constraints,
+      'gctx' refers to the global context 'e' can refer to.
+
+    Type References:
+        ctx : (ident * tyscheme) list == (ident * (tyvar list * gtype)) list
+    tyscheme : (tyvar list * gtype)
+      retty : gtype * (gtype * gtype) list * (gtype * tx) *)
+let rec generate_constraints gctx e =
+  let rec constrain ctx e =
+    match e with
+    | Literal e -> value e
+    | Var name ->
+      let _, (_, tau) = List.find (fun x -> fst x = name) ctx in
+      (tau, [], (tau, TypedVar name))
+    | If (e1, e2, e3) ->
+      let t1, c1, tex1 = generate_constraints gctx e1 in
+      let t2, c2, tex2 = generate_constraints gctx e2 in
+      let t3, c3, tex3 = generate_constraints gctx e3 in
+      let c = [ (booltype, t1); (t3, t2) ] @ c1 @ c2 @ c3 in
+      let tex = TypedIf (tex1, tex2, tex3) in
+      (t3, c, (t3, tex))
+    | Apply (f, args) ->
+      let t1, c1, tex1 = generate_constraints ctx f in
+      let ts2, c2, texs2 =
+        List.fold_left
+          (fun acc e ->
+              let t, c, x = generate_constraints ctx e in
+              let ts, cs, xs = acc in
+              (t :: ts, c @ cs, x :: xs))
+          ([], c1, []) (List.rev args)
+      in
+      (* reverse args to maintain arg order *)
+      let retType = fresh () in
+      ( retType,
+        (t1, Tast.functiontype retType ts2) :: c2,
+        (retType, TypedApply (tex1, texs2)) )
+    | Let (bindings, expr) ->
+      let l = List.map (fun (_, e) -> generate_constraints ctx e) bindings in
+      let cns = List.concat (List.map (fun (_, c, _) -> c) l) in
+      let taus = List.map (fun (t, _, _) -> t) l in
+      let asts = List.map (fun (_, _, a) -> a) l in
+      let names = List.map fst bindings in
+      let ctx_addition =
+        List.map (fun (n, t) -> (n, ([], t))) (List.combine names taus)
+      in
+      let new_ctx = ctx_addition @ ctx in
+      let b_tau, b_cns, b_tast = generate_constraints new_ctx expr in
+      (b_tau, b_cns @ cns, (b_tau, TypedLet (List.combine names asts, b_tast)))
+    | Lambda (formals, body) ->
+      let binding = List.map (fun x -> (x, ([], fresh ()))) formals in
+      let new_context = binding @ ctx in
+      let t, c, tex = generate_constraints new_context body in
+      let _, tyschms = List.split binding in
+      let _, formaltys = List.split tyschms in
+      let typedFormals = List.combine formaltys formals in
+      ( Tast.functiontype t formaltys,
+        c,
+        (Tast.functiontype t formaltys, TypedLambda (typedFormals, tex)) )
+  and value v =
+    match v with
+    | Int  e -> (inttype, [],  (inttype,  TLiteral (TInt e)))
+    | Char e -> (chartype, [], (chartype, TLiteral (TChar e)))
+    | Bool e -> (booltype, [], (booltype, TLiteral (TBool e)))
+    | Root t -> tree t
+  and tree t =
+    match t with
+    | Leaf     -> Diagnostic.error (Diagnostic.Unimplemented "contraint generation for Leaf")
+    | Branch _ -> Diagnostic.error (Diagnostic.Unimplemented "contraint generation for Branch")
+  in
+  constrain gctx e
+
+
+(* gimme_tycon_gtype - sort of a hack function that we made to solve the bug we
+    came across in applying substitutions, called in tysubst *)
+let gimme_tycon_gtype _ = function
+  | TYCON x -> x
+  | TYVAR x ->
+    Diagnostic.error (Diagnostic.TypeError ("the variable " ^ string_of_tyvar x
+                        ^ " has type tyvar but an expression was exprected of type tycon"))
+  | CONAPP x ->
+    Diagnostic.error (Diagnostic.TypeError ("the constructor " ^ string_of_conapp x
+                        ^ " has type conapp but an expression was exprected of type tycon"))
+
+
+
+(* tysubst - subs in the type in place of type variable  *)
+let rec tysubst (one_sub : tyvar * gtype) (t : gtype) =
+  match (one_sub, t) with
+  | (x, y), TYVAR z -> if x = z then y else TYVAR z
+  | _, TYCON (TArrow retty) -> TYCON (TArrow (tysubst one_sub retty))
+  | _, TYCON c -> TYCON c
+  | (x, _), CONAPP (a, bs) ->
+    let tycn = gimme_tycon_gtype x in
+    CONAPP (tycn (tysubst one_sub (TYCON a)), (List.map (tysubst one_sub)) bs)
+
+(* get_constraints - returns a list of Tasts
+        Tast : [ (ident * (gtype * tx)) ] = [ (ident * texpr) | texpr ] = [ tdefns ]
+    tyscheme : (tyvar list * gtype) *)
+let get_constraints (ctx : (ident * tyscheme) list) (d : defn) =
+  match d with
+  | Val (name, e) ->
+    let t, c, tex = generate_constraints ctx e in
+    (t, c, TVal (name, tex))
+  | Expr e ->
+    let (t, c, tex) = generate_constraints ctx e in
+    (t, c, TExpr tex)
+
+
+(*  input: (tyvar * gtype) list *)
+(*  retty: tdefn -> tdefn *)
+let apply_subs (sub : (tyvar * gtype) list) =
+  match sub with
+  | [] -> (fun x -> x)
+  | xs ->
+    let final_ans =
+      (fun tdef ->
+          (* xs - the list of substitutions we want to apply *)
+          (* tdef - the tdefn we want to apply the substitutions to *)
+          let rec expr_only_case (x : texpr) =
+            List.fold_left
+              (* anon fun - takes one texpr and takes one substitution and subs substitution into the texpr *)
+              (fun (tast_gt, tast_tx) (tv, gt) ->
+                (* updated_tast_tx - matches texpr with tx and recurses on expressions *)
+                let updated_tast_tx = match tast_tx with
+                  | TypedIf (x, y, z) ->
+                    TypedIf (expr_only_case x, expr_only_case y, expr_only_case z)
+                  | TypedApply (x, xs) ->
+                    let txs = List.map expr_only_case xs in
+                    TypedApply (expr_only_case x, txs)
+                  | TypedLet ((its), x) -> TypedLet (List.map (fun (x, y) ->
+                      (x, expr_only_case y)) its, expr_only_case x)
+                  | TypedLambda (tyformals, body) ->
+                    TypedLambda ((List.map (fun (x, y) -> (tysubst (tv, gt) x, y))
+                                    tyformals), expr_only_case body)
+                  | TLiteral x -> TLiteral x
+                  | TypedVar x -> TypedVar x
+                in
+                let temp = (tysubst (tv, gt) tast_gt, updated_tast_tx) in temp) x xs in
+          match tdef with
+          | TVal (name, x) -> TVal (name, (expr_only_case x))
+          (* Do we need to do anything with updating context here? *)
+          | TExpr x -> TExpr (expr_only_case x)
+      )
+    in final_ans
+
+(* update_ctx - if the typed definition is a TVal this function will make sure
+    there are no unbound type variables and tha *)
+let update_ctx ctx tydefn =
+  match tydefn with
+  | TVal (name, (gt, _)) ->
+    (name, (List.filter (fun x -> List.exists (fun y -> y = x) (ftvs gt)) (ftvs gt), gt))::ctx
+  | TExpr _ -> ctx
+
+
+(* type_infer
+      input : ( ident | ident * expr ) list
+    returns : ( ident * (gtype * tx) ) list *)
+
+let type_infer (ds : defn list) =
+  let rec infer_defns ctx defn =
+    match defn with
+    | [] -> []
+    | d :: ds ->
+      (* get the constraints for the defn *)
+      let _, cs, tex = get_constraints ctx d in
+      (* subs -> (Infer.tyvar * Infer.gtype) list *)
+      let subs = solve cs in
+      (* apply subs to tdefns *)
+      let tdefn = (apply_subs subs) tex in
+      (* update ctx *)
+      let ctx' = update_ctx ctx tdefn in
+      (* recurse *)
+      tdefn :: infer_defns ctx' ds
+  in
+  infer_defns prims ds
+
+(* type_infer
+      input : ( ident | ident * expr ) list
+    returns : ( ident * (gtype * tx) ) list *)
+\end{lstlisting}
     \pagebreak
 
 
     \subsection{\texttt{mast.ml}}
     \label{app:mast}
+    Author(s): Amy
+\begin{lstlisting}
+(* MAST -- monomorphized AST where pholymorphism is removed *)
+module StringMap = Map.Make(String)
+type mname = string
+
+type mtype =
+    Mtycon of mtycon
+  | Mtyvar of int
+  | Mconapp of mconapp
+and mtycon =
+    MIntty
+  | MCharty
+  | MBoolty
+  | MTarrow of mtype
+and mconapp = (mtycon * mtype list)
+
+let integerTy  = Mtycon MIntty
+let characterTy = Mtycon MCharty
+let booleanTy = Mtycon MBoolty
+let functionTy (ret, args) = Mconapp (MTarrow ret, args)
+
+
+
+type mexpr = mtype * mx
+and mx =
+  | MLiteral  of mvalue
+  | MVar      of mname
+  | MIf       of mexpr * mexpr * mexpr
+  | MApply    of mexpr * mexpr list
+  | MLet      of (mname * mexpr) list * mexpr
+  | MLambda   of (mtype * mname) list * mexpr
+and mvalue =
+  | MChar     of char
+  | MInt      of int
+  | MBool     of bool
+  | MRoot     of mtree
+and mtree =
+  | MLeaf
+  | MBranch   of mvalue * mtree * mtree
+
+type mdefn =
+  | MVal      of mname * mexpr
+  | MExpr     of mexpr
+
+
+type polyty_env = mexpr StringMap.t
+
+type mprog = mdefn list
+
+
+(* Pretty printer *)
+(* String of mtypes *)
+let rec string_of_mtype = function
+  | Mtycon ty -> string_of_mtycon ty
+  | Mconapp con -> string_of_mconapp con
+  | Mtyvar i -> "'" ^ string_of_int i
+and string_of_mtycon = function
+  | MIntty -> "int"
+  | MBoolty -> "bool"
+  | MCharty -> "char"
+  | MTarrow (retty) -> string_of_mtype retty
+and string_of_mconapp (tyc, tys) =
+  string_of_mtycon tyc ^ " (" 
+  ^ String.concat " " (List.map string_of_mtype tys) ^ ")"
+
+
+(* String of a typed expression (mexpr) == (type, m-expression) *)
+let rec string_of_mexpr (typ, exp) =
+  "[" ^ string_of_mtype typ ^ "] " ^ string_of_mx exp
+and string_of_mx = function
+  | MLiteral v -> string_of_mvalue v
+  | MVar id -> id
+  | MIf (e1, e2, e3) ->
+    "(if "  ^ string_of_mexpr e1 ^ " "
+    ^ string_of_mexpr e2 ^ " "
+    ^ string_of_mexpr e3 ^ ")"
+  | MApply (f, args) ->
+    "(" ^ string_of_mexpr f ^ " "
+    ^ String.concat " " (List.map string_of_mexpr args) ^ ")"
+  | MLet (binds, body) ->
+    let string_of_binding (id, e) =
+      "[" ^ id ^ " " ^ (string_of_mexpr e) ^ "]"
+    in
+    "(let ("  ^ String.concat " " (List.map string_of_binding binds) ^ ") "
+    ^ string_of_mexpr body ^ ")"
+  | MLambda (formals, body) ->
+    let formalStringlist = List.map (fun (ty, x) -> string_of_mtype ty ^ " " ^ x) formals in
+    "(lambda (" ^ String.concat ", "  formalStringlist
+    ^ ") " ^ string_of_mexpr body ^ ")"
+(* toString for Mast.mvalue *)
+and string_of_mvalue = function
+  | MChar c -> String.make 1 c
+  | MInt i -> string_of_int i
+  | MBool b -> if b then "#t" else "#f"
+  | MRoot tr -> string_of_mtree tr
+(* toString for Mast.mtree *)
+and string_of_mtree = function
+  | MLeaf -> "leaf"
+  | MBranch (v, sib, child) ->
+    "(tree " ^ string_of_mvalue v ^ " "
+    ^ string_of_mtree sib ^ " "
+    ^ string_of_mtree child ^ ")"
+
+
+
+(* String of a mono typed defn (mdefn) *)
+let string_of_mdefn = function
+  | MVal (id, me) -> "(val " ^ id ^ " " ^ string_of_mexpr me ^ ")"
+  | MExpr me    -> string_of_mexpr me
+
+
+(* String of the mprog == mdefn list *)
+let string_of_mprog mdefns =
+  String.concat "\n" (List.map string_of_mdefn mdefns) ^ "\n"
+\end{lstlisting}
     \pagebreak
 
 
@@ -1358,32 +2158,51 @@ let string_of_prog defns =
 
     \subsection{\texttt{mono.ml}}
     \label{app:mono}
+    Author(s): Amy
+    \pagebreak
+
+
+
+    \subsection{\texttt{hast.ml}}
+    \label{app:cast}
+    Author(s): Amy
+    \pagebreak
+
+
+    \subsection{\texttt{hof.ml}}
+    \label{app:conversion}
+    Author(s): Amy
     \pagebreak
 
 
 
     \subsection{\texttt{cast.ml}}
     \label{app:cast}
+    Author(s): Amy 
     \pagebreak
 
 
     \subsection{\texttt{conversion.ml}}
     \label{app:conversion}
+    Author(s): Amy, Eliza
     \pagebreak
 
 
     \subsection{\texttt{llgtype.ml}}
     \label{app:llgtype}
+    Author(s): Amy
     \pagebreak
 
     \subsection{\texttt{codegen.ml}}
     \label{app:codegen}
+    Author(s): Amy, Eliza
     \pagebreak
 
 
 
     \subsection{\texttt{diagnostic.ml}}
     \label{app:diagnostic}
+    Author(s): Zach
     \pagebreak
 
 \pagebreak
