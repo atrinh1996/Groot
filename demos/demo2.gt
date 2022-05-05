@@ -1,8 +1,13 @@
-(val threeEqualFlips 
-	(lambda (flip0)
-		(lambda (flip1)
-			(if (!=i flip0 flip1)
-				(lambda (flip2) #f)
-				(lambda (flip2) (=i flip2 flip1))))))
+(val add1 (lambda (x) (+ x 1)))
 
-(printb (((threeEqualFlips 0) 0) 1))
+(val sub1 (lambda (x) (- x 1)))
+
+(val retx (lambda (x) x))
+
+(val callFunc (lambda (func arg) (func arg)))
+
+(printi (callFunc add1 41))		(; prints 42 ;)
+(printi (callFunc sub1 43))		(; prints 42 ;)
+(printc (callFunc retx 'c'))	(; prints c  ;)
+(printi (callFunc retx 42))		(; prints 42 ;)
+(printb (callFunc retx #t))		(; prints #t ;)
