@@ -14,24 +14,14 @@ let translate { main = main;  functions = functions;
   let ltype_of_type (struct_table : L.lltype StringMap.t) (ty : ctype) =
     let rec ltype_of_ctype = function
         Tycon ty -> ltype_of_tycon ty
-      (* | Tyvar tp -> ltype_of_tyvar tp *)
       | Conapp con -> ltype_of_conapp con
     and ltype_of_tycon = function
         Intty                -> int_ty
       | Boolty               -> bool_ty
-      | Charty               -> char_ptr_ty (* char_ty *)
-      | Tarrow ret  ->
-        (* let llretty =  *)
-        ltype_of_ctype ret
-      (* in
-         let llargtys = List.map ltype_of_ctype args in  *)
-      (* L.pointer_type (L.function_type llretty (Array.of_list llargtys)) *)
+      | Charty               -> char_ptr_ty 
+      | Tarrow ret  -> ltype_of_ctype ret
       | Clo (sname, _, _) ->
         L.pointer_type (StringMap.find sname struct_table)
-    (* and ltype_of_tyvar = function  *)
-    (* What is this type even? *)
-    (* Tparam _ -> void_ty *)
-    (* And what types do conapps represent? Function type *)
     and ltype_of_conapp (tyc, ctys) =
       let llretty = ltype_of_tycon tyc in
       let llargtys = List.map ltype_of_ctype ctys in
@@ -103,7 +93,8 @@ let translate { main = main;  functions = functions;
         Tycon (Clo (name, anonFunTy, freetys)) ->
         let v = create_struct name (anonFunTy :: freetys) map
         in StringMap.add name v map
-      | _ -> Diagnostic.error (Diagnostic.GenerationError "lambda is non-closure type")
+      | _ -> Diagnostic.error 
+              (Diagnostic.GenerationError "lambda is non-closure type")
     in
     let structs = List.rev structures in
     List.fold_left gen_struct_def StringMap.empty structs
@@ -118,7 +109,9 @@ let translate { main = main;  functions = functions;
         Array.of_list (List.map (fun (t, _) -> ltype_of_type struct_table t)
                          (def.formals @ def.frees))
       in
-      let ftype = L.function_type (ltype_of_type struct_table def.rettyp) formal_types
+      let ftype = L.function_type 
+                    (ltype_of_type struct_table def.rettyp) 
+                    formal_types
       in StringMap.add name (L.define_function name ftype the_module, def) map
     in List.fold_left define_func StringMap.empty functions
   in
@@ -184,7 +177,8 @@ let translate { main = main;  functions = functions;
     (* create the "string" constant in the code for the char *)
       CChar c ->
       let spc = L.build_alloca char_ptr_ty "spc" builder in
-      let globalChar = L.build_global_string (String.make 1 c) "globalChar" builder in
+      let globalChar = 
+        L.build_global_string (String.make 1 c) "globalChar" builder in
       let newStr = L.build_bitcast globalChar char_ptr_ty "newStr" builder in
       let loc = L.build_gep spc [| zero |] "loc" builder in
       let _ = L.build_store newStr loc builder in
@@ -192,7 +186,8 @@ let translate { main = main;  functions = functions;
     | CInt  i -> L.const_int int_ty i
     (* HAS to be an i1 lltype for the br instructions *)
     | CBool b -> L.const_int bool_ty (if b then 1 else 0)
-    | CRoot _ -> Diagnostic.error (Diagnostic.Unimplemented "codegen SRoot Literal")
+    | CRoot _ -> Diagnostic.error 
+                  (Diagnostic.Unimplemented "codegen SRoot Literal")
 
   in
 
@@ -209,7 +204,10 @@ let translate { main = main;  functions = functions;
     | CVar     s  ->
       let varValue =
         (try L.build_load (lookup s lenv) s builder
-         with Not_found -> Diagnostic.error (Diagnostic.Unbound ("name \"" ^ s ^ "\" not found in codegen")))
+         with Not_found -> Diagnostic.error 
+                            (Diagnostic.Unbound ("name \"" ^ s 
+                                                 ^ "\" not found in codegen")))
+      (*  *)
       in (builder, varValue)
     | CIf (e1, (t2, e2), e3) ->
       (* allocate space for result of the if statement *)
@@ -271,68 +269,68 @@ let translate { main = main;  functions = functions;
     | CApply ((_, CVar "+"), arg1::[arg2], _) ->
       let (builder', e1) = expr builder lenv block arg1 in
       let (builder'', e2) = expr builder' lenv block arg2 in
-      let instruction = L.build_add e1 e2 "+" builder''
+      let instruction = L.build_add e1 e2 "addition" builder''
       in (builder'', instruction)
     | CApply ((_, CVar "-"), arg1::[arg2], _) ->
       let (builder', e1) = expr builder lenv block arg1 in
       let (builder'', e2) = expr builder' lenv block arg2 in
-      let instruction = L.build_sub e1 e2 "-" builder''
+      let instruction = L.build_sub e1 e2 "subtraction" builder''
       in (builder'', instruction)
     | CApply ((_, CVar "/"), arg1::[arg2], _) ->
       let (builder', e1) = expr builder lenv block arg1 in
       let (builder'', e2) = expr builder' lenv block arg2 in
-      let instruction = L.build_sdiv e1 e2 "/" builder''
+      let instruction = L.build_sdiv e1 e2 "division" builder''
       in (builder'', instruction)
     | CApply ((_, CVar "*"), arg1::[arg2], _) ->
       let (builder', e1) = expr builder lenv block arg1 in
       let (builder'', e2) = expr builder' lenv block arg2 in
-      let instruction = L.build_mul e1 e2 "*" builder''
+      let instruction = L.build_mul e1 e2 "multiply" builder''
       in (builder'', instruction)
     | CApply ((_, CVar "mod"), arg1::[arg2], _) ->
       let (builder', e1) = expr builder lenv block arg1 in
       let (builder'', e2) = expr builder' lenv block arg2 in
-      let instruction = L.build_srem e1 e2 "mod" builder''
+      let instruction = L.build_srem e1 e2 "modulus" builder''
       in (builder'', instruction)
     | CApply ((_, CVar "&&"), arg1::[arg2], _) ->
       let (builder', e1) = expr builder lenv block arg1 in
       let (builder'', e2) = expr builder' lenv block arg2 in
-      let instruction = L.build_and e1 e2 "&&" builder''
+      let instruction = L.build_and e1 e2 "logAND" builder''
       in (builder'', instruction)
     | CApply ((_, CVar "||"), arg1::[arg2], _) ->
       let (builder', e1) = expr builder lenv block arg1 in
       let (builder'', e2) = expr builder' lenv block arg2 in
-      let instruction = L.build_or e1 e2 "||" builder''
+      let instruction = L.build_or e1 e2 "logOR" builder''
       in (builder'', instruction)
     (* BINOP PRIMITIVES - Comparisons *)
     | CApply ((_, CVar "<"), arg1::[arg2], _) ->
       let (builder', e1) = expr builder lenv block arg1 in
       let (builder'', e2) = expr builder' lenv block arg2 in
-      let instruction = L.build_icmp L.Icmp.Slt e1 e2 "<" builder''
+      let instruction = L.build_icmp L.Icmp.Slt e1 e2 "lt" builder''
       in (builder'', instruction)
     | CApply ((_, CVar ">"), arg1::[arg2], _) ->
       let (builder', e1) = expr builder lenv block arg1 in
       let (builder'', e2) = expr builder' lenv block arg2 in
-      let instruction = L.build_icmp L.Icmp.Sgt e1 e2 ">" builder''
+      let instruction = L.build_icmp L.Icmp.Sgt e1 e2 "gt" builder''
       in (builder'', instruction)
     | CApply ((_, CVar "<="), arg1::[arg2], _) ->
       let (builder', e1) = expr builder lenv block arg1 in
       let (builder'', e2) = expr builder' lenv block arg2 in
-      let instruction = L.build_icmp L.Icmp.Sle e1 e2 "<=" builder''
+      let instruction = L.build_icmp L.Icmp.Sle e1 e2 "leq" builder''
       in (builder'', instruction)
     | CApply ((_, CVar ">="), arg1::[arg2], _) ->
       let (builder', e1) = expr builder lenv block arg1 in
       let (builder'', e2) = expr builder' lenv block arg2 in
-      let instruction = L.build_icmp L.Icmp.Sge e1 e2 ">=" builder''
+      let instruction = L.build_icmp L.Icmp.Sge e1 e2 "geq" builder''
       in (builder'', instruction)
     | CApply ((_, CVar "=i"), arg1::[arg2], _) ->
       let (builder', e1) = expr builder lenv block arg1 in
       let (builder'', e2) = expr builder' lenv block arg2 in
-      let instruction = L.build_icmp L.Icmp.Eq e1 e2 "=i" builder''
+      let instruction = L.build_icmp L.Icmp.Eq e1 e2 "eqI" builder''
       in (builder'', instruction)
     | CApply ((_, CVar "!=i"), arg1::[arg2], _) ->
       let (builder', e1) = expr builder lenv block arg1 in
       let (builder'', e2) = expr builder' lenv block arg2 in
-      let instruction = L.build_icmp L.Icmp.Ne e1 e2 "!=i" builder''
+      let instruction = L.build_icmp L.Icmp.Ne e1 e2 "neqI" builder''
       in (builder'', instruction)
     | CApply (f, args, numFrees) ->
       (* Since all normal function application is as struct value, call to the
@@ -414,7 +412,8 @@ let translate { main = main;  functions = functions;
            in List.map2 set_free llFreeArgs structFields
          in
          (builder', struct_obj)
-       | _ -> Diagnostic.error (Diagnostic.GenerationError "lambda is non-closure type"))
+       | _ -> Diagnostic.error 
+                (Diagnostic.GenerationError "lambda is non-closure type"))
   in
 
 
@@ -442,9 +441,9 @@ let translate { main = main;  functions = functions;
   in
 
   let main_builder' = build_main main_builder main in
-  (* Every function definition needs to end in a ret. Puts a return at end of main *)
+  (* Every function definition needs to end in a ret. 
+     Puts a return at end of main *)
   let _ = L.build_ret (L.const_int int_ty 0) main_builder' in
-
 
 
 
@@ -460,7 +459,8 @@ let translate { main = main;  functions = functions;
     let locals =
       let add_formal map (ty, nm) p =
         let () = L.set_value_name nm p in
-        let local = L.build_alloca (ltype_of_type struct_table ty) nm fbuilder in
+        let local = L.build_alloca 
+                      (ltype_of_type struct_table ty) nm fbuilder in
         let _ = L.build_store p local fbuilder in
         StringMap.add nm local map
       in
@@ -485,8 +485,6 @@ let translate { main = main;  functions = functions;
         | Charty      -> L.build_ret result
         | Tarrow _    -> L.build_ret result
         | Clo _       -> L.build_ret result
-      (* and ret_of_tyvar = function
-          Tparam _ -> raise (Failure ("TODO: ret of TParam")) *)
       and ret_of_conapp (tyc, _) = ret_of_tycon tyc
       in ret_of_typ t
     in

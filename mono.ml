@@ -248,7 +248,7 @@ let monomorphize (tdefns : tprog) =
         if isPolymorphic mty
           then
             let gamma' = set_aside id (mty, mexp) gamma in
-            (gamma', prog)
+            (gamma', MVal (id, (mty, mexp)) :: prog')
         else (gamma, MVal (id, (mty, mexp)) :: prog')
     | TExpr (ty, texp) ->
         let ((mty, mexp), prog') = expr gamma prog (ty, texp) in
@@ -304,7 +304,9 @@ let monomorphize (tdefns : tprog) =
             let args' = List.map resolve_expr args in 
             MApply (f', args')
         | MLet (bs, body) -> 
-            let bs' = List.map (fun (name, mex) -> (name, resolve_expr mex)) bs in
+            let bs' = List.map (fun (name, mex) -> 
+                                  (name, resolve_expr mex)) 
+                               bs in
             let body' = resolve_expr body in 
             MLet (bs', body')
         | MLambda (formals, body) ->
