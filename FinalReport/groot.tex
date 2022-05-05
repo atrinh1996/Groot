@@ -5,6 +5,7 @@
 \usepackage{syntax} % grammar format
 % \usepackage{markdown} % inline mark down
 \usepackage[color, leftbars]{changebar}
+\usepackage{subcaption}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Reduce margin
@@ -1077,6 +1078,49 @@ function: (flurry func)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Project Plan}
 \label{sec:PLAN}
+
+
+    \pagebreak
+    \subsection{Project Logs}
+
+    \begin{figure}[h]
+        \centering
+        \fbox{\includegraphics[width=1\linewidth]{images/log\_dev.png}}
+    \end{figure}
+
+
+    \begin{figure}[h]
+        \centering
+        \begin{tabular}{cc}
+            \begin{subfigure}{.5\textwidth}
+                \centering
+                \includegraphics[width=1\textwidth,height=3.8cm]{images/log\_amy.png}
+                \label{fig:Amy}
+            \end{subfigure} &
+            \begin{subfigure}{.5\textwidth}
+                \centering
+                \includegraphics[width=1\textwidth,height=3.8cm]{images/log\_nik.png}
+                \label{fig:Nik}
+            \end{subfigure} \\ 
+            \begin{subfigure}{.5\textwidth}
+                \centering
+                \includegraphics[width=1\textwidth,height=3.8cm]{images/log\_zach1.png}
+                \label{fig:Zach}
+            \end{subfigure} &
+            \begin{subfigure}{.5\textwidth}
+                \centering
+                \includegraphics[width=1\textwidth,height=3.8cm]{images/log\_sam1.png}
+                \label{fig:Zam}
+            \end{subfigure} \\
+            \begin{subfigure}{.5\textwidth}
+                \centering
+                \includegraphics[width=1\textwidth,height=3.8cm]{images/log\_eliza1.png}
+                \label{fig:Eliza}
+            \end{subfigure} &
+        \end{tabular}
+        % \label{fig:MULTI_NAME}
+    \end{figure}
+
 
 \pagebreak
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
