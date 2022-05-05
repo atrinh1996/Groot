@@ -21,13 +21,13 @@ let prerho env =
       ("<=", (0, boolTy));      (">=", (0, boolTy));
       ("!=i", (0, boolTy));     ("=i", (0, boolTy));
       ("&&", (0, boolTy));      ("||", (0, boolTy));
-      ("not", (0, boolTy))                            ]
+      ("not", (0, boolTy));     ("~", (0, intTy))          ]
 
 (* list of variable names that get ignored/are not to be considered frees *)
 let ignores = [ "printi"; "printb"; "printc";
                 "+"; "-"; "*"; "/"; "mod";
                 "<"; ">"; ">="; "<=";
-                "!=i"; "=i";
+                "!=i"; "=i"; "~";
                 "&&"; "||"; "not"            ]
 
 

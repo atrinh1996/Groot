@@ -23,7 +23,7 @@ let prims =
     ( "&&",     ([ TVariable (-6) ], Tast.functiontype booltype [ booltype; booltype ]) );
     ( "||",     ([ TVariable (-6) ], Tast.functiontype booltype [ booltype; booltype ]) );
     ("not",     ([ TVariable (-7) ], Tast.functiontype booltype [ booltype ]));
-    ("~",       ([TVariable (-2)], Tast.functiontype inttype [inttype]))
+    ("~",       ([ TVariable (-2) ], Tast.functiontype inttype [ inttype ]))
   ]
 
 (* is_ftv - returns true if 'gt' is equal to free type variable 'var'
