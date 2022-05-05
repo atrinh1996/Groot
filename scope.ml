@@ -1,6 +1,5 @@
 (* Name (scope) checks variable names *)
 open Ast
-exception Unbound of string
 
 (* toplevel naming environment, preloaded with built-ins *)
 let nameEnv = List.fold_right List.cons [ "printi"; "printb"; "printc";
