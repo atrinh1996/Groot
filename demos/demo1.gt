@@ -1,0 +1,29 @@
+(val letterGrade (lambda (test) 
+	(if (< 90 test)
+		'A'
+		(if (< 80 test)
+			'B'
+			(if (< 70 test)
+				'C'
+				'D')))))
+
+(printc (letterGrade 89))		(; this prints B ;)
+
+(val computeGrade (lambda (test test2 test3)
+	(let ([sum (+ (+ test test2) test3)]) 
+		(let ([avg (/ sum 3)])
+			(letterGrade avg)))))
+
+(printc (computeGrade 88 90 91))	(; this prints B ;)	
+
+(val letterGrade (lambda (test) 
+	(if (< 85 test)
+		'A'
+		(if (< 75 test)
+			'B'
+			(if (< 65 test)
+				'C'
+				'D')))))
+
+(printc (letterGrade 89))		(; this prints A ;)
+(printc (computeGrade 88 90 91))	(; this prints B ;)

@@ -55,8 +55,6 @@ let translate { main = main;  functions = functions;
   let puts_func : L.llvalue =
     L.declare_function "puts" puts_ty the_module in
 
-
-
   (* To test struct type
      Comment these lines in, run.
      Should make the code defining the struct appear in the llvm code. *)

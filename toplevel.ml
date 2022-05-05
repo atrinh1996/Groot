@@ -11,7 +11,7 @@ type action =
   | Mast
   | Cast
   | LLVM_IR
-  (* | Compile *)
+  | Compile 
 
 
 let () =
@@ -24,8 +24,8 @@ let () =
     ("-m", Arg.Unit (set_action Mast), 	"Print the MAST");
     ("-v", Arg.Unit (set_action Cast), 	"Print the CAST");
     ("-l", Arg.Unit (set_action LLVM_IR), 	"Print the generated LLVM IR");
-    (* ("-c", Arg.Unit (set_action Compile), *)
-    (* "Check and print the generated LLVM IR"); *)
+    ("-c", Arg.Unit (set_action Compile),
+      "Check and print the generated LLVM IR");
   ] in
 
 
@@ -52,6 +52,6 @@ let () =
     | Mast -> print_string (Mast.string_of_mprog mast)
     | Cast -> print_string (Cast.string_of_cprog cast)
     | LLVM_IR -> print_string (Llvm.string_of_llmodule (Codegen.translate cast))
-    (* | Compile -> let the_module = Codegen.translate cast in
+    | Compile -> let the_module = Codegen.translate cast in
           Llvm_analysis.assert_valid_module the_module;
-          print_string (Llvm.string_of_llmodule the_module) *)
+          print_string (Llvm.string_of_llmodule the_module) 
