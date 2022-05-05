@@ -263,6 +263,14 @@ let translate { main = main;  functions = functions;
           [| bool_stringptr |]
           "printb" builder'
       in (builder', instruction)
+    | CApply ((_, CVar "~"), [arg], _) ->
+      let (builder', e) = expr builder lenv block arg in
+      let instruction = L.build_neg e "~" builder'
+      in (builder', instruction)
+    | CApply ((_, CVar "not"), [arg], _) ->
+      let (builder', e) = expr builder lenv block arg in
+      let instruction = L.build_not e "not" builder'
+      in (builder', instruction)
     (* BINOP PRIMITIVES - Int and Boolean Algebra *)
     | CApply ((_, CVar "+"), arg1::[arg2], _) ->
       let (builder', e1) = expr builder lenv block arg1 in

@@ -1,0 +1,44 @@
+Main:
+(printc H)
+(printc e)
+(printc l)
+(printc l)
+(printc o)
+(printc  )
+(printc W)
+(printc o)
+(printc r)
+(printc l)
+(printc d)
+(printc !)
+(printc 
+)
+
+
+Functions:
+
+
+Rho:
+!=i: bool !=i0
+&&: bool &&0
+*: int *0
++: int +0
+-: int -0
+/: int /0
+<: bool <0
+<=: bool <=0
+=i: bool =i0
+>: bool >0
+>=: bool >=0
+mod: int mod0
+not: bool not0
+printb: bool printb0
+printc: char printc0
+printi: int printi0
+||: bool ||0
+~: int ~0
+
+
+Structures:
+
+
