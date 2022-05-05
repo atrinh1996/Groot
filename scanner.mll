@@ -44,7 +44,9 @@ rule tokenize = parse
   | "val"                { VAL }
   | ident as id          { ID(id) }
   | eof                  { EOF }
-  | _                    { Diagnostic.error(Diagnostic.lex_error "unrecognized character" lexbuf) }
+  | _                    { Diagnostic.error
+                            (Diagnostic.lex_error "unrecognized character" 
+                            lexbuf) }
 and comment = parse
   | ";)"                 { tokenize lexbuf }
   | _                    { comment lexbuf }
@@ -52,7 +54,8 @@ and comment = parse
 (* apostrophe handler *)
 and apos_handler = parse
   | '('[^''']      { tree_builder lexbuf }
-  | '''            { Diagnostic.error(Diagnostic.lex_error "empty character literal" lexbuf) }
+  | '''            { Diagnostic.error
+                    (Diagnostic.lex_error "empty character literal" lexbuf) }
   | '\\'           { escaped_char_handler lexbuf }
   | _ as c         { char_builder c lexbuf }
 
@@ -65,7 +68,9 @@ and tree_builder = parse
 
 and char_builder c = parse
   | '''   { CHAR(c) }
-  | _ { Diagnostic.error(Diagnostic.lex_error "character literal contains more than one token" lexbuf) }
+  | _ { Diagnostic.error
+          (Diagnostic.lex_error ("character literal contains more " 
+           ^ "than one token") lexbuf) }
 
 and escaped_char_handler = parse
   | '\\' { char_builder '\\' lexbuf }
@@ -78,6 +83,9 @@ and escaped_char_handler = parse
   | ' '  { char_builder '\ ' lexbuf  }
   | chrcode as ord
          { print_string ord; if int_of_string ord > 255
-           then Diagnostic.error(Diagnostic.lex_error "invalid escape sequence ASCII value" lexbuf)
+           then Diagnostic.error
+                (Diagnostic.lex_error "invalid escape sequence ASCII value" 
+                lexbuf)
            else char_builder (Char.chr (int_of_string ord)) lexbuf }
-  | _    { Diagnostic.error(Diagnostic.lex_error "unrecognized escape sequence" lexbuf) }
+  | _    { Diagnostic.error
+          (Diagnostic.lex_error "unrecognized escape sequence" lexbuf) }

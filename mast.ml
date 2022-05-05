@@ -43,17 +43,15 @@ type mdefn =
   | MExpr     of mexpr
 
 
-(* type polyty_env = (mexpr * mtype list) StringMap.t *)
 type polyty_env = mexpr StringMap.t
 
 type mprog = mdefn list
 
 
 
-
 (* Pretty printer *)
 
-(* String of gtypes *)
+(* String of mtypes *)
 let rec string_of_mtype = function
   | Mtycon ty -> string_of_mtycon ty
   | Mconapp con -> string_of_mconapp con
