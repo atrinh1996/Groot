@@ -20,7 +20,8 @@ let leaf = ("leaf"|"()")
 let chrcode = digit+
 
 (* all visible characters, excluding ()'[]\;{}| *)
-let ident = ['!'-'&' '*'-':' '<'-'Z' '^'-'z' '~' '|']+
+let ident = ['!'-'&' '*'-':' '<'-'Z' '`'-'z' '~' '|']
+            ['!'-'&' '*'-':' '<'-'Z' '^'-'z' '~' '|']*
 
 
 (* ToKeNiZe *)
