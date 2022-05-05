@@ -1,3 +1,89 @@
+
+(val x 42)
+(val retn (lambda (n) n))
+(val retx (lambda () (retn x)))
+(printi (retx))
+
+(;
+
+(val add1 (lambda (n) (+ n 1)))
+(val sub1 (lambda (n) (- n 1)))
+
+(val callFunc (lambda (func a) (func a)))
+
+(printi (callFunc add1 6))
+(printi (callFunc add1 14))
+
+(printi (callFunc sub1 4))
+
+;)
+
+(;
+(val add1 (lambda (n) (+ n 1)))
+add1 --> { Cls(_anon0, Int, [Int], []); Lambda([(Int, n)], body') }
+
+(val callFunc (lambda (func a) (func a)))
+callFunc --> { Cls(_anon1, Int, [i32 (i32), Int], []); Lambda ([(i32 (i32), func), (Int, a)], (func a)) }
+
+
+
+(callFunc add1 6)
+lookup f: callFunc
+	Got a Cls { Cls(_anon1, Int, [i32 (i32), Int], []); HX }
+	It is a HOF 
+		Get the (mexpr) args list 
+		Convert to (hexpr) args list 
+		Split to get a list of Args ty:: Hargsty
+		
+		get the name of the closure: _anon1 
+		get the full expression and lambda id: 
+		"callFunc": { Cls(_anon1, Int, [i32 (i32), Int], []); Lambda ([(i32 (i32), func), (Int, a)], (func a)) }
+		
+		Start with the Cls::argsty --> lay the Hargsty Cls::argsty
+		Then, with the lambda::argsty --> For each (ty, hname) pair, lay down the corresponding ty in Hargsty
+		Create local gamma' with newformals added in, then resolve body. 
+		
+		Take ty of body', and make that the retty of the Cls
+		
+		Inject into main a new defn: HVal ("callFunc", (newCls, newLambda))
+	
+	It is NOT a HOF
+		proceed as normal
+
+;)
+
+
+
+(;
+(val add1 (lambda (n) (+ n 1)))
+(val sub1 (lambda (n) (- n 1)))
+
+(val callFunc (lambda (func a) (func a)))
+
+(callFunc add1 6)
+(callFunc add1 14)
+
+(callFunc sub1 4)
+;)
+
+(;
+(val x 42)
+(val addx (lambda (n) (+ x n)))
+(callFunc addx 6)
+
+(val sub1 (lambda (n) (- n 1)))
+
+(callFunc add1 6)
+(callFunc sub1 4)
+
+(val sub1 (lambda (n) (- n 1)))
+(callFunc sub1 9)
+
+(val retn (lambda (n) n))
+(val test (lambda () (retn 12)))
+;)
+
+
 (;
 (val retn (lambda (n m) n)) 
 
@@ -17,7 +103,7 @@
 (printc (retn 'g' 34))
 ;)
 
-
+(;
 (val retn (lambda (n) n))
 
 
@@ -25,6 +111,8 @@
 (printi (retn 42))
 (printc (retn 'c'))
 (printb (retn #t))
+
+;)
 
 (;
 (printb (retn #f))

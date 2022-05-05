@@ -64,7 +64,8 @@ and string_of_mtycon = function
   | MCharty -> "char"
   | MTarrow (retty) -> string_of_mtype retty
 and string_of_mconapp (tyc, tys) =
-  string_of_mtycon tyc ^ " (" ^ String.concat " " (List.map string_of_mtype tys) ^ ")"
+  string_of_mtycon tyc ^ " (" 
+  ^ String.concat " " (List.map string_of_mtype tys) ^ ")"
 
 
 (* String of a typed expression (mexpr) == (type, m-expression) *)
@@ -73,10 +74,10 @@ let rec string_of_mexpr (typ, exp) =
 and string_of_mx = function
   | MLiteral v -> string_of_mvalue v
   | MVar id -> id
-  | MIf (te1, te2, te3) ->
-    "(if "  ^ string_of_mexpr te1 ^ " "
-    ^ string_of_mexpr te2 ^ " "
-    ^ string_of_mexpr te3 ^ ")"
+  | MIf (e1, e2, e3) ->
+    "(if "  ^ string_of_mexpr e1 ^ " "
+    ^ string_of_mexpr e2 ^ " "
+    ^ string_of_mexpr e3 ^ ")"
   | MApply (f, args) ->
     "(" ^ string_of_mexpr f ^ " "
     ^ String.concat " " (List.map string_of_mexpr args) ^ ")"
@@ -90,13 +91,13 @@ and string_of_mx = function
     let formalStringlist = List.map (fun (ty, x) -> string_of_mtype ty ^ " " ^ x) formals in
     "(lambda (" ^ String.concat ", "  formalStringlist
     ^ ") " ^ string_of_mexpr body ^ ")"
-(* toString for Sast.svalue *)
+(* toString for Mast.mvalue *)
 and string_of_mvalue = function
   | MChar c -> String.make 1 c
   | MInt i -> string_of_int i
   | MBool b -> if b then "#t" else "#f"
   | MRoot tr -> string_of_mtree tr
-(* toString for Sast.stree *)
+(* toString for Mast.mtree *)
 and string_of_mtree = function
   | MLeaf -> "leaf"
   | MBranch (v, sib, child) ->
@@ -106,12 +107,12 @@ and string_of_mtree = function
 
 
 
-(* String of a typed defn (tdefn) *)
+(* String of a mono typed defn (mdefn) *)
 let string_of_mdefn = function
   | MVal (id, me) -> "(val " ^ id ^ " " ^ string_of_mexpr me ^ ")"
   | MExpr me    -> string_of_mexpr me
 
 
-(* String of the tprog == tdefn list *)
+(* String of the mprog == mdefn list *)
 let string_of_mprog mdefns =
   String.concat "\n" (List.map string_of_mdefn mdefns) ^ "\n"
