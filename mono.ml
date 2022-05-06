@@ -4,7 +4,6 @@ open Tast
 open Mast
 
 
-
 (* Function takes a tprog (list of typed definitions),
    and monomorphizes it. to produce a mprog *)
 let monomorphize (tdefns : tprog) =
@@ -326,5 +325,3 @@ let monomorphize (tdefns : tprog) =
   in 
 
   List.fold_left buggy_resolve [] program
-
-

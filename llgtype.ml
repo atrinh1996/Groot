@@ -1,14 +1,9 @@
-(*
-            llgtype.ml
-
-    Creates a context and puts types in it to use in the LLVM code.
- *)
+(*  llgtype.ml
+    Creates a context and puts types in it to use in the LLVM code.*)
 module L = Llvm
-
 
 (* creates the glocal context instance *)
 let context = L.global_context ()
-
 
 (* Add types to the context to use in the LLVM code *)
 let int_ty      = L.i32_type  context
@@ -26,10 +21,10 @@ let lltrue = L.const_int bool_ty 1
 let tree_struct_ty = L.named_struct_type context "tree_struct"
 let tree_struct_ptr_ty = L.pointer_type tree_struct_ty
 let () = L.struct_set_body
-    tree_struct_ty
-    [|
-      int_ty;
-      tree_struct_ptr_ty;
-      tree_struct_ptr_ty
-    |]
-    false
+            tree_struct_ty
+            [|
+              int_ty;
+              tree_struct_ptr_ty;
+              tree_struct_ptr_ty
+            |]
+            false

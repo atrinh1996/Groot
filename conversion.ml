@@ -1,6 +1,4 @@
 (* Closure conversion for groot compiler *)
-
-
 open Hast
 open Cast
 

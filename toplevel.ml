@@ -1,9 +1,7 @@
 
 (* Top-level of the groot compiler: scan & parse input,
-    build the AST, generate LLVM IR, dump the module, and compile it to C code. *)
+    build the AST, generate LLVM IR *)
 
-(* may not need to use this, but this is how to robustly create unique exception
-   types *)
 type action =
   | Ast
   | Name_Check
@@ -31,7 +29,8 @@ let () =
   ] in
 
 
-  let usage_msg = "usage: ./toplevel.native [-a|-n|-t|-m|-v|-l|-c] [file.gt]" in
+  let usage_msg = 
+      "usage: ./toplevel.native [-a|-n|-t|-m|-h|-v|-l|-c] [file.gt]" in
   let channel = ref stdin in
   Arg.parse speclist (fun filename -> channel := open_in filename) usage_msg;
   let lexbuf = Lexing.from_channel !channel in
@@ -43,8 +42,6 @@ let () =
   | _ ->
     let ast' = Scope.check ast in
     match !action with
-    (* This option doesn't do anything, just need it to satisfy
-       the pattern matching for type action. *)
     | Ast -> ()
     | Name_Check -> print_string (Ast.string_of_prog ast')
     | _ ->
@@ -63,8 +60,10 @@ let () =
           let cast = Conversion.conversion hast in
             match !action with
             | Cast -> print_string (Cast.string_of_cprog cast)
-            | LLVM_IR -> print_string (Llvm.string_of_llmodule (Codegen.translate cast))
-            | Compile -> let the_module = Codegen.translate cast in
-                  Llvm_analysis.assert_valid_module the_module;
-                  print_string (Llvm.string_of_llmodule the_module)
+            | LLVM_IR -> 
+                print_string (Llvm.string_of_llmodule (Codegen.translate cast))
+            | Compile -> 
+                let the_module = Codegen.translate cast in
+                Llvm_analysis.assert_valid_module the_module;
+                print_string (Llvm.string_of_llmodule the_module)
             | _ -> print_string usage_msg

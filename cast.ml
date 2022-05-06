@@ -23,8 +23,7 @@ and conapp = (tycon * ctype list)
 let intty = Tycon Intty
 let charty = Tycon Charty
 let boolty = Tycon Boolty
-(* let treetype ty = CONAPP () *)
-(* let funty (ret, args) = Tycon (Tarrow (ret, args)) *)
+
 let funty (ret, args) =
   Conapp (Tarrow ret, args)
 let closuretype (id, functy, freetys) =
@@ -85,11 +84,7 @@ type cprog =
   }
 
 
-
-
-
 (* Pretty Print *)
-
 (* returns string of a ctype *)
 let rec string_of_ctype = function
     Tycon ty -> string_of_tycon ty
@@ -107,7 +102,8 @@ and string_of_tycon = function
     ^ String.concat ", " (List.map string_of_ctype freetys)
     ^ "}"
 and string_of_conapp (tyc, tys) =
-  string_of_tycon tyc ^ " (" ^ String.concat ", " (List.map string_of_ctype tys) ^ ")"
+  string_of_tycon tyc ^ " (" 
+  ^ String.concat ", " (List.map string_of_ctype tys) ^ ")"
 
 
 (* stringifies cexpr *)

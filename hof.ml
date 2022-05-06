@@ -31,7 +31,7 @@ let ignores = [ "printi"; "printb"; "printc";
                 "&&"; "||"; "not"            ]
 
 
-(* partial cprog to return from this module *)
+(* partial hprog to return from this module *)
 let res =
   {
     program  = emptyListEnv;
@@ -47,7 +47,8 @@ let addMain d = res.program <- d :: res.program
 let isBound id env = StringMap.mem id env
 
 (* Returns the first element of th value that "id" is bound to in the given 
-   StringMap env. If the binding doesn't exist, Not_Found exception is raised. *)
+   StringMap env. If the binding doesn't exist, Not_Found exception 
+   is raised. *)
 let find id env =
   let occursList = StringMap.find id env in List.nth occursList 0
 
@@ -69,7 +70,9 @@ let bindLocal map k v =
 (* Given a h-closure type, returns the closure's id *)
 let getClosureId (cls : htype) = match cls with  
     HTycon (HCls (id, _, _, _)) -> id  
-  | _ -> Diagnostic.error (Diagnostic.TypeError ("Nonclosure-type accessed when trying to get closure ID"))
+  | _ -> Diagnostic.error 
+        (Diagnostic.TypeError ("Nonclosure-type accessed when" 
+                                ^ " trying to get closure ID"))
 
 
 (* Converts a mtype to a htype *)
@@ -97,19 +100,23 @@ and hof_tycon = function
   | HTarrow _ -> true 
   | HCls (_, retty, argsty, _) -> 
       isFunctionType retty 
-      || (List.fold_left (fun init argty -> init || (isFunctionType argty)) false argsty)
+      || (List.fold_left 
+            (fun init argty -> init || (isFunctionType argty)) 
+            false argsty)
 and hof_conapp (tyc, tys) =  
       hof_tycon tyc 
-      || (List.fold_left (fun init typ -> init || (isFunctionType typ)) false tys)
+      || (List.fold_left 
+            (fun init typ -> init || (isFunctionType typ)) 
+            false tys)
 
 (* Returns true if the given htype indicates a higher order function *)
 let isHOF = function 
     HTycon (HCls (_, retty, argsty, _)) -> 
       isFunctionType retty 
-      || (List.fold_left (fun init argty -> init || (isFunctionType argty)) false argsty)
+      || (List.fold_left 
+            (fun init argty -> init || (isFunctionType argty)) 
+            false argsty)
   | _ -> false 
-
-
 
 
 
@@ -154,9 +161,12 @@ let freeTypesOf (xs, e) gamma =
   StringMap.fold getTy freeGamma []
 
 
-(* *)
+(* Resolves all lamdba's function types, and uses of these expressions 
+   to a new closure type. *)
 let clean (mdefns : mprog) = 
 
+  (* Given a hexpr, returns a possibly updated hexpr using the given 
+     environment.  *)
   let rec h_expr (env : ty_env) ((typ, exp) : hexpr) = match exp with 
     | HLiteral l -> (typ, HLiteral l)
     | HVar v -> let (_, typ') = find v env in (typ', HVar v) 
@@ -189,7 +199,6 @@ let clean (mdefns : mprog) =
   in 
 
   (* Given a mexpr, returns the equivalent hexpr *)
-  (* let rec expr (env : ty_env) (id : hname) (mexp : mexpr) =  *)
   let rec expr (env : ty_env) (mexp : mexpr) = 
     let rec expr' (ty, exp) = match exp with 
         MLiteral l -> (ofMtype ty, HLiteral (value l))
@@ -230,7 +239,8 @@ let clean (mdefns : mprog) =
           let freetys = freeTypesOf (formals, body) env in 
 
           (* Create new closure type *)
-          let closureType = partialClosurety (id, retty, formaltys', freetys) in 
+          let closureType = 
+                  partialClosurety (id, retty, formaltys', freetys) in 
           (closureType, HLambda (formals', body'))
     and value = function 
       | MChar c -> HChar c
@@ -240,21 +250,28 @@ let clean (mdefns : mprog) =
     and tree = function 
       | MLeaf -> HLeaf
       | MBranch (v, t1, t2) -> HBranch (value v, tree t1, tree t2)
-    and resolveHOF (env : ty_env) (closuretype : htype) (arguments : hexpr list) = 
-          (* Extract argument actual types, and name of closure being referenced *)
+    and resolveHOF (env : ty_env) (closuretype : htype) 
+                   (arguments : hexpr list) = 
+          (* Extract argument actual types, and name of closure 
+             being referenced *)
           let (argtypes, _) = List.split arguments in 
           let cloName = getClosureId closuretype in 
           let (id, (_, lambdaexp)) = StringMap.find cloName res.hofs in 
           (* Function returns the subexpressions of a lambda expression *)
           let get_lambda_subxs = function 
               HLambda (formals, body) -> (formals, body)
-            | _ -> Diagnostic.error (Diagnostic.TypeError ("Nonclosure-type accessed when tryong to get lambda subexpressions"))
+            | _ -> Diagnostic.error 
+                    (Diagnostic.TypeError ("Nonclosure-type accessed when" 
+                      ^ " tryong to get lambda subexpressions"))
           in
           (* Function replaces return types and argument types of a closure 
              type with the new given types passed in. *)
           let resolve_cls_ty retty argtys = function 
-              HTycon (HCls (id, _, _, freetys)) -> HTycon (HCls (id, retty, argtys, freetys))
-            | _ -> Diagnostic.error (Diagnostic.TypeError ("Nonclosure-type accessed when tyring to resolve closure type"))
+              HTycon (HCls (id, _, _, freetys)) ->
+                   HTycon (HCls (id, retty, argtys, freetys))
+            | _ -> Diagnostic.error 
+                    (Diagnostic.TypeError ("Nonclosure-type accessed when" 
+                      ^ " tyring to resolve closure type"))
           in 
           (* Lambda subexpressions *)
           let (formals, body) = get_lambda_subxs lambdaexp in 
