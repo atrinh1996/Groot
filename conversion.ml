@@ -1,6 +1,4 @@
 (* Closure conversion for groot compiler *)
-
-
 open Hast
 open Cast
 
@@ -185,7 +183,7 @@ let rec hexprToCexpr (env : var_env) (e : hexpr)  =
                 Conapp (Tarrow ret, _) -> (ret, List.length freetys)
               | _ -> raise (Failure "Non-function function type"))
            | _ -> (intty, 0)) in
-        (retty, CApply ((retty, f'), normalargs, freesCount))
+        (retty, CApply ((ctyp, f'), normalargs, freesCount))
     | HLet (bs, body) ->
         let bs' = List.map (fun (name, hex) -> (name, expr hex)) bs in
         let local_env = 
