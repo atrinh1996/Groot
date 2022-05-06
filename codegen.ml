@@ -200,7 +200,7 @@ let translate { main = main;  functions = functions;
         in
 
         (* set aside the result of the condition expr *)
-        let (_, bool_val) = expr builder lenv block e1 in
+        let (newbuilder, bool_val) = expr builder lenv block e1 in
 
         (* Create the merge block for after exec of then or the else block *)
         let merge_bb = L.append_block context "merge" block in
@@ -221,7 +221,8 @@ let translate { main = main;  functions = functions;
         let () = add_terminal else_builder branch_instr in
 
         (* Complete the if-then-else block, return should be llvalue *)
-        let _ = L.build_cond_br bool_val then_bb else_bb builder in
+        (* let _ = L.build_cond_br bool_val then_bb else_bb builder in *)
+        let _ = L.build_cond_br bool_val then_bb else_bb newbuilder in
         (* Get the result of either the the or the else block *)
         let merge_builder = L.builder_at_end context merge_bb in
         let result_value = L.build_load result "if-res-val" merge_builder in
