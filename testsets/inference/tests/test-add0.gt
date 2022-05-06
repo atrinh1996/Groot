@@ -1,1 +1,3 @@
+;; ensure success of addition
+
 (+ 1 1)

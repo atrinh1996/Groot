@@ -1,1 +1,3 @@
+;; ensure failure with type mismatch for multiply
+
 (* #f 79)

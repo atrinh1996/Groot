@@ -1,2 +1,4 @@
+;; ensure failure with lacking parens
+
 mod 38 9
 

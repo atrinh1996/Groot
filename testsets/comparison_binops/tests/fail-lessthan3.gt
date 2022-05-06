@@ -1,1 +1,3 @@
+;; ensure failure with lacking parens
+
 < 6 7

@@ -1,3 +1,5 @@
+;; generic function application 
+
 (val x 42)
 
 (val retn (lambda (n m) n))

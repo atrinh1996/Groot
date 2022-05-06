@@ -1,1 +1,3 @@
+;; modulo sanity check
+
 (printi (mod 38 9))

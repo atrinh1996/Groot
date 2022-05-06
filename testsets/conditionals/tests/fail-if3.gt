@@ -1,1 +1,3 @@
-(if (> 34) (+ 2 3) #f)
+;; ensure failure with bad guard conditional
+
+(if (> 34) (+ 2 3) 4)

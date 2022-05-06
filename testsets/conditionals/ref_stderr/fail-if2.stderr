@@ -1,1 +1,3 @@
-Fatal error: exception Invalid_argument("List.combine")
+llc: error: llc: testsets/conditionals/ref_llvm/fail-if2.ll:26:9: error: stored value and pointer type do not match
+  store i1 false, i32* %if-res-ptr, align 1
+        ^

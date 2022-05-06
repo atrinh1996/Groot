@@ -1,1 +1,3 @@
+;; subtractional sanity check
+
 (- 3 2)

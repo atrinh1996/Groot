@@ -1,2 +1,4 @@
+;; ensure failure with too many args that are ill-typed 
+
 (&& #f #f 9)
 

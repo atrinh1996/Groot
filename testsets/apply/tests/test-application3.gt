@@ -1,3 +1,5 @@
+;; no-args lambdas that return closures upon evaluation
+
 (val ret4 (lambda () 4))
 (val call4 (lambda () (ret4 )))
 (printi (call4 ))

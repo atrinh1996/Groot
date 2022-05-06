@@ -1,1 +1,0 @@
-(val square (lambda (x) (* x x)))

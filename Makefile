@@ -11,6 +11,9 @@ dev:
 tests:
 	bash maketests.bash
 
+validate:
+	bash testall.bash
+
 # IMPORTANT Note from Zach:
 #	the _tags file contains arguments that are ingested by ocamlbuild
 #   and alter it's behavior

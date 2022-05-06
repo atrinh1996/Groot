@@ -1,1 +1,1 @@
-Fatal error: exception Scope.Unbound("Unbound variable +4")
+[31;1mType Error: [0mtype constructor mismatch int != int (int int)

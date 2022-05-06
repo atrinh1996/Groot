@@ -1,1 +1,3 @@
+;; ensure failure with too many args and type mismatch
+
 (>= 6 #t 8)

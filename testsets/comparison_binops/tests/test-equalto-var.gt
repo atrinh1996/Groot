@@ -1,0 +1,20 @@
+;; ensure that equivalence of vars is possible
+
+(val a 12)
+(val b 12)
+(val c 10)
+
+(printb (=i a 12))
+(printb (=i b 12))
+(printb (=i a b))
+(printb (=i b a))
+(printb (=i a a))
+(printb (=i b b))
+
+(printb (=i c 12))
+(printb (=i c a))
+(printb (=i c b))
+
+(val d a)
+(printb (=i a d))
+(printb (=i d 12))

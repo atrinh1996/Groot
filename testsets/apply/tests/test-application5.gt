@@ -1,3 +1,5 @@
+;; passing ID as param to application
+
 (val x 79)
 (val retn (lambda (n m) n))
 (printi (retn x 9))

@@ -19,8 +19,8 @@ fi
 
 shopt -s extglob
 
-# make clean
-# make toplevel.native
+make clean
+make toplevel.native
 
 GROOT="./toplevel.native"
 #GROOT="_build/toplevel.native"
@@ -157,7 +157,7 @@ CheckFail() {
     genfiles=""
 
     genfiles="$genfiles ${diffile} ${stderr}" &&
-    RunFail "$GROOT" -l "$tstfile" "2>" "${stderr}" &&
+    RunFail "$GROOT" -l "$tstfile" "1>" "/dev/null" "2>" "${stderr}" &&
     Compare ${stderr} ${referr} ${diffile}
 
     # Report the status and clean up the generated files

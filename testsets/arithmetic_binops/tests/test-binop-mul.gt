@@ -1,1 +1,3 @@
+;; multiplicational sanity check
+
 (printi (* 23 79))

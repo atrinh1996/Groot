@@ -17,8 +17,8 @@ if [ "$SHELL" != "/bin/bash" ]; then
     exit
 fi
 
-# make clean
-# make toplevel.native
+make clean
+make toplevel.native
 
 shopt -s extglob
 

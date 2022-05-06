@@ -1,1 +1,3 @@
+;; ensure failure with bad bool literal
+
 (if (> 34 2) (+ 2 3) #frigid)

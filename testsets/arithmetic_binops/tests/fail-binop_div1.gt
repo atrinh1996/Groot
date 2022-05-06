@@ -1,2 +1,4 @@
+;; ensure failure with too few args
+
 (/ 68)
 

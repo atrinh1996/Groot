@@ -1,1 +1,3 @@
+;; divisional sanity check
+
 (printi (/ 10 2))

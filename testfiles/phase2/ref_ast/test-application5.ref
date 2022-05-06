@@ -1,4 +1,0 @@
-(val x 79)
-(val retn (lambda (n m) n))
-(printi (retn x 9))
-(printi (retn 7 9))

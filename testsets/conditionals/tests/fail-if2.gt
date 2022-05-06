@@ -1,1 +1,3 @@
-(if (> 34 2) (+ 3) #f)
+;; ensure failure with inconsitence branch types
+
+(if (> 34 2) (+ 3 1) #f)

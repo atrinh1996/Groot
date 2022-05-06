@@ -1,1 +1,3 @@
+;; ensure failure with type mismatch for div
+
 (/ 908 #t)

@@ -1,3 +1,9 @@
-(> 6 7)
-(> 6 test)
-(> #f 209)
+;; ensure correct behavior with constant literals and vars
+
+(printb (> 6 7))
+
+(val a 4)
+(printb (> 6 a))
+(printb (> a 6))
+(printb (> a a))
+(printb (> 6 6))

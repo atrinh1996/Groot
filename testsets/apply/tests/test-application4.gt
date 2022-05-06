@@ -1,3 +1,5 @@
+;; ensure correct behavior of global capture
+
 (val x 42)
 (val retx (lambda () x))
 (printi (retx ))

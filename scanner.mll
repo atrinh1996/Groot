@@ -26,7 +26,8 @@ let ident = ['!'-'&' '*'-':' '<'-'Z' '^'-'z' '~' '|']+
 (* ToKeNiZe *)
 rule tokenize = parse
   | [' ' '\n' '\t' '\r'] { tokenize lexbuf }
-  | "(;"                 { comment lexbuf }
+  | ";;"                 { single_comment lexbuf }
+  | "(;"                 { multi_comment lexbuf }
   | '('                  { LPAREN }
   | ')'                  { RPAREN }
   | '['                  { LSQUARE }
@@ -44,14 +45,17 @@ rule tokenize = parse
   | ident as id          { ID(id) }
   | eof                  { EOF }
   | _                    { Diagnostic.error(Diagnostic.lex_error "unrecognized character" lexbuf) }
-and comment = parse
+and single_comment = parse
+  | '\n'                 { tokenize lexbuf }
+  | _                    { single_comment lexbuf }
+and multi_comment  = parse
   | ";)"                 { tokenize lexbuf }
-  | _                    { comment lexbuf }
+  | _                    { multi_comment lexbuf }
 
 (* apostrophe handler *)
 and apos_handler = parse
   | '('[^''']      { tree_builder lexbuf }
-  | '''            { Diagnostic.error(Diagnostic.lex_error "empty character literal" lexbuf) }
+  | '''            { Diagnostic.error (Diagnostic.lex_error "empty character literal" lexbuf) }
   | '\\'           { escaped_char_handler lexbuf }
   | _ as c         { char_builder c lexbuf }
 
@@ -60,7 +64,7 @@ and tree_builder = parse
   (* | ")" { TREE(1, 1) } *)
   (* | _+ { TREE(tokenize "5", tree_builder lexbuf, tree_builder lexbuf)} *)
   (* | "()" { LEAF } *)
-  | _ { Diagnostic.error(Diagnostic.Unimplemented "in-place tree syntax") }
+  | _ { Diagnostic.error (Diagnostic.Unimplemented "in-place tree syntax") }
 
 and char_builder c = parse
   | '''   { CHAR(c) }
@@ -68,13 +72,13 @@ and char_builder c = parse
 
 and escaped_char_handler = parse
   | '\\' { char_builder '\\' lexbuf }
-  | '"'  { char_builder '\"' lexbuf  }
-  | '''  { char_builder '\'' lexbuf  }
-  | 'n'  { char_builder '\n' lexbuf  }
-  | 'r'  { char_builder '\r' lexbuf  }
-  | 't'  { char_builder '\t' lexbuf  }
-  | 'b'  { char_builder '\b' lexbuf  }
-  | ' '  { char_builder '\ ' lexbuf  }
+  | '"'  { char_builder '\"' lexbuf }
+  | '''  { char_builder '\'' lexbuf }
+  | 'n'  { char_builder '\n' lexbuf }
+  | 'r'  { char_builder '\r' lexbuf }
+  | 't'  { char_builder '\t' lexbuf }
+  | 'b'  { char_builder '\b' lexbuf }
+  | ' '  { char_builder '\ ' lexbuf }
   | chrcode as ord
          { print_string ord; if int_of_string ord > 255
            then Diagnostic.error(Diagnostic.lex_error "invalid escape sequence ASCII value" lexbuf)
