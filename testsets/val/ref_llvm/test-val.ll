@@ -9,7 +9,7 @@ source_filename = "gROOT"
 @__anon0_1 = global i32 ()* null
 @_x_6 = global %_anon0_struct* null
 @_x_5 = global i32 0
-@_x_4 = global i0 0
+@_x_4 = global i8* null
 @_x_3 = global i32 0
 @_x_2 = global i32 0
 @_x_1 = global i32 0
@@ -41,9 +41,9 @@ merge:                                            ; preds = %else, %then
   %loc = getelementptr i8*, i8** %spc, i32 0
   store i8* getelementptr inbounds ([2 x i8], [2 x i8]* @globalChar, i32 0, i32 0), i8** %loc, align 8
   %character_ptr = load i8*, i8** %spc, align 8
-  store i8* %character_ptr, i0* @_x_4, align 8
-  %_x_4 = load i0, i0* @_x_4, align 1
-  %printc = call i32 @puts(i0 %_x_4)
+  store i8* %character_ptr, i8** @_x_4, align 8
+  %_x_4 = load i8*, i8** @_x_4, align 8
+  %printc = call i32 @puts(i8* %_x_4)
   store i32 1, i32* @_x_5, align 4
   %_x_5 = load i32, i32* @_x_5, align 4
   %printi4 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt, i32 0, i32 0), i32 %_x_5)

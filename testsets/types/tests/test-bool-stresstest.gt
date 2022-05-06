@@ -1,3 +1,43 @@
 ;; boolean stress test; test everything
 
-(! (< 59823 (> (&& (* 9 8) (|| #t (!=i 5 (if (<= 59 4) 5 4))) 8)))
+;; (if (=i (if (!=i 4 5) 4 5) 5) (printc 'a') (printc'b'))
+
+;; (val cond (if (=i 0 0) #t #f))
+
+;; (if cond
+;; 	(printc 'a')
+;; 	(printc 'b')
+;; )
+;; (val a 0)
+;; (if (=i a 1)
+;; 	(printc 'a')
+;;  	(printc 'b')
+;;  )
+
+(if (if (=i 0 0) #t #f)
+	(printc 'a')
+	(printc 'b')
+)
+
+;; (if
+;; 	cond
+;; 	true
+;; 	false
+
+;; )
+
+;; (if (&& #t (|| #t (!=i 5 (if (<= 59 4) 5 4)))) 23456 65432)
+
+;; (not
+;; 	(<
+;; 		59823
+;; 		(if 
+;; 			(>
+;; 				(if (&& #t (|| #t (!=i 5 (if (<= 59 4) 5 4)))) 23456 65432)
+;; 				32123
+;; 			)
+;; 			59824
+;; 			59823
+;; 		)
+;; 	)
+;; )

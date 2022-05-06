@@ -6,12 +6,11 @@
 (val x (+ 3 4))
 (printi x)
 
-;; (val x (if (> x 2) 1 0))
-;; (printi x)
-(val y 'c')
+(val x (if (> x 2) 1 0))
+(printi x)
+
 (val x 'a')
-(val x 'b')
-;; (printc x)
+(printc x)
 
 (val x 1)
 (printi x)

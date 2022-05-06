@@ -1,3 +1,0 @@
-llc: error: llc: testsets/val/llvm/test-val.ll:12:16: error: expected type
-@_x_4 = global i0 0
-               ^
