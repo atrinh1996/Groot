@@ -61,10 +61,14 @@ and string_of_tycon = function
   | TyBool -> "bool"
   | TyChar -> "char"
   | TArrow (retty) -> string_of_ttype retty
+
 and string_of_tyvar = function
   | TVariable n -> "'" ^ string_of_int n
 and string_of_conapp (tyc, tys) =
   string_of_tycon tyc ^ " (" ^ String.concat " " (List.map string_of_ttype tys) ^ ")"
+and string_of_constraint (t1, t2) = "(" ^ string_of_ttype t1 ^ ", " ^ string_of_ttype t2 ^ ")"
+and string_of_constraints cs =
+  "[ " ^ String.concat " , " (List.map string_of_constraint cs) ^ " ]"
 
 and string_of_subs = function
   | [] -> ""
