@@ -1,475 +1,398 @@
-	.text
-	.file	"gROOT"
-	.globl	main                            # -- Begin function main
-	.p2align	4, 0x90
-	.type	main,@function
-main:                                   # @main
+	.section	__TEXT,__text,regular,pure_instructions
+	.build_version macos, 12, 0
+	.globl	_main                           ; -- Begin function main
+	.p2align	2
+_main:                                  ; @main
 	.cfi_startproc
-# %bb.0:                                # %entry
-	pushq	%r14
+; %bb.0:                                ; %entry
+	sub	sp, sp, #144                    ; =144
+	stp	x20, x19, [sp, #112]            ; 16-byte Folded Spill
+	stp	x29, x30, [sp, #128]            ; 16-byte Folded Spill
+	.cfi_def_cfa_offset 144
+	.cfi_offset w30, -8
+	.cfi_offset w29, -16
+	.cfi_offset w19, -24
+	.cfi_offset w20, -32
+Lloh0:
+	adrp	x8, __anon0@PAGE
+Lloh1:
+	adrp	x9, __add1_1@PAGE
+	add	x10, sp, #104                   ; =104
+Lloh2:
+	adrp	x11, __anon1@PAGE
+Lloh3:
+	add	x8, x8, __anon0@PAGEOFF
+Lloh4:
+	add	x11, x11, __anon1@PAGEOFF
+	str	x10, [x9, __add1_1@PAGEOFF]
+Lloh5:
+	adrp	x9, __retx_1@PAGE
+	add	x10, sp, #88                    ; =88
+	str	x10, [x9, __retx_1@PAGEOFF]
+	stp	x11, x8, [sp, #96]
+Lloh6:
+	adrp	x8, __anon2@PAGE
+Lloh7:
+	adrp	x10, __anon4@PAGE
+	adrp	x20, __sub1_1@PAGE
+	add	x9, sp, #96                     ; =96
+Lloh8:
+	add	x8, x8, __anon2@PAGEOFF
+Lloh9:
+	add	x10, x10, __anon4@PAGEOFF
+	str	x9, [x20, __sub1_1@PAGEOFF]
+	adrp	x9, __callFunc_1@PAGE
+	stp	x10, x8, [sp, #80]
+	add	x8, sp, #80                     ; =80
+	add	x0, sp, #104                    ; =104
+	mov	w1, #41
+	str	x8, [x9, __callFunc_1@PAGEOFF]
+	blr	x10
+Lloh10:
+	adrp	x19, l_fmt@PAGE
+                                        ; kill: def $w0 killed $w0 def $x0
+Lloh11:
+	add	x19, x19, l_fmt@PAGEOFF
+	str	x0, [sp]
+	mov	x0, x19
+	bl	_printf
+	ldr	x0, [x20, __sub1_1@PAGEOFF]
+Lloh12:
+	adrp	x8, __anon5@PAGE
+Lloh13:
+	add	x8, x8, __anon5@PAGEOFF
+	adrp	x9, __callFunc_2@PAGE
+	add	x10, sp, #72                    ; =72
+	mov	w1, #43
+	str	x8, [sp, #72]
+	str	x10, [x9, __callFunc_2@PAGEOFF]
+	blr	x8
+                                        ; kill: def $w0 killed $w0 def $x0
+	str	x0, [sp]
+	mov	x0, x19
+	bl	_printf
+Lloh14:
+	adrp	x8, __anon7@PAGE
+Lloh15:
+	adrp	x11, __anon6@PAGE
+Lloh16:
+	adrp	x1, l_globalChar@PAGE
+Lloh17:
+	add	x8, x8, __anon7@PAGEOFF
+	adrp	x9, __retx_2@PAGE
+	add	x10, sp, #64                    ; =64
+Lloh18:
+	add	x11, x11, __anon6@PAGEOFF
+	adrp	x12, __callFunc_3@PAGE
+	add	x13, sp, #56                    ; =56
+Lloh19:
+	add	x1, x1, l_globalChar@PAGEOFF
+	add	x0, sp, #64                     ; =64
+	stp	x11, x8, [sp, #56]
+	str	x10, [x9, __retx_2@PAGEOFF]
+	str	x13, [x12, __callFunc_3@PAGEOFF]
+	str	x1, [sp, #48]
+	blr	x11
+	bl	_puts
+Lloh20:
+	adrp	x8, __anon9@PAGE
+Lloh21:
+	adrp	x11, __anon8@PAGE
+Lloh22:
+	add	x8, x8, __anon9@PAGEOFF
+	adrp	x9, __retx_3@PAGE
+	add	x10, sp, #40                    ; =40
+Lloh23:
+	add	x11, x11, __anon8@PAGEOFF
+	adrp	x12, __callFunc_4@PAGE
+	add	x13, sp, #32                    ; =32
+	add	x0, sp, #40                     ; =40
+	mov	w1, #42
+	stp	x11, x8, [sp, #32]
+	str	x10, [x9, __retx_3@PAGEOFF]
+	str	x13, [x12, __callFunc_4@PAGEOFF]
+	blr	x11
+                                        ; kill: def $w0 killed $w0 def $x0
+	str	x0, [sp]
+	mov	x0, x19
+	bl	_printf
+Lloh24:
+	adrp	x8, __anon11@PAGE
+Lloh25:
+	adrp	x11, __anon10@PAGE
+Lloh26:
+	add	x8, x8, __anon11@PAGEOFF
+	adrp	x9, __retx_4@PAGE
+	add	x10, sp, #24                    ; =24
+Lloh27:
+	add	x11, x11, __anon10@PAGEOFF
+	adrp	x12, __callFunc_5@PAGE
+	add	x13, sp, #16                    ; =16
+	add	x0, sp, #24                     ; =24
+	mov	w1, #1
+	stp	x11, x8, [sp, #16]
+	str	x10, [x9, __retx_4@PAGEOFF]
+	str	x13, [x12, __callFunc_5@PAGEOFF]
+	blr	x11
+Lloh28:
+	adrp	x0, l_boolF@PAGE
+Lloh29:
+	add	x0, x0, l_boolF@PAGEOFF
+	bl	_puts
+	ldp	x29, x30, [sp, #128]            ; 16-byte Folded Reload
+	ldp	x20, x19, [sp, #112]            ; 16-byte Folded Reload
+	mov	w0, wzr
+	add	sp, sp, #144                    ; =144
+	ret
+	.loh AdrpAdd	Lloh28, Lloh29
+	.loh AdrpAdd	Lloh25, Lloh27
+	.loh AdrpAdd	Lloh24, Lloh26
+	.loh AdrpAdd	Lloh21, Lloh23
+	.loh AdrpAdd	Lloh20, Lloh22
+	.loh AdrpAdd	Lloh16, Lloh19
+	.loh AdrpAdd	Lloh15, Lloh18
+	.loh AdrpAdd	Lloh14, Lloh17
+	.loh AdrpAdd	Lloh12, Lloh13
+	.loh AdrpAdd	Lloh10, Lloh11
+	.loh AdrpAdd	Lloh7, Lloh9
+	.loh AdrpAdd	Lloh6, Lloh8
+	.loh AdrpAdd	Lloh2, Lloh4
+	.loh AdrpAdrp	Lloh1, Lloh5
+	.loh AdrpAdd	Lloh0, Lloh3
+	.cfi_endproc
+                                        ; -- End function
+	.globl	__anon10                        ; -- Begin function _anon10
+	.p2align	2
+__anon10:                               ; @_anon10
+	.cfi_startproc
+; %bb.0:                                ; %entry
+	sub	sp, sp, #32                     ; =32
+	stp	x29, x30, [sp, #16]             ; 16-byte Folded Spill
+	.cfi_def_cfa_offset 32
+	.cfi_offset w30, -8
+	.cfi_offset w29, -16
+	ldr	x8, [x0]
+	str	x0, [sp, #8]
+	and	w0, w1, #0x1
+	strb	w0, [sp, #7]
+	blr	x8
+	ldp	x29, x30, [sp, #16]             ; 16-byte Folded Reload
+	and	w0, w0, #0x1
+	add	sp, sp, #32                     ; =32
+	ret
+	.cfi_endproc
+                                        ; -- End function
+	.globl	__anon11                        ; -- Begin function _anon11
+	.p2align	2
+__anon11:                               ; @_anon11
+	.cfi_startproc
+; %bb.0:                                ; %entry
+	sub	sp, sp, #16                     ; =16
 	.cfi_def_cfa_offset 16
-	pushq	%rbx
-	.cfi_def_cfa_offset 24
-	subq	$104, %rsp
-	.cfi_def_cfa_offset 128
-	.cfi_offset %rbx, -24
-	.cfi_offset %r14, -16
-	movq	_anon0@GOTPCREL(%rip), %rax
-	movq	%rax, 88(%rsp)
-	movq	_add1_1@GOTPCREL(%rip), %rax
-	leaq	88(%rsp), %rdi
-	movq	%rdi, (%rax)
-	movq	_anon1@GOTPCREL(%rip), %rax
-	movq	%rax, 80(%rsp)
-	movq	_sub1_1@GOTPCREL(%rip), %rbx
-	leaq	80(%rsp), %rax
-	movq	%rax, (%rbx)
-	movq	_anon2@GOTPCREL(%rip), %rax
-	movq	%rax, 72(%rsp)
-	movq	_retx_1@GOTPCREL(%rip), %rax
-	leaq	72(%rsp), %rcx
-	movq	%rcx, (%rax)
-	movq	_anon4@GOTPCREL(%rip), %rax
-	movq	%rax, 64(%rsp)
-	movq	_callFunc_1@GOTPCREL(%rip), %rcx
-	leaq	64(%rsp), %rdx
-	movq	%rdx, (%rcx)
-	movl	$41, %esi
-	callq	*%rax
-	leaq	.Lfmt(%rip), %r14
-	movq	%r14, %rdi
-	movl	%eax, %esi
-	xorl	%eax, %eax
-	callq	printf@PLT
-	movq	_anon5@GOTPCREL(%rip), %rax
-	movq	%rax, 56(%rsp)
-	movq	_callFunc_2@GOTPCREL(%rip), %rcx
-	leaq	56(%rsp), %rdx
-	movq	%rdx, (%rcx)
-	movq	(%rbx), %rdi
-	movl	$43, %esi
-	callq	*%rax
-	movq	%r14, %rdi
-	movl	%eax, %esi
-	xorl	%eax, %eax
-	callq	printf@PLT
-	movq	_anon7@GOTPCREL(%rip), %rax
-	movq	%rax, 48(%rsp)
-	movq	_retx_2@GOTPCREL(%rip), %rax
-	leaq	48(%rsp), %rdi
-	movq	%rdi, (%rax)
-	movq	_anon6@GOTPCREL(%rip), %rax
-	movq	%rax, 40(%rsp)
-	movq	_callFunc_3@GOTPCREL(%rip), %rcx
-	leaq	40(%rsp), %rdx
-	movq	%rdx, (%rcx)
-	leaq	.LglobalChar(%rip), %rsi
-	movq	%rsi, 96(%rsp)
-	callq	*%rax
-	movq	%rax, %rdi
-	callq	puts@PLT
-	movq	_anon9@GOTPCREL(%rip), %rax
-	movq	%rax, 32(%rsp)
-	movq	_retx_3@GOTPCREL(%rip), %rax
-	leaq	32(%rsp), %rdi
-	movq	%rdi, (%rax)
-	movq	_anon8@GOTPCREL(%rip), %rax
-	movq	%rax, 24(%rsp)
-	movq	_callFunc_4@GOTPCREL(%rip), %rcx
-	leaq	24(%rsp), %rdx
-	movq	%rdx, (%rcx)
-	movl	$42, %esi
-	callq	*%rax
-	movq	%r14, %rdi
-	movl	%eax, %esi
-	xorl	%eax, %eax
-	callq	printf@PLT
-	movq	_anon11@GOTPCREL(%rip), %rax
-	movq	%rax, 16(%rsp)
-	movq	_retx_4@GOTPCREL(%rip), %rax
-	leaq	16(%rsp), %rdi
-	movq	%rdi, (%rax)
-	movq	_anon10@GOTPCREL(%rip), %rax
-	movq	%rax, 8(%rsp)
-	movq	_callFunc_5@GOTPCREL(%rip), %rcx
-	leaq	8(%rsp), %rdx
-	movq	%rdx, (%rcx)
-	movl	$1, %esi
-	callq	*%rax
-	leaq	.LboolF(%rip), %rdi
-	callq	puts@PLT
-	xorl	%eax, %eax
-	addq	$104, %rsp
-	.cfi_def_cfa_offset 24
-	popq	%rbx
+	and	w0, w0, #0x1
+	strb	w0, [sp, #15]
+	add	sp, sp, #16                     ; =16
+	ret
+	.cfi_endproc
+                                        ; -- End function
+	.globl	__anon8                         ; -- Begin function _anon8
+	.p2align	2
+__anon8:                                ; @_anon8
+	.cfi_startproc
+; %bb.0:                                ; %entry
+	sub	sp, sp, #32                     ; =32
+	stp	x29, x30, [sp, #16]             ; 16-byte Folded Spill
+	.cfi_def_cfa_offset 32
+	.cfi_offset w30, -8
+	.cfi_offset w29, -16
+	ldr	x8, [x0]
+	str	x0, [sp, #8]
+	mov	w0, w1
+	str	w1, [sp, #4]
+	blr	x8
+	ldp	x29, x30, [sp, #16]             ; 16-byte Folded Reload
+	add	sp, sp, #32                     ; =32
+	ret
+	.cfi_endproc
+                                        ; -- End function
+	.globl	__anon9                         ; -- Begin function _anon9
+	.p2align	2
+__anon9:                                ; @_anon9
+	.cfi_startproc
+; %bb.0:                                ; %entry
+	sub	sp, sp, #16                     ; =16
 	.cfi_def_cfa_offset 16
-	popq	%r14
-	.cfi_def_cfa_offset 8
-	retq
-.Lfunc_end0:
-	.size	main, .Lfunc_end0-main
+	str	w0, [sp, #12]
+	add	sp, sp, #16                     ; =16
+	ret
 	.cfi_endproc
-                                        # -- End function
-	.globl	_anon10                         # -- Begin function _anon10
-	.p2align	4, 0x90
-	.type	_anon10,@function
-_anon10:                                # @_anon10
+                                        ; -- End function
+	.globl	__anon6                         ; -- Begin function _anon6
+	.p2align	2
+__anon6:                                ; @_anon6
 	.cfi_startproc
-# %bb.0:                                # %entry
-	subq	$24, %rsp
+; %bb.0:                                ; %entry
+	sub	sp, sp, #32                     ; =32
+	stp	x29, x30, [sp, #16]             ; 16-byte Folded Spill
 	.cfi_def_cfa_offset 32
-	movq	%rdi, %rax
-	movq	%rdi, 16(%rsp)
-	movl	%esi, %ecx
-	andl	$1, %ecx
-	movb	%cl, 15(%rsp)
-	movl	%esi, %edi
-	callq	*(%rax)
-	addq	$24, %rsp
-	.cfi_def_cfa_offset 8
-	retq
-.Lfunc_end1:
-	.size	_anon10, .Lfunc_end1-_anon10
+	.cfi_offset w30, -8
+	.cfi_offset w29, -16
+	ldr	x8, [x0]
+	stp	x1, x0, [sp]
+	mov	x0, x1
+	blr	x8
+	ldp	x29, x30, [sp, #16]             ; 16-byte Folded Reload
+	add	sp, sp, #32                     ; =32
+	ret
 	.cfi_endproc
-                                        # -- End function
-	.globl	_anon11                         # -- Begin function _anon11
-	.p2align	4, 0x90
-	.type	_anon11,@function
-_anon11:                                # @_anon11
+                                        ; -- End function
+	.globl	__anon7                         ; -- Begin function _anon7
+	.p2align	2
+__anon7:                                ; @_anon7
 	.cfi_startproc
-# %bb.0:                                # %entry
-	movl	%edi, %eax
-	movl	%edi, %ecx
-	andl	$1, %ecx
-	movb	%cl, -1(%rsp)
-                                        # kill: def $al killed $al killed $eax
-	retq
-.Lfunc_end2:
-	.size	_anon11, .Lfunc_end2-_anon11
+; %bb.0:                                ; %entry
+	sub	sp, sp, #16                     ; =16
+	.cfi_def_cfa_offset 16
+	str	x0, [sp, #8]
+	add	sp, sp, #16                     ; =16
+	ret
 	.cfi_endproc
-                                        # -- End function
-	.globl	_anon8                          # -- Begin function _anon8
-	.p2align	4, 0x90
-	.type	_anon8,@function
-_anon8:                                 # @_anon8
+                                        ; -- End function
+	.globl	__anon5                         ; -- Begin function _anon5
+	.p2align	2
+__anon5:                                ; @_anon5
 	.cfi_startproc
-# %bb.0:                                # %entry
-	subq	$24, %rsp
+; %bb.0:                                ; %entry
+	sub	sp, sp, #32                     ; =32
+	stp	x29, x30, [sp, #16]             ; 16-byte Folded Spill
 	.cfi_def_cfa_offset 32
-	movq	%rdi, %rax
-	movq	%rdi, 16(%rsp)
-	movl	%esi, 12(%rsp)
-	movl	%esi, %edi
-	callq	*(%rax)
-	addq	$24, %rsp
-	.cfi_def_cfa_offset 8
-	retq
-.Lfunc_end3:
-	.size	_anon8, .Lfunc_end3-_anon8
+	.cfi_offset w30, -8
+	.cfi_offset w29, -16
+	ldr	x8, [x0]
+	str	x0, [sp, #8]
+	mov	w0, w1
+	str	w1, [sp, #4]
+	blr	x8
+	ldp	x29, x30, [sp, #16]             ; 16-byte Folded Reload
+	add	sp, sp, #32                     ; =32
+	ret
 	.cfi_endproc
-                                        # -- End function
-	.globl	_anon9                          # -- Begin function _anon9
-	.p2align	4, 0x90
-	.type	_anon9,@function
-_anon9:                                 # @_anon9
+                                        ; -- End function
+	.globl	__anon4                         ; -- Begin function _anon4
+	.p2align	2
+__anon4:                                ; @_anon4
 	.cfi_startproc
-# %bb.0:                                # %entry
-	movl	%edi, %eax
-	movl	%edi, -4(%rsp)
-	retq
-.Lfunc_end4:
-	.size	_anon9, .Lfunc_end4-_anon9
-	.cfi_endproc
-                                        # -- End function
-	.globl	_anon6                          # -- Begin function _anon6
-	.p2align	4, 0x90
-	.type	_anon6,@function
-_anon6:                                 # @_anon6
-	.cfi_startproc
-# %bb.0:                                # %entry
-	subq	$24, %rsp
+; %bb.0:                                ; %entry
+	sub	sp, sp, #32                     ; =32
+	stp	x29, x30, [sp, #16]             ; 16-byte Folded Spill
 	.cfi_def_cfa_offset 32
-	movq	%rdi, %rax
-	movq	%rdi, 16(%rsp)
-	movq	%rsi, 8(%rsp)
-	movq	%rsi, %rdi
-	callq	*(%rax)
-	addq	$24, %rsp
-	.cfi_def_cfa_offset 8
-	retq
-.Lfunc_end5:
-	.size	_anon6, .Lfunc_end5-_anon6
+	.cfi_offset w30, -8
+	.cfi_offset w29, -16
+	ldr	x8, [x0]
+	str	x0, [sp, #8]
+	mov	w0, w1
+	str	w1, [sp, #4]
+	blr	x8
+	ldp	x29, x30, [sp, #16]             ; 16-byte Folded Reload
+	add	sp, sp, #32                     ; =32
+	ret
 	.cfi_endproc
-                                        # -- End function
-	.globl	_anon7                          # -- Begin function _anon7
-	.p2align	4, 0x90
-	.type	_anon7,@function
-_anon7:                                 # @_anon7
+                                        ; -- End function
+	.globl	__anon2                         ; -- Begin function _anon2
+	.p2align	2
+__anon2:                                ; @_anon2
 	.cfi_startproc
-# %bb.0:                                # %entry
-	movq	%rdi, %rax
-	movq	%rdi, -8(%rsp)
-	retq
-.Lfunc_end6:
-	.size	_anon7, .Lfunc_end6-_anon7
+; %bb.0:                                ; %entry
+	sub	sp, sp, #16                     ; =16
+	.cfi_def_cfa_offset 16
+	str	w0, [sp, #12]
+	add	sp, sp, #16                     ; =16
+	ret
 	.cfi_endproc
-                                        # -- End function
-	.globl	_anon5                          # -- Begin function _anon5
-	.p2align	4, 0x90
-	.type	_anon5,@function
-_anon5:                                 # @_anon5
+                                        ; -- End function
+	.globl	__anon1                         ; -- Begin function _anon1
+	.p2align	2
+__anon1:                                ; @_anon1
 	.cfi_startproc
-# %bb.0:                                # %entry
-	subq	$24, %rsp
-	.cfi_def_cfa_offset 32
-	movq	%rdi, %rax
-	movq	%rdi, 16(%rsp)
-	movl	%esi, 12(%rsp)
-	movl	%esi, %edi
-	callq	*(%rax)
-	addq	$24, %rsp
-	.cfi_def_cfa_offset 8
-	retq
-.Lfunc_end7:
-	.size	_anon5, .Lfunc_end7-_anon5
+; %bb.0:                                ; %entry
+	sub	sp, sp, #16                     ; =16
+	.cfi_def_cfa_offset 16
+	sub	w8, w0, #1                      ; =1
+	str	w0, [sp, #12]
+	mov	w0, w8
+	add	sp, sp, #16                     ; =16
+	ret
 	.cfi_endproc
-                                        # -- End function
-	.globl	_anon4                          # -- Begin function _anon4
-	.p2align	4, 0x90
-	.type	_anon4,@function
-_anon4:                                 # @_anon4
+                                        ; -- End function
+	.globl	__anon0                         ; -- Begin function _anon0
+	.p2align	2
+__anon0:                                ; @_anon0
 	.cfi_startproc
-# %bb.0:                                # %entry
-	subq	$24, %rsp
-	.cfi_def_cfa_offset 32
-	movq	%rdi, %rax
-	movq	%rdi, 16(%rsp)
-	movl	%esi, 12(%rsp)
-	movl	%esi, %edi
-	callq	*(%rax)
-	addq	$24, %rsp
-	.cfi_def_cfa_offset 8
-	retq
-.Lfunc_end8:
-	.size	_anon4, .Lfunc_end8-_anon4
+; %bb.0:                                ; %entry
+	sub	sp, sp, #16                     ; =16
+	.cfi_def_cfa_offset 16
+	add	w8, w0, #1                      ; =1
+	str	w0, [sp, #12]
+	mov	w0, w8
+	add	sp, sp, #16                     ; =16
+	ret
 	.cfi_endproc
-                                        # -- End function
-	.globl	_anon2                          # -- Begin function _anon2
-	.p2align	4, 0x90
-	.type	_anon2,@function
-_anon2:                                 # @_anon2
-	.cfi_startproc
-# %bb.0:                                # %entry
-	movl	%edi, %eax
-	movl	%edi, -4(%rsp)
-	retq
-.Lfunc_end9:
-	.size	_anon2, .Lfunc_end9-_anon2
-	.cfi_endproc
-                                        # -- End function
-	.globl	_anon1                          # -- Begin function _anon1
-	.p2align	4, 0x90
-	.type	_anon1,@function
-_anon1:                                 # @_anon1
-	.cfi_startproc
-# %bb.0:                                # %entry
-                                        # kill: def $edi killed $edi def $rdi
-	movl	%edi, -4(%rsp)
-	leal	-1(%rdi), %eax
-	retq
-.Lfunc_end10:
-	.size	_anon1, .Lfunc_end10-_anon1
-	.cfi_endproc
-                                        # -- End function
-	.globl	_anon0                          # -- Begin function _anon0
-	.p2align	4, 0x90
-	.type	_anon0,@function
-_anon0:                                 # @_anon0
-	.cfi_startproc
-# %bb.0:                                # %entry
-                                        # kill: def $edi killed $edi def $rdi
-	movl	%edi, -4(%rsp)
-	leal	1(%rdi), %eax
-	retq
-.Lfunc_end11:
-	.size	_anon0, .Lfunc_end11-_anon0
-	.cfi_endproc
-                                        # -- End function
-	.type	.Lfmt,@object                   # @fmt
-	.section	.rodata.str1.1,"aMS",@progbits,1
-.Lfmt:
+                                        ; -- End function
+	.section	__TEXT,__cstring,cstring_literals
+l_fmt:                                  ; @fmt
 	.asciz	"%d\n"
-	.size	.Lfmt, 4
 
-	.type	.LboolT,@object                 # @boolT
-.LboolT:
+l_boolT:                                ; @boolT
 	.asciz	"#t"
-	.size	.LboolT, 3
 
-	.type	.LboolF,@object                 # @boolF
-.LboolF:
+l_boolF:                                ; @boolF
 	.asciz	"#f"
-	.size	.LboolF, 3
 
-	.type	__anon0_1,@object               # @__anon0_1
-	.bss
-	.globl	__anon0_1
-	.p2align	3
-__anon0_1:
-	.quad	0
-	.size	__anon0_1, 8
-
-	.type	__anon1_1,@object               # @__anon1_1
-	.globl	__anon1_1
-	.p2align	3
-__anon1_1:
-	.quad	0
-	.size	__anon1_1, 8
-
-	.type	__anon10_1,@object              # @__anon10_1
-	.globl	__anon10_1
-	.p2align	3
-__anon10_1:
-	.quad	0
-	.size	__anon10_1, 8
-
-	.type	__anon11_1,@object              # @__anon11_1
-	.globl	__anon11_1
-	.p2align	3
-__anon11_1:
-	.quad	0
-	.size	__anon11_1, 8
-
-	.type	__anon2_1,@object               # @__anon2_1
-	.globl	__anon2_1
-	.p2align	3
-__anon2_1:
-	.quad	0
-	.size	__anon2_1, 8
-
-	.type	__anon4_1,@object               # @__anon4_1
-	.globl	__anon4_1
-	.p2align	3
-__anon4_1:
-	.quad	0
-	.size	__anon4_1, 8
-
-	.type	__anon5_1,@object               # @__anon5_1
-	.globl	__anon5_1
-	.p2align	3
-__anon5_1:
-	.quad	0
-	.size	__anon5_1, 8
-
-	.type	__anon6_1,@object               # @__anon6_1
-	.globl	__anon6_1
-	.p2align	3
-__anon6_1:
-	.quad	0
-	.size	__anon6_1, 8
-
-	.type	__anon7_1,@object               # @__anon7_1
-	.globl	__anon7_1
-	.p2align	3
-__anon7_1:
-	.quad	0
-	.size	__anon7_1, 8
-
-	.type	__anon8_1,@object               # @__anon8_1
-	.globl	__anon8_1
-	.p2align	3
-__anon8_1:
-	.quad	0
-	.size	__anon8_1, 8
-
-	.type	__anon9_1,@object               # @__anon9_1
-	.globl	__anon9_1
-	.p2align	3
-__anon9_1:
-	.quad	0
-	.size	__anon9_1, 8
-
-	.type	_add1_1,@object                 # @_add1_1
-	.globl	_add1_1
-	.p2align	3
-_add1_1:
-	.quad	0
-	.size	_add1_1, 8
-
-	.type	_callFunc_5,@object             # @_callFunc_5
-	.globl	_callFunc_5
-	.p2align	3
-_callFunc_5:
-	.quad	0
-	.size	_callFunc_5, 8
-
-	.type	_callFunc_4,@object             # @_callFunc_4
-	.globl	_callFunc_4
-	.p2align	3
-_callFunc_4:
-	.quad	0
-	.size	_callFunc_4, 8
-
-	.type	_callFunc_3,@object             # @_callFunc_3
-	.globl	_callFunc_3
-	.p2align	3
-_callFunc_3:
-	.quad	0
-	.size	_callFunc_3, 8
-
-	.type	_callFunc_2,@object             # @_callFunc_2
-	.globl	_callFunc_2
-	.p2align	3
-_callFunc_2:
-	.quad	0
-	.size	_callFunc_2, 8
-
-	.type	_callFunc_1,@object             # @_callFunc_1
-	.globl	_callFunc_1
-	.p2align	3
-_callFunc_1:
-	.quad	0
-	.size	_callFunc_1, 8
-
-	.type	_retx_4,@object                 # @_retx_4
-	.globl	_retx_4
-	.p2align	3
-_retx_4:
-	.quad	0
-	.size	_retx_4, 8
-
-	.type	_retx_3,@object                 # @_retx_3
-	.globl	_retx_3
-	.p2align	3
-_retx_3:
-	.quad	0
-	.size	_retx_3, 8
-
-	.type	_retx_2,@object                 # @_retx_2
-	.globl	_retx_2
-	.p2align	3
-_retx_2:
-	.quad	0
-	.size	_retx_2, 8
-
-	.type	_retx_1,@object                 # @_retx_1
-	.globl	_retx_1
-	.p2align	3
-_retx_1:
-	.quad	0
-	.size	_retx_1, 8
-
-	.type	_sub1_1,@object                 # @_sub1_1
-	.globl	_sub1_1
-	.p2align	3
-_sub1_1:
-	.quad	0
-	.size	_sub1_1, 8
-
-	.type	.LglobalChar,@object            # @globalChar
-	.section	.rodata.str1.1,"aMS",@progbits,1
-.LglobalChar:
+	.globl	___anon0_1                      ; @__anon0_1
+.zerofill __DATA,__common,___anon0_1,8,3
+	.globl	___anon1_1                      ; @__anon1_1
+.zerofill __DATA,__common,___anon1_1,8,3
+	.globl	___anon10_1                     ; @__anon10_1
+.zerofill __DATA,__common,___anon10_1,8,3
+	.globl	___anon11_1                     ; @__anon11_1
+.zerofill __DATA,__common,___anon11_1,8,3
+	.globl	___anon2_1                      ; @__anon2_1
+.zerofill __DATA,__common,___anon2_1,8,3
+	.globl	___anon4_1                      ; @__anon4_1
+.zerofill __DATA,__common,___anon4_1,8,3
+	.globl	___anon5_1                      ; @__anon5_1
+.zerofill __DATA,__common,___anon5_1,8,3
+	.globl	___anon6_1                      ; @__anon6_1
+.zerofill __DATA,__common,___anon6_1,8,3
+	.globl	___anon7_1                      ; @__anon7_1
+.zerofill __DATA,__common,___anon7_1,8,3
+	.globl	___anon8_1                      ; @__anon8_1
+.zerofill __DATA,__common,___anon8_1,8,3
+	.globl	___anon9_1                      ; @__anon9_1
+.zerofill __DATA,__common,___anon9_1,8,3
+	.globl	__add1_1                        ; @_add1_1
+.zerofill __DATA,__common,__add1_1,8,3
+	.globl	__callFunc_5                    ; @_callFunc_5
+.zerofill __DATA,__common,__callFunc_5,8,3
+	.globl	__callFunc_4                    ; @_callFunc_4
+.zerofill __DATA,__common,__callFunc_4,8,3
+	.globl	__callFunc_3                    ; @_callFunc_3
+.zerofill __DATA,__common,__callFunc_3,8,3
+	.globl	__callFunc_2                    ; @_callFunc_2
+.zerofill __DATA,__common,__callFunc_2,8,3
+	.globl	__callFunc_1                    ; @_callFunc_1
+.zerofill __DATA,__common,__callFunc_1,8,3
+	.globl	__retx_4                        ; @_retx_4
+.zerofill __DATA,__common,__retx_4,8,3
+	.globl	__retx_3                        ; @_retx_3
+.zerofill __DATA,__common,__retx_3,8,3
+	.globl	__retx_2                        ; @_retx_2
+.zerofill __DATA,__common,__retx_2,8,3
+	.globl	__retx_1                        ; @_retx_1
+.zerofill __DATA,__common,__retx_1,8,3
+	.globl	__sub1_1                        ; @_sub1_1
+.zerofill __DATA,__common,__sub1_1,8,3
+l_globalChar:                           ; @globalChar
 	.asciz	"c"
-	.size	.LglobalChar, 2
 
-	.section	".note.GNU-stack","",@progbits
+.subsections_via_symbols
