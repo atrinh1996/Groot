@@ -1,3 +1,5 @@
+;; ensure correct typing of all prims
+
 (printb #t)
 (printi 10)
 (printc 'x')

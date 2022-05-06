@@ -1,2 +1,4 @@
+;; typed ids in conditional
+
 (val x 3)
 (if #t x 10)

@@ -1,1 +1,3 @@
-((lambda (n) n) 6 )
+;; ensure success of inline lambda application
+
+((lambda (n) n) 6)

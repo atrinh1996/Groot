@@ -1,3 +1,5 @@
+;; applying non-function is not allowed
+
 (val foo 3)
 
 (foo 1 2)

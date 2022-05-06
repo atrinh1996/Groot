@@ -1,3 +1,5 @@
+;; ensure that lambda closures maintain static copies of free vars (unchanged when global vars change)
+
 (val x 1)
 (printi x)
 

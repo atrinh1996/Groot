@@ -1,3 +1,5 @@
+;; small stress test of various functions
+
 (val x 42)
 (val retx (lambda () x))
 (printi (retx))

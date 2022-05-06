@@ -1,1 +1,3 @@
+;; ensure that guard conditional applies boolean constraint on lambda arg
+
 (lambda (x) (if x x x))

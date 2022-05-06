@@ -1,1 +1,3 @@
+;; ensure unused polymorphic type for identity function
+
 (lambda (x) x)

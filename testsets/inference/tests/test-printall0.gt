@@ -1,3 +1,5 @@
+;; ensure correct printing of values form each prim
+
 (printi (+ 1 0))
 (printi (- 4 2))
 (printi (/ 6 2))

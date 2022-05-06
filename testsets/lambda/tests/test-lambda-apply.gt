@@ -1,1 +1,3 @@
+;; print value of lambda application
+
 (printi ((lambda (x) 1) 2))

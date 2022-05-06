@@ -103,7 +103,7 @@ let translate { main = main;  functions = functions;
         Tycon (Clo (name, anonFunTy, freetys)) ->
         let v = create_struct name (anonFunTy :: freetys) map
         in StringMap.add name v map
-      | _ -> Diagnostic.error (Diagnostic.GenerationError "lambda is non-closure type")
+      | _ -> Diagnostic.error (Diagnostic.GenerationError "declaration of lambda that is non-closure type")
     in
     let structs = List.rev structures in
     List.fold_left gen_struct_def StringMap.empty structs
@@ -414,7 +414,7 @@ let translate { main = main;  functions = functions;
            in List.map2 set_free llFreeArgs structFields
          in
          (builder', struct_obj)
-       | _ -> Diagnostic.error (Diagnostic.GenerationError "lambda is non-closure type"))
+       | _ -> Diagnostic.error (Diagnostic.GenerationError "application of lambda that is non-closure type"))
   in
 
 

@@ -1,2 +1,4 @@
+;; nested lambda within nested lambda, no application
+
 (val retn (lambda (n m) n))
 (val test (lambda (a) (lambda (b) (retn a b))))

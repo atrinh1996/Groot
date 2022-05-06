@@ -1,1 +1,3 @@
+;; lambda, no body
+
 (lambda (x y z))

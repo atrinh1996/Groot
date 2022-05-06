@@ -1,2 +1,4 @@
-!(== 6 7)
-! (!= 6 7)
+;; invert some booleans
+
+(printb (! (== 6 7)))
+(printb (! (!= 6 7)))

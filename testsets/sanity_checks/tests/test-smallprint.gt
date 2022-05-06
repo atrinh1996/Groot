@@ -1,3 +1,4 @@
+;; small stress test of various functions, with printing
 (val x 42)
 
 x

@@ -1,3 +1,5 @@
+;; lambda stress test
+
 (lambda (x y z) (if (+ x y) (|| x y) (&& x y)))
 (lambda () 4) 
 (lambda (x) 4) 

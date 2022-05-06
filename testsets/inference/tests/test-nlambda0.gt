@@ -1,1 +1,3 @@
+;; nested lambda with free vars
+
 (lambda (n) (lambda () (n)))

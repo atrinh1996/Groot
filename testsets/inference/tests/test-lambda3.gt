@@ -1,1 +1,3 @@
+;; ensure polymorphic type for unsued param in lambda
+
 (lambda (n) (+ 1 1))

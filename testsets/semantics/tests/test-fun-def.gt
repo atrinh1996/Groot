@@ -1,1 +1,3 @@
+;; square an integer! a very useful function!
+
 (val square (lambda (x) (* x x)))
