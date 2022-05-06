@@ -1341,54 +1341,52 @@ function: (flurry func)
     My main takeaway is that compiler writing, or even writing just a single optimization for a compiler, is a very complicated endeavor. We did not end up with a lot of our original goals and features we intended for our functional language, but the detours we took while exploring this whole other paradigm was very enriching, and I was never bored and always challenged. Everyone should write a compiler at least once before graduating. This was a great project in demonstrating the practical application of the concepts and theory we learnt in 170 and 105, and I'd recommend taking both classes before 107 or at the same time for a more comfortable time. I have a lot of appreciation for people who do research and contribute to the field of functional languages, and the complexity of lambda calculus. My advice to future students is that you should have a burning desire to implement type inferencing and lambda calculus before you settle on a a functional language as your project topic; I never knew how much we took static typing and statment blocks for granted. Or you can get a thrill from just taking on this challenge. 
     
     \subsection{Nickolas Gravel}
-        \begin{itemize}
-            \item Takeaway: Compiler writing is a long, long journey filled with
-            various pitfalls, unexpected challenges, dragons, and possibly avocados.
-            For myself, I found the learning curve to be slightly steeper than my peers.
-            Before this class, I had not taken CS105 Programming Languages or had
-            any experience coding in a functional language. So, in the beginning, 
-            I encountered some tribulation understanding these concepts. Effectively,
-            I not only needed to learn the basics of compiler writing, but needed
-            to learn the basic components of a programming language, and the basics
-            of coding in a functional language as well.
-            
-            Then came type inferencing, a module that we had greatly underestimated
-            the amount of time and work it would take to implement. I was one of the main
-            programmers that worked on implementing this module. Again, I found
-            that having some previous experience with type inferencing would have
-            been a huge help here...but we persevered! I dove into the Hadley-Milner 
-            type system algorithm, and with the guidance of Mert and Michael Ryan
-            Clarkson, after about a month of coding the and a week of debugging
-            we had a working type inferencer! 
-            
-            All in all, building a compiler is no joke. Even seemingly trivial
-            steps in implementing a compiler were found to be not so trivial,
-            requiring us to brain storm creative solutions to get to the next step. 
-            For anyone building a compiler, I recommend spending ample time writing
-            up a thorough design. Having a written design indicating which data
-            structures and data types were being passed and returned from each
-            module would have helped in overall organization and may have 
-            prevented some of the various bugs that we encountered. Future students, 
-            if you are set on building a language with inferred types make sure
-            you have a strong understanding how to implement type inferencing and
-            design your inferencer thoroughly before implementing it.
-            
-            Designing a programming language and building a compiler for it was
-            riveting experience. I learned so much about functional languages,
-            type inferencing, and what it really takes to compile source code
-            down to a final executable. Everyone with any interest in low-level 
-            programming should take this course, but I would recommend taking a
-            course in programming languages more gradual learning curve. 
 
-
-            \item Advice: 
-        \end{itemize}
+    Compiler writing is a long, long journey filled with
+    various pitfalls, unexpected challenges, dragons, and possibly avocados.
+    For myself, I found the learning curve to be slightly steeper than my peers.
+    Before this class, I had not taken CS105 Programming Languages or had
+    any experience coding in a functional language. So, in the beginning, 
+    I encountered some tribulation understanding these concepts. Effectively,
+    I not only needed to learn the basics of compiler writing, but needed
+    to learn the basic components of a programming language, and the basics
+    of coding in a functional language as well.
+    
+    Then came type inferencing, a module that we had greatly underestimated
+    the amount of time and work it would take to implement. I was one of the main
+    programmers that worked on implementing this module. Again, I found
+    that having some previous experience with type inferencing would have
+    been a huge help here...but we persevered! I dove into the Hadley-Milner 
+    type system algorithm, and with the guidance of Mert and Michael Ryan
+    Clarkson, after about a month of coding the and a week of debugging
+    we had a working type inferencer! 
+    
+    All in all, building a compiler is no joke. Even seemingly trivial
+    steps in implementing a compiler were found to be not so trivial,
+    requiring us to brain storm creative solutions to get to the next step. 
+    For anyone building a compiler, I recommend spending ample time writing
+    up a thorough design. Having a written design indicating which data
+    structures and data types were being passed and returned from each
+    module would have helped in overall organization and may have 
+    prevented some of the various bugs that we encountered. Future students, 
+    if you are set on building a language with inferred types make sure
+    you have a strong understanding how to implement type inferencing and
+    design your inferencer thoroughly before implementing it.
+    
+    Designing a programming language and building a compiler for it was
+    riveting experience. I learned so much about functional languages,
+    type inferencing, and what it really takes to compile source code
+    down to a final executable. Everyone with any interest in low-level 
+    programming should take this course, but I would recommend taking a
+    course in programming languages more gradual learning curve. 
     
     \subsection{Sam Russo}
-        \begin{itemize}
-            \item Takeaway:
-            \item Advice: 
-        \end{itemize}
+
+    There are so many independent aspects to working on a compiler, from language design/syntax to memory to warnings to additional features. Coming up with solutions to the problems that we found in each of these domains and dealing with bugs was challenging, but it was also hard to ensure that the choices we made in each of the domains worked well with each other. If one person decided to do thing x while working in one area, sometimes we would realize later that that decision was incompatible or poorly compatible with a decision someone else made in a different domain at the same time.
+
+    Working with a group as big as ours for as long as we did (and I know in the scheme of things our team wasn't that big and we weren't working together for that long) is really hard. Challenges were mostly accountability (definitely including my own) and stemmed from everyone's having different schedules and different workloads. Different workloads meant that people 1) prioritized our project different amounts, 2) had differing amounts of time to dedicate to it, and 3) had different ideas of how to spend the time when we worked on it together. Specifically, the grad students in our group had much more time to work on the project, which led to pretty different levels of contribution. For future mixed grad-undergrad groups, I would think about this before committing to such a group, and if people decide to stick with it, then they should be very clear around group expectations.
+
+  
     
     \subsection{Eliza Encherman}
         \begin{itemize}
