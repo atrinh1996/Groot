@@ -3,7 +3,7 @@ open Tast
 module StringMap = Map.Make (String)
 
 (* prims - initializes context with built-in functions with their types *)
-(* prims : (id * tyvar) list * (tycon * gtype list) *)
+(* prims : (id * (tyvar list * gtype)) *)
 let prims =
   [
     ("printb",  ([ TVariable (-1) ], Tast.functiontype inttype [ booltype ]));
@@ -54,18 +54,36 @@ let fresh =
   fun () -> incr k; TYVAR (TVariable !k)
 
 
+(* gimme_tycon_gtype - sort of a hack function that we made to solve the bug we
+   came across in applying substitutions, called in tysubst *)
+   let gimme_tycon_gtype _ = function
+   | TYCON x -> x
+   | TYVAR x ->
+     Diagnostic.error (Diagnostic.TypeError ("the variable " ^ string_of_tyvar x
+                        ^ " has type tyvar but an expression was exprected of type tycon"))
+   | CONAPP x ->
+     Diagnostic.error (Diagnostic.TypeError ("the constructor " ^ string_of_conapp x
+                        ^ " has type conapp but an expression was exprected of type tycon"))
+ 
+
+(* tysubst - subs in the type in place of type variable  *)
+let rec tysubst (one_sub : tyvar * gtype) (t : gtype) =
+  match (one_sub, t) with
+  | (x, y), TYVAR z -> if x = z then y else TYVAR z
+  | _, TYCON (TArrow retty) -> TYCON (TArrow (tysubst one_sub retty))
+  | _, TYCON c -> TYCON c
+  | (x, _), CONAPP (a, bs) ->
+    let tycn = gimme_tycon_gtype x in
+    CONAPP (tycn (tysubst one_sub (TYCON a)), (List.map (tysubst one_sub)) bs)
+    
+  
 (* sub - updates a list of constraints with substitutions in theta *)
 let sub (theta : (tyvar * gtype) list) (cns : (gtype * gtype) list) =
   (* sub_one - takes in single constraint and updates it with substitution in theta *)
   let sub_one (cn : gtype * gtype) =
     List.fold_left
-      (fun ((c1, c2) : gtype * gtype) ((tv, gt) : tyvar * gtype) ->
-         match (c1, c2) with
-         | TYVAR t1, TYVAR t2 ->
-           if tv = t1 then (gt, c2) else if tv = t2 then (c1, gt) else (c1, c2)
-         | TYVAR t1, _ -> if tv = t1 then (gt, c2) else (c1, c2)
-         | _, TYVAR t2 -> if tv = t2 then (c1, gt) else (c1, c2)
-         | _, _ -> (c1, c2))
+      (fun ((c1, c2) : gtype * gtype) (sub : tyvar * gtype) ->
+        (tysubst sub c1, tysubst sub c2))
       cn theta
   in
   List.map sub_one cns
@@ -154,9 +172,9 @@ let rec generate_constraints gctx e =
       let _, (_, tau) = List.find (fun x -> fst x = name) ctx in
       (tau, [], (tau, TypedVar name))
     | If (e1, e2, e3) ->
-      let t1, c1, tex1 = generate_constraints gctx e1 in
-      let t2, c2, tex2 = generate_constraints gctx e2 in
-      let t3, c3, tex3 = generate_constraints gctx e3 in
+      let t1, c1, tex1 = generate_constraints ctx e1 in
+      let t2, c2, tex2 = generate_constraints ctx e2 in
+      let t3, c3, tex3 = generate_constraints ctx e3 in
       let c = [ (booltype, t1); (t3, t2) ] @ c1 @ c2 @ c3 in
       let tex = TypedIf (tex1, tex2, tex3) in
       (t3, c, (t3, tex))
@@ -210,29 +228,6 @@ let rec generate_constraints gctx e =
   in
   constrain gctx e
 
-
-(* gimme_tycon_gtype - sort of a hack function that we made to solve the bug we
-   came across in applying substitutions, called in tysubst *)
-let gimme_tycon_gtype _ = function
-  | TYCON x -> x
-  | TYVAR x ->
-    Diagnostic.error (Diagnostic.TypeError ("the variable " ^ string_of_tyvar x
-                       ^ " has type tyvar but an expression was exprected of type tycon"))
-  | CONAPP x ->
-    Diagnostic.error (Diagnostic.TypeError ("the constructor " ^ string_of_conapp x
-                       ^ " has type conapp but an expression was exprected of type tycon"))
-
-
-
-(* tysubst - subs in the type in place of type variable  *)
-let rec tysubst (one_sub : tyvar * gtype) (t : gtype) =
-  match (one_sub, t) with
-  | (x, y), TYVAR z -> if x = z then y else TYVAR z
-  | _, TYCON (TArrow retty) -> TYCON (TArrow (tysubst one_sub retty))
-  | _, TYCON c -> TYCON c
-  | (x, _), CONAPP (a, bs) ->
-    let tycn = gimme_tycon_gtype x in
-    CONAPP (tycn (tysubst one_sub (TYCON a)), (List.map (tysubst one_sub)) bs)
 
 (* get_constraints - returns a list of Tasts
         Tast : [ (ident * (gtype * tx)) ] = [ (ident * texpr) | texpr ] = [ tdefns ]
