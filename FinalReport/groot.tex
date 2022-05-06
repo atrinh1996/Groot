@@ -205,6 +205,8 @@
 
   Engineering a Compiler, 2th Edition. Keith D. Cooper and Linda Torczon. Morgan Kauf-mann, 2012.
 
+  \href{https://v2.ocaml.org/manual/index.html}{OCaml Manual}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ACK %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1115,6 +1117,111 @@ function: (flurry func)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Project Plan}
 \label{sec:PLAN}
+
+    \subsection{Planning, Specification, and Development}
+
+      Initial planning involved going through several different ideas for a language before we settled on a functional language with an achievable feature that stands out. Most members of the group primarily had experience with imperative languages, so this topic provided an interesting challenge for everyone. 
+
+      We came up with a preliminary syntax for which we could parse and described in our LRM. The syntax was finalized (to include definitions) once parsing of expressions worked and as we moved on to more complex phases of the compiler. 
+
+      We used GitLab for organization and version control, and relied on clear communication over text, Discord, and in-person to keep each other up-to-date with responsibilities, new tasks, scheduling, road blocks, and goals reached. Every feature was worked on a separate branch, and merges were usually done as a group to resolve merge conflicts between branches together, if any. 
+
+      Phase 1 (Scanner/Parser) was done as a group. In subsequent phases, different tasks were divided amongsts group members depending on interest, with frequent collaboration with project mentor and other members as the need arises and to double-check each others work. Different responsibilities are described below.
+
+      We did not have an official style-guide, and relied on everyone to keep their work readable and well-documented. A few final passes through each file was done to ensure good style. 
+
+    \pagebreak
+
+
+
+
+    \subsection{Project Timeline}
+      For the most part, we tried to finish as much of a deliverable as possible before a given deadline. For subtasks without any hard due dates, finish-dates became more ambiguous, because a member's work tested by another member of the group, often times, revealed a new bug or a new feature that needs to be implemented before the original task is complete. Due to some of these challenges, we often found ourselves working up to a deadline or working pass an expected finish date. 
+
+      \begin{tabular}{|l|l|}
+        \hline 
+        \textbf{Goal} & \textbf{Finish or Submit Date} \\
+        \hline
+        Final Language Idea & Feb. 2 \\ 
+        Project Proposal & Feb. 4 \\
+        Phase 1 test script & Feb. 23 \\ 
+        Phase 1: Scanner \& Parser & Feb. 24 \\ 
+        Language Reference Manual & Feb. 28 \\
+        Final Language Syntax & Mar. 5 \\
+        Start planning and implementing type-inferencer & Mar. 5 \\ 
+        Start planning code generation & Mar. 5 \\
+        Start planning closure conversion & Mar. 11 \\
+        Semant for purposes of testing Conversion and Codegen & Mar. 13 \\
+        Partial Semant and Codegen Module that forces a printing & Mar. 11 \\
+        New phase 2 test script and reference outputs for all phases & Mar. 24 \\ 
+        Phase 2: Hello World & Mar. 28 \\
+        Conversion & Apr. 15 \\
+        Codegen & Apr. 19 \\
+        Extended Test Suite & Apr. 20 \\ 
+        Type Inferencer & Apr. 23 \\ 
+        Start Monomorphization to deal with infer's polymorphic types & Apr. 23 \\ 
+        Debug Conversion \& Codegen & Apr. 29 \\
+        thread primitives through each module & Apr. 29 \\
+        Debug Infer & May 2 \\ 
+        Mono & May 2 \\ 
+        Create HAST \& Hof (conversion I) phase and & \\ 
+        \hspace*{0.5cm}fit with Conversion (conversion II) to allow HOFs & May 5 \\
+        Extend testing script & May 5 \\
+        Presentation slides & May 5 \\
+        Presentation & May 6 \\ 
+        Final Paper \& Submission & May 7 \\ 
+        \hline
+      \end{tabular}
+
+    \pagebreak
+
+
+
+
+    \subsection{Roles and Responsibilities}
+      These were the originally assigned recommended roles: 
+
+      \begin{center}
+      \begin{tabular}{ll}
+        \hline 
+        Name & Role \\ 
+        \hline 
+        Eliza Encherman & Manager \\ 
+        Sam Russo & Tester \\
+        Zachary Goldstein & Language Guru\\
+        Nickolas Gravel & System Architect\\
+        Amy Bui & Facilitator\\
+        \hline 
+      \end{tabular}
+      \end{center}
+
+      As the project progressed and implementing features of a functional language became more difficult, we abandoned these roles and each subgroup or member focused on progressively implementing different language features. Everyone was responsible intially testing their own feature and subsequent debugging, but we were also responsible for checking each others work and providing ``fresh eyes'' when testing someone else's implemented feature. Here is a list of each person's primary responsibility: 
+
+      \begin{center}
+        \begin{tabular}{ll}
+          \hline 
+          Name & Responsibilities \\ 
+          \hline 
+          Eliza Encherman & Primitive recognition and testing in Scanner/Parser, \\ 
+          & Scope, Infer, Conversion, and primitive code generation \\ 
+          Sam Russo & Type Inferencer  \\
+          Zachary Goldstein & Errors \& Warnings, test suite, Docker environment \\
+          Nickolas Gravel & Type Inferencer \\
+          Amy Bui & monomorphizer, conversion I \& II, codegen\\
+          \hline 
+        \end{tabular}
+        \end{center}
+
+
+
+    \pagebreak
+
+
+
+
+    \subsection{Development Tools}
+
+    \pagebreak
 
 
     \pagebreak
