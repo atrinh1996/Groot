@@ -1,0 +1,7 @@
+(val letterGrade [_anon0{ char (int :: ) }] (lambda (int test) [char] (if [bool] ([bool] < [int] 90 [int] test) [char] A [char] (if [bool] ([bool] < [int] 80 [int] test) [char] B [char] (if [bool] ([bool] < [int] 70 [int] test) [char] C [char] D)))))
+[int] ([char] printc [char] ([_anon0{ char (int :: ) }] letterGrade [int] 89))
+(val computeGrade [_anon1{ char (int, int, int :: _anon0{ char (int :: ) }) }] (lambda (int test, int test2, int test3) [char] (let ([sum [int] ([int] + [int] ([int] + [int] test [int] test2) [int] test3)]) [char] (let ([avg [int] ([int] / [int] sum [int] 3)]) [char] ([_anon0{ char (int :: ) }] letterGrade [int] avg)))))
+[int] ([char] printc [char] ([_anon1{ char (int, int, int :: _anon0{ char (int :: ) }) }] computeGrade [int] 88 [int] 90 [int] 91))
+(val letterGrade [_anon2{ char (int :: ) }] (lambda (int test) [char] (if [bool] ([bool] < [int] 85 [int] test) [char] A [char] (if [bool] ([bool] < [int] 75 [int] test) [char] B [char] (if [bool] ([bool] < [int] 65 [int] test) [char] C [char] D)))))
+[int] ([char] printc [char] ([_anon2{ char (int :: ) }] letterGrade [int] 89))
+[int] ([char] printc [char] ([_anon1{ char (int, int, int :: _anon0{ char (int :: ) }) }] computeGrade [int] 88 [int] 90 [int] 91))
