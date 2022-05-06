@@ -1,16 +1,17 @@
 ;; val stress test
 
-(val x y)
+(val x 10)
 (printi x)
 
 (val x (+ 3 4))
 (printi x)
 
-(val x (if (> x 2) 1 0))
-(printi x)
-
+;; (val x (if (> x 2) 1 0))
+;; (printi x)
+(val y 'c')
 (val x 'a')
-(printx x)
+(val x 'b')
+;; (printc x)
 
 (val x 1)
 (printi x)

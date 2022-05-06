@@ -1,3 +1,1 @@
-llc: error: llc: testsets/lambda/llvm/test-lambda.ll:133:9: error: stored value and pointer type do not match
-  store i1 %"||", i32* %if-res-ptr, align 1
-        ^
+[31;1mType Error: [0mtype constructor mismatch int != bool

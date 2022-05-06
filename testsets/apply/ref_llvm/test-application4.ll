@@ -3,6 +3,7 @@ source_filename = "gROOT"
 
 %_anon1_struct = type { i32 (i32)*, i32 }
 %_anon0_struct = type { i32 (i32)*, i32 }
+%_anon3_struct = type { i32 (i32, i32, i32)*, i32 }
 %_anon2_struct = type { i32 (i32, i32, i32)*, i32 }
 
 @fmt = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
@@ -11,8 +12,10 @@ source_filename = "gROOT"
 @__anon0_1 = global i32 (i32)* null
 @__anon1_1 = global i32 (i32)* null
 @__anon2_1 = global i32 (i32, i32, i32)* null
+@__anon3_1 = global i32 (i32, i32, i32)* null
 @_retx_2 = global %_anon1_struct* null
 @_retx_1 = global %_anon0_struct* null
+@_retx2_2 = global %_anon3_struct* null
 @_retx2_1 = global %_anon2_struct* null
 @_x_2 = global i32 0
 @_x_1 = global i32 0
@@ -67,14 +70,33 @@ entry:
   %freeField20 = getelementptr inbounds %_anon2_struct, %_anon2_struct* %gstruct17, i32 0, i32 1
   store i32 %_x_219, i32* %freeField20, align 4
   store %_anon2_struct* %gstruct17, %_anon2_struct** @_retx2_1, align 8
-  %_retx2_1 = load %_anon2_struct*, %_anon2_struct** @_retx2_1, align 8
-  %freePtr21 = getelementptr inbounds %_anon2_struct, %_anon2_struct* %_retx2_1, i32 0, i32 1
-  %freeVal22 = load i32, i32* %freePtr21, align 4
-  %function_access23 = getelementptr inbounds %_anon2_struct, %_anon2_struct* %_retx2_1, i32 0, i32 0
-  %function_call24 = load i32 (i32, i32, i32)*, i32 (i32, i32, i32)** %function_access23, align 8
-  %function_result25 = call i32 %function_call24(i32 9, i32 8, i32 %freeVal22)
-  %printi26 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt, i32 0, i32 0), i32 %function_result25)
+  %gstruct21 = alloca %_anon3_struct, align 8
+  %funcField22 = getelementptr inbounds %_anon3_struct, %_anon3_struct* %gstruct21, i32 0, i32 0
+  store i32 (i32, i32, i32)* @_anon3, i32 (i32, i32, i32)** %funcField22, align 8
+  %_x_223 = load i32, i32* @_x_2, align 4
+  %freeField24 = getelementptr inbounds %_anon3_struct, %_anon3_struct* %gstruct21, i32 0, i32 1
+  store i32 %_x_223, i32* %freeField24, align 4
+  store %_anon3_struct* %gstruct21, %_anon3_struct** @_retx2_2, align 8
+  %_retx2_2 = load %_anon3_struct*, %_anon3_struct** @_retx2_2, align 8
+  %freePtr25 = getelementptr inbounds %_anon3_struct, %_anon3_struct* %_retx2_2, i32 0, i32 1
+  %freeVal26 = load i32, i32* %freePtr25, align 4
+  %function_access27 = getelementptr inbounds %_anon3_struct, %_anon3_struct* %_retx2_2, i32 0, i32 0
+  %function_call28 = load i32 (i32, i32, i32)*, i32 (i32, i32, i32)** %function_access27, align 8
+  %function_result29 = call i32 %function_call28(i32 9, i32 8, i32 %freeVal26)
+  %printi30 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt, i32 0, i32 0), i32 %function_result29)
   ret i32 0
+}
+
+define i32 @_anon3(i32 %n, i32 %m, i32 %_x_2) {
+entry:
+  %n1 = alloca i32, align 4
+  store i32 %n, i32* %n1, align 4
+  %m2 = alloca i32, align 4
+  store i32 %m, i32* %m2, align 4
+  %_x_23 = alloca i32, align 4
+  store i32 %_x_2, i32* %_x_23, align 4
+  %_x_24 = load i32, i32* %_x_23, align 4
+  ret i32 %_x_24
 }
 
 define i32 @_anon2(i32 %n, i32 %m, i32 %_x_2) {

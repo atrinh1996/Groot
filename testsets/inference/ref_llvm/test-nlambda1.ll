@@ -43,6 +43,6 @@ entry:
   store i32 %n, i32* %n2, align 4
   %x3 = load i32, i32* %x1, align 4
   %n4 = load i32, i32* %n2, align 4
-  %"+" = add i32 %x3, %n4
-  ret i32 %"+"
+  %addition = add i32 %x3, %n4
+  ret i32 %addition
 }

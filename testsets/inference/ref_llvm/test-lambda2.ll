@@ -25,6 +25,6 @@ entry:
   %n1 = alloca i32, align 4
   store i32 %n, i32* %n1, align 4
   %n2 = load i32, i32* %n1, align 4
-  %"+" = add i32 %n2, 1
-  ret i32 %"+"
+  %addition = add i32 %n2, 1
+  ret i32 %addition
 }

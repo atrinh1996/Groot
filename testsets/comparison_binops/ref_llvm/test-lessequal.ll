@@ -15,14 +15,14 @@ entry:
   %printb = call i32 @puts(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @boolT, i32 0, i32 0))
   store i32 4, i32* @_a_1, align 4
   %_a_1 = load i32, i32* @_a_1, align 4
-  %"<=" = icmp sle i32 6, %_a_1
+  %leq = icmp sle i32 6, %_a_1
   %printb1 = call i32 @puts(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @boolF, i32 0, i32 0))
   %_a_12 = load i32, i32* @_a_1, align 4
-  %"<=3" = icmp sle i32 %_a_12, 6
+  %leq3 = icmp sle i32 %_a_12, 6
   %printb4 = call i32 @puts(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @boolF, i32 0, i32 0))
   %_a_15 = load i32, i32* @_a_1, align 4
   %_a_16 = load i32, i32* @_a_1, align 4
-  %"<=7" = icmp sle i32 %_a_15, %_a_16
+  %leq7 = icmp sle i32 %_a_15, %_a_16
   %printb8 = call i32 @puts(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @boolF, i32 0, i32 0))
   %printb9 = call i32 @puts(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @boolT, i32 0, i32 0))
   ret i32 0

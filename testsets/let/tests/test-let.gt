@@ -1,7 +1,19 @@
 ;; let stress test
 
-(printi (let ([x 4]) y))
+(val var 2)
+
+(printi (let ([var 4]) var))
 (printi (let ([y 4]) y))
 
 (printi (let ([a 2][b 3]) (+ a b)))
-(printi (let ([x 5]) (let ([y 5]) (let ([z 9]) (* x (* y z))))))
+
+
+(printi 
+	(let ([x 3])
+		(let ([y 4])
+			(let ([z 5])
+				(* x (* y z))
+			)
+		)
+	)
+)

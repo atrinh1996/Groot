@@ -19,46 +19,46 @@ entry:
   store i32 12, i32* @_b_1, align 4
   store i32 10, i32* @_c_1, align 4
   %_a_1 = load i32, i32* @_a_1, align 4
-  %"=i" = icmp eq i32 %_a_1, 12
+  %eqI = icmp eq i32 %_a_1, 12
   %printb = call i32 @puts(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @boolF, i32 0, i32 0))
   %_b_1 = load i32, i32* @_b_1, align 4
-  %"=i1" = icmp eq i32 %_b_1, 12
+  %eqI1 = icmp eq i32 %_b_1, 12
   %printb2 = call i32 @puts(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @boolF, i32 0, i32 0))
   %_a_13 = load i32, i32* @_a_1, align 4
   %_b_14 = load i32, i32* @_b_1, align 4
-  %"=i5" = icmp eq i32 %_a_13, %_b_14
+  %eqI5 = icmp eq i32 %_a_13, %_b_14
   %printb6 = call i32 @puts(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @boolF, i32 0, i32 0))
   %_b_17 = load i32, i32* @_b_1, align 4
   %_a_18 = load i32, i32* @_a_1, align 4
-  %"=i9" = icmp eq i32 %_b_17, %_a_18
+  %eqI9 = icmp eq i32 %_b_17, %_a_18
   %printb10 = call i32 @puts(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @boolF, i32 0, i32 0))
   %_a_111 = load i32, i32* @_a_1, align 4
   %_a_112 = load i32, i32* @_a_1, align 4
-  %"=i13" = icmp eq i32 %_a_111, %_a_112
+  %eqI13 = icmp eq i32 %_a_111, %_a_112
   %printb14 = call i32 @puts(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @boolF, i32 0, i32 0))
   %_b_115 = load i32, i32* @_b_1, align 4
   %_b_116 = load i32, i32* @_b_1, align 4
-  %"=i17" = icmp eq i32 %_b_115, %_b_116
+  %eqI17 = icmp eq i32 %_b_115, %_b_116
   %printb18 = call i32 @puts(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @boolF, i32 0, i32 0))
   %_c_1 = load i32, i32* @_c_1, align 4
-  %"=i19" = icmp eq i32 %_c_1, 12
+  %eqI19 = icmp eq i32 %_c_1, 12
   %printb20 = call i32 @puts(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @boolF, i32 0, i32 0))
   %_c_121 = load i32, i32* @_c_1, align 4
   %_a_122 = load i32, i32* @_a_1, align 4
-  %"=i23" = icmp eq i32 %_c_121, %_a_122
+  %eqI23 = icmp eq i32 %_c_121, %_a_122
   %printb24 = call i32 @puts(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @boolF, i32 0, i32 0))
   %_c_125 = load i32, i32* @_c_1, align 4
   %_b_126 = load i32, i32* @_b_1, align 4
-  %"=i27" = icmp eq i32 %_c_125, %_b_126
+  %eqI27 = icmp eq i32 %_c_125, %_b_126
   %printb28 = call i32 @puts(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @boolF, i32 0, i32 0))
   %_a_129 = load i32, i32* @_a_1, align 4
   store i32 %_a_129, i32* @_d_1, align 4
   %_a_130 = load i32, i32* @_a_1, align 4
   %_d_1 = load i32, i32* @_d_1, align 4
-  %"=i31" = icmp eq i32 %_a_130, %_d_1
+  %eqI31 = icmp eq i32 %_a_130, %_d_1
   %printb32 = call i32 @puts(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @boolF, i32 0, i32 0))
   %_d_133 = load i32, i32* @_d_1, align 4
-  %"=i34" = icmp eq i32 %_d_133, 12
+  %eqI34 = icmp eq i32 %_d_133, 12
   %printb35 = call i32 @puts(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @boolF, i32 0, i32 0))
   ret i32 0
 }

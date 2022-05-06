@@ -83,16 +83,10 @@ let translate { main = main;  functions = functions;
   let struct_table : L.lltype StringMap.t =
     let gen_struct_def map closure = match closure with
         Tycon (Clo (name, anonFunTy, freetys)) ->
-<<<<<<< HEAD
-        let v = create_struct name (anonFunTy :: freetys) map
-        in StringMap.add name v map
-      | _ -> Diagnostic.error (Diagnostic.GenerationError "declaration of lambda that is non-closure type")
-=======
           let v = create_struct name (anonFunTy :: freetys) map
           in StringMap.add name v map
       | _ -> Diagnostic.error 
-              (Diagnostic.GenerationError "lambda is non-closure type")
->>>>>>> 3222e85f6897815c9bbb3999c5e3d1602be559f2
+              (Diagnostic.GenerationError "declaration of lambda that is non-closure type")
     in
     let structs = List.rev structures in
     List.fold_left gen_struct_def StringMap.empty structs

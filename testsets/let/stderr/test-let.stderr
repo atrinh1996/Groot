@@ -1,1 +1,1 @@
-Fatal error: exception Scope.Unbound("Unbound variable y")
+[31;1mUnbound Error: [0mname "x" not found in codegen

@@ -5,6 +5,9 @@
 
 DEPENDS=toplevel.ml ast.ml tast.ml parser.mly scanner.mll diagnostic.ml infer.ml mast.ml mono.ml codegen.ml cast.ml conversion.ml 
 
+default:
+	make toplevel.native
+
 dev:
 	docker run --rm -it -v `pwd`:/home/dev/workdir -w=/home/dev/workdir zegger/llvm-opam
 

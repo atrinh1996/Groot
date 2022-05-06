@@ -28,6 +28,6 @@ entry:
   store i32 %x, i32* %x1, align 4
   %x2 = load i32, i32* %x1, align 4
   %x3 = load i32, i32* %x1, align 4
-  %"*" = mul i32 %x2, %x3
-  ret i32 %"*"
+  %multiply = mul i32 %x2, %x3
+  ret i32 %multiply
 }
