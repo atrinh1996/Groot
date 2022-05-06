@@ -119,7 +119,7 @@ let translate { main = main;  functions = functions;
     and const_tycon = function
         Intty            -> L.const_int  lltyp 0
       | Boolty           -> L.const_int  lltyp 0
-      | Charty           -> L.const_int  lltyp 0
+      | Charty           -> L.const_pointer_null  lltyp 
       | Tarrow _         -> L.const_pointer_null lltyp
       | Clo _            -> L.const_pointer_null lltyp
     and const_conapp (_, _) = L.const_pointer_null lltyp

@@ -7,13 +7,13 @@ let context = L.global_context ()
 
 (* Add types to the context to use in the LLVM code *)
 let int_ty      = L.i32_type  context
-let char_ty       = L.i8_type   context
+let char_ty     = L.i8_type   context
 let char_ptr_ty = L.pointer_type char_ty
-let bool_ty       = L.i1_type   context
+let bool_ty     = L.i1_type   context
 let string_ty   = L.struct_type context [| L.pointer_type char_ty |]
 let zero = L.const_int int_ty 0
 (* REMOVE VOID later *)
-let void_ty    = L.void_type context
+(* let void_ty    = L.void_type context *)
 
 let lltrue = L.const_int bool_ty 1
 
