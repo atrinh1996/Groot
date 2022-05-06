@@ -26,7 +26,7 @@ hello:
 	make toExe
 
 %.exe: %.gt
-	./toplevel.native -c $< > tmp.ll && llc -relocation-model=pic tmp.ll > tmp.s && cc -o $@ tmp.s
+	./toplevel.native -l $< > tmp.ll && llc -relocation-model=pic tmp.ll > tmp.s && cc -o $@ tmp.s
 
 parser: parser.mly
 	ocamlyacc parser.mly

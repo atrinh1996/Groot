@@ -1,8 +1,7 @@
 (* Closure conversion for groot compiler *)
-
-
-open Mast
+open Hast
 open Cast
+
 module StringMap = Map.Make(String)
 
 (***********************************************************************)
@@ -20,14 +19,13 @@ let prerho env =
       ("<=", (0, boolty));      (">=", (0, boolty));
       ("!=i", (0, boolty));     ("=i", (0, boolty));
       ("&&", (0, boolty));      ("||", (0, boolty));
-      ("not", (0, boolty))                            ]
+      ("not", (0, boolty));     ("~", (0, intty))       ]
 
 (* list of variable names that get ignored/are not to be considered frees *)
 let ignores = [ "printi"; "printb"; "printc";
                 "+"; "-"; "*"; "/"; "mod";
-                "<"; ">"; ">="; "<=";
-                "!=i"; "=i";
-                "&&"; "||"; "not"            ]
+                "<"; ">"; ">="; "<="; "!=i"; "=i"; 
+                "&&"; "||"; "not"; "~"           ]
 
 
 (* partial cprog to return from this module *)
@@ -39,21 +37,24 @@ let res =
     structures  = emptyList
   }
 
-(* name used for anonymous lambda functions *)
-let anon = "_anon"
-let count = ref 0
 
-(* Converts a gtype to a ctype *)
-let rec ofMtype = function
-    Mtycon ty    -> Tycon (ofTycon ty)
-  | Mtyvar _     -> raise (Failure "Closure: closing on polymorphic type")
-  | Mconapp con  -> Conapp (ofConapp con)
+
+
+(* Converts a htype to a ctype *)
+let rec ofHtype = function
+    HTycon ty    -> Tycon (ofTycon ty)
+  | HConapp con  -> Conapp (ofConapp con)
 and ofTycon = function
-    MIntty        -> Intty
-  | MBoolty       -> Boolty
-  | MCharty       -> Charty
-  | MTarrow retty -> Tarrow (ofMtype retty)
-and ofConapp (tyc, tys) = (ofTycon tyc, List.map ofMtype tys)
+    HIntty        -> Intty
+  | HBoolty       -> Boolty
+  | HCharty       -> Charty
+  | HTarrow retty -> Tarrow (ofHtype retty)
+  | HCls (id, retty, argsty, freetys) -> 
+      let retty' = ofHtype retty in 
+      let argsty' = List.map ofHtype argsty in 
+      let freetys' = List.map ofHtype freetys in 
+      Clo (id ^ "_struct", funty (retty', argsty' @ freetys'), freetys')
+and ofConapp (tyc, tys) = (ofTycon tyc, List.map ofHtype tys)
 
 
 (* puts the given cdefn into the main list *)
@@ -83,30 +84,30 @@ let bind k v = res.rho <-
 let find id env =
   let occursList = StringMap.find id env in List.nth occursList 0
 
-(* Adds a local binding of k to v in the given StringMap env *)
-let bindLocal map k (t, _) =
+(* Adds a local binding of k to ctype in the given StringMap env *)
+let bindLocal map k ty =
   let currList = if isBound k map then StringMap.find k map else [] in
-  let localList = (0, ofMtype t) :: currList in
+  let localList = (0, ty) :: currList in
   StringMap.add k localList map
 
 (* Given expression an a string name n, returns true if n is
    a free variable in the expression *)
 let freeIn exp n =
   let rec free (_, e) = match e with
-    | MLiteral _        -> false
-    | MVar s            -> s = n
-    | MIf (s1, s2, s3)  -> free s1 || free s2 || free s3
-    | MApply (f, args)  -> free f  || List.fold_left
+    | HLiteral _        -> false
+    | HVar s            -> s = n
+    | HIf (s1, s2, s3)  -> free s1 || free s2 || free s3
+    | HApply (f, args)  -> free f  || List.fold_left
                              (fun a b -> a || free b)
                              false args
-    | MLet (bs, body) -> List.fold_left (fun a (_, e) -> a || free e) false bs
+    | HLet (bs, body) -> List.fold_left (fun a (_, e) -> a || free e) false bs
                          || (free body && not (List.fold_left
                                                  (fun a (x, _) -> a || x = n)
                                                  false bs))
-    | MLambda (formals, body) ->
+    | HLambda (formals, body) ->
       let (_, names) = List.split formals in
       free body && not (List.fold_left (fun a x -> a || x = n) false names)
-  in free (Mtycon MIntty, exp)
+  in free (intTy, exp)
 
 
 (* Given the formals list and body of a lambda (xs, e), and a
@@ -118,17 +119,14 @@ let improve (xs, e) rho =
     (fun n _ ->
        if List.mem n ignores
        then false
-       else freeIn (MLambda (xs, e)) n)
+       else freeIn (HLambda (xs, e)) n)
     rho
 
-(* removes any occurrance of things in no_no list from the env (StringMap)
-   and returns the new StringMap *)
-let clean no_no env =
-  StringMap.filter (fun n _ -> not (List.mem n no_no)) env
 
 (* Given a var_env, returns a (ctype  * name) list version *)
 let toParamList (venv : var_env) =
-  StringMap.fold  (fun id occursList res ->
+  StringMap.fold  
+    (fun id occursList res ->
       let (num, ty) = List.nth occursList 0 in
       let id' = if num = 0 then id
         else "_" ^ id ^ "_" ^ string_of_int num in
@@ -145,23 +143,22 @@ let convertToVars (frees : (ctype * cname) list) =
    for free variables, when given the original function type and an
    association list of gtypes and var names to add to the new formals list
    of the function type. *)
-let newFuntype  (origTyp : mtype) (newRet : ctype)
+let newFuntype  (origTyp : htype) (newRet : ctype)
     (toAdd : (ctype * cname) list) =
   (match origTyp with
-     Mconapp (MTarrow _, argstyp) ->
-     let newFormalTys = List.map ofMtype argstyp in
+     HTycon (HCls (_, _, argsty, _)) ->
+     let newFormalTys = List.map ofHtype argsty in
      let (newFreeTys, _) = List.split toAdd in
-     (* Tycon (Tarrow (newRet, newFormalTys @ newFreeTys)) *)
      funty (newRet, newFormalTys @ newFreeTys)
    | _ -> raise (Failure "Non-function function type"))
 
 
 
 (* Converts given sexpr to cexpr, and returns the cexpr *)
-let rec mexprToCexpr ((ty, e) : mexpr) (env : var_env) =
-  let rec exp ((typ, ex) : mexpr) = match ex with
-    | MLiteral v -> (ofMtype typ, CLiteral (value v))
-    | MVar s     ->
+let rec hexprToCexpr (env : var_env) (e : hexpr)  =
+  let rec expr ((typ, ex) : hexpr) = match ex with
+    | HLiteral v -> (ofHtype typ, CLiteral (value v))
+    | HVar s     ->
         (* In case s is a name of a define, get the closure type *)
         let (occurs, ctyp) = find s env in
         (* to match the renaming convention in svalToCval, and to ignore
@@ -170,14 +167,14 @@ let rec mexprToCexpr ((ty, e) : mexpr) (env : var_env) =
                       then s
                     else "_" ^ s ^ "_" ^ string_of_int occurs
         in (ctyp, CVar (vname))
-    | MIf (t1, t2, t3) ->
-        let cexp1 = exp t1
-        and cexp2 = exp t2
-        and cexp3 = exp t3 in
-        (fst cexp2, CIf (cexp1, cexp2, cexp3))
-    | MApply (f, args) ->
-        let (ctyp, f') = exp f in
-        let normalargs = List.map exp args in
+    | HIf (e1, e2, e3) ->
+        let e1' = expr e1
+        and e2' = expr e2
+        and e3' = expr e3 in
+        (fst e2', CIf (e1', e2', e3'))
+    | HApply (f, args) ->
+        let (ctyp, f') = expr f in
+        let normalargs = List.map expr args in
         (* actual type of the function application is the type of the return*)
         let (retty, freesCount) =
           (match ctyp with
@@ -187,63 +184,79 @@ let rec mexprToCexpr ((ty, e) : mexpr) (env : var_env) =
               | _ -> raise (Failure "Non-function function type"))
            | _ -> (intty, 0)) in
         (retty, CApply ((retty, f'), normalargs, freesCount))
-    | MLet (bs, body) ->
-        let local_env = (List.fold_left (fun map (x, se) ->
-            bindLocal map x se)
-            env bs) in
-        let c_bs = List.map (fun (x, e) -> (x, exp e)) bs in
-        let (ctyp, body') = mexprToCexpr body local_env in
-        (ctyp, CLet (c_bs, (ctyp, body')))
+    | HLet (bs, body) ->
+        let bs' = List.map (fun (name, hex) -> (name, expr hex)) bs in
+        let local_env = 
+            List.fold_left (fun map (name, (ty, _)) ->
+                              bindLocal map name ty)
+                           env bs' in
+        let (ctyp, body') = hexprToCexpr local_env body  in
+        (ctyp, CLet (bs', (ctyp, body')))
     (* Supose we hit a lambda expression, turn it into a closure *)
-    | MLambda (formals, body) -> create_anon_function formals body typ env
+    | HLambda (formals, body) -> create_anon_function formals body typ env
   and value = function
-    | MChar c             -> CChar c
-    | MInt  i             -> CInt  i
-    | MBool b             -> CBool b
-    | MRoot t             -> CRoot (tree t)
+    | HChar c             -> CChar c
+    | HInt  i             -> CInt  i
+    | HBool b             -> CBool b
+    | HRoot t             -> CRoot (tree t)
   and tree = function
-    | MLeaf               -> CLeaf
-    | MBranch (v, t1, t2) -> CBranch (value v, tree t1, tree t2)
-  in exp (ty, e)
+    | HLeaf               -> CLeaf
+    | HBranch (v, t1, t2) -> CBranch (value v, tree t1, tree t2)
+  in expr e
 (* When given just a lambda expresion withot a user defined identity/name
    this function will generate a name and give the function a body --
    Lambda lifting. *)
-and create_anon_function  (fformals : (mtype * string) list) (fbody : mexpr)
-    (ty : mtype) (env : var_env) =
+and create_anon_function  (fformals : (htype * hname) list) (fbody : hexpr)
+                          (closurety : htype) (env : var_env) =
+
+  
+  let fformals' = List.map (fun (hty, x) -> (ofHtype hty, x)) fformals in 
+  let local_env = List.fold_left 
+                    (fun map (formtyp, name) ->
+                      bindLocal map name formtyp)
+                    env fformals' in
+  let func_body = hexprToCexpr local_env fbody in
+  let rettype = fst func_body in 
+  let freeformals = toParamList (improve (fformals, fbody) env) in 
+
   (* All anonymous functions are named the same and numbered. *)
-  let id = anon ^ string_of_int !count in
-  let () = count := !count + 1 in
+  (* Given a h-closure type, returns the closure's id *)
+  let getClsID (cls : htype) = match cls with  
+      HTycon (HCls (id, _, _, _)) -> id  
+    | _ -> Diagnostic.error 
+           (Diagnostic.TypeError ("Conversion: Nonclosure-type accessed" 
+                                  ^ " when trying to get closure ID"))
+  in 
+  let id = getClsID closurety in 
+
   (* Create the record that represents the function body and definition *)
-  let local_env = List.fold_left (fun map (typ, x) ->
-      bindLocal map x (typ, MVar x))
-      env fformals in
-  let func_body = mexprToCexpr fbody local_env in
-  let f_def =
+  let func_def =
     {
       body    = func_body;
-      rettyp  = fst func_body;
+      rettyp  = rettype;
       fname   = id;
-      formals = List.map (fun (ty, nm) -> (ofMtype ty, nm)) fformals;
-      frees   = toParamList (improve (fformals, fbody) env);
+      formals = fformals';
+      frees   = freeformals;
     }
   in
-  let () = addFunction f_def in
+  let () = addFunction func_def in
+
   (* New function type will include the types of free arguments *)
-  let anonFunTy = newFuntype ty f_def.rettyp f_def.frees in
+  let anonFunTy = newFuntype closurety rettype freeformals in
   (* Record the type of the anonymous function and its "rea" ftype *)
   let () = bind id (1, anonFunTy) in
   (* The value of a Lambda expression is a Closure -- new type construction
      will help create the structs in codegen that represents the closure *)
-  let (freetys, _) = List.split f_def.frees in
-  let clo_ty = closurety (id ^ "_struct", anonFunTy, freetys) in
+  let (freetys, _) = List.split freeformals in
+  let clo_ty = closuretype (id ^ "_struct", anonFunTy, freetys) in
   let () = addClosure clo_ty in
-  let freeVars = convertToVars f_def.frees in
+  let freeVars = convertToVars freeformals in
   (clo_ty, CLambda (id, freeVars))
 
 
 
 (* Converts given SVal to CVal, and returns the CVal *)
-let mvalToCval (id, (ty, e)) =
+let hvalToCval (id, (ty, e)) =
   (* check if id was already defined in rho, in order to get
      the actual frequency the variable name was defined.
      The (0, inttype is a placeholder) *)
@@ -253,7 +266,7 @@ let mvalToCval (id, (ty, e)) =
   (* Modify the name to account for the redefinitions, and so old closures
      can access original variable values *)
   let id' = "_" ^ id ^ "_" ^ string_of_int (occurs + 1) in
-  let (ty', cexp) = mexprToCexpr (ty, e) res.rho in
+  let (ty', cexp) = hexprToCexpr res.rho (ty, e) in
   (* bind original name to the number of occurrances and the variable's type *)
   let () = bind id (occurs + 1, ty') in
   (* Return the possibly new CVal definition *)
@@ -262,19 +275,19 @@ let mvalToCval (id, (ty, e)) =
 
 
 
-(* Given an sprog (which is an sdefn list), convert returns a
+(* Given an hprog (which is an hdefn list), convert returns a
    cprog version. *)
-let conversion mdefns =
+let conversion hdefns =
   (* With a given sdefn, function converts it to the appropriate CAST type
      and sorts it to the appropriate list in a cprog type. *)
   let convert = function
-    | MVal (id, (ty, mexp)) ->
-        let cval = mvalToCval (id, (ty, mexp)) in addMain cval
-    | MExpr e ->
-        let cexp = mexprToCexpr e res.rho in addMain (CExpr cexp)
+    | HVal (id, (ty, hexp)) ->
+        let cval = hvalToCval (id, (ty, hexp)) in addMain cval
+    | HExpr e ->
+        let cexp = hexprToCexpr res.rho e in addMain (CExpr cexp)
   in
 
-  let _ = List.iter convert mdefns in
+  let _ = List.iter convert hdefns in
   {
     main       = List.rev res.main;
     functions  = res.functions;
