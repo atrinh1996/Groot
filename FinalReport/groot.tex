@@ -708,9 +708,9 @@ The following tree-related keywords are still recognized, but their uses are uni
 \cbcolor{dkgreen}
 \cbstart
 \begin{lstlisting}
-(let x 4 
-    (let y 5 
-        (let z 9 
+(let ([x 4])
+    (let ([y 5]) 
+        (let ([z 9]) 
             (+ x (- y z)))))
 \end{lstlisting}
 \cbend
@@ -769,411 +769,437 @@ The following tree-related keywords are still recognized, but their uses are uni
     \label{sec:func}
 
         \subsubsection{Built-In Functions}
-        \textbf{Note}: Throughout this section, the character pair \texttt{tr} is used as shorthand to represent a tree value, an identifier bound to a tree value.
+        Along with the primitive operators mentioned previously, this language has three built-int print functions:
+          \begin{itemize}
+            \item[--] \texttt{printi}
+            
+            Usage: \texttt{(printi 42)}
 
-        There are four built-in functions which are integral to the tree data type. It is a checked-runtime error to call \texttt{elm, sib, cld} on a \texttt{leaf}:
-        \begin{enumerate}
-            \item \texttt{elm}
+            Purpose: sends the string of an integer to standard out. 
 
-            Usage: \texttt{(elm tr)}
+            \item[--] \texttt{printc}
+            
+            Usage: \texttt{(printi 'c')}
 
-            Purpose: returns the element of the provided tree value \texttt{(tr)}
+            Purpose: sends the string of an character to standard out. 
 
-            \item \texttt{sib}
+            \item[--] \texttt{printb}
+            
+            Usage: \texttt{(printi \#t)}
 
-            Usage: \texttt{(sib tr)}
+            Purpose: sends the string of an boolean to standard out. 
 
-            Purpose: returns the sibling tree of the provided tree value \texttt{(tr)}
+          \end{itemize}
 
-            \item \texttt{cld}
+        \subsubsection{Higher-Order Functions}
+        User-defined functions may be passed as arguments to other functions, and may be returned from functions. Passing around built-in functions as such is not supported. 
 
-            Usage: \texttt{(cld tr)}
 
-            Purpose: returns the child tree of the provided tree value \texttt{(tr)}
+        % \textbf{Note}: Throughout this section, the character pair \texttt{tr} is used as shorthand to represent a tree value, an identifier bound to a tree value.
 
-            \item \texttt{leaf?}
-            
-            Usage: \texttt{(leaf? tr)}
+        % There are four built-in functions which are integral to the tree data type. It is a checked-runtime error to call \texttt{elm, sib, cld} on a \texttt{leaf}:
+        % \begin{enumerate}
+        %     \item \texttt{elm}
 
-            Purpose: Returns boolean val \texttt{\#t} iff \texttt{tr} is a leaf.
+        %     Usage: \texttt{(elm tr)}
 
-            \item \texttt{tree}
+        %     Purpose: returns the element of the provided tree value \texttt{(tr)}
 
-            Usage: \texttt{(tree ELEMENT SIBLING CHILD)}
+        %     \item \texttt{sib}
 
-            Purpose: constructs a tree value containing the value ELEMENT, with sibling SIBLING and child CHILD
-        \end{enumerate}
+        %     Usage: \texttt{(sib tr)}
 
-        \subsubsection{Standard Library Functions}
-        \textbf{Note}: Throughout this section, the character pair \texttt{tr} is used as shorthand to represent a tree value, an identifier bound to a tree value.
+        %     Purpose: returns the sibling tree of the provided tree value \texttt{(tr)}
 
-        The first set of functions introduced in the standard library allow for programmers to use some of their beloved list functions present in other languages:
-        \begin{enumerate}
-            \item \texttt{(cons a b)}
-            
-            Creates a 1-ary tree approximating the functionality of single-dimensional list in other functional languages. \texttt{a} is any value not a tree, \texttt{b} may be \texttt{leaf} or \texttt{nil}.
+        %     \item \texttt{cld}
 
-            \item \texttt{(car tr)}
-            
-            Extracts the first value in the pair.
+        %     Usage: \texttt{(cld tr)}
 
-            \item \texttt{(cdr tr)}
-            
-            Extracts the second value in the pair.
+        %     Purpose: returns the child tree of the provided tree value \texttt{(tr)}
 
-            \item \texttt{(null? tr)}
+        %     \item \texttt{leaf?}
             
-            A predicate function that evaluates to true iff the pseudo-list is empty.
+        %     Usage: \texttt{(leaf? tr)}
 
-            \item \texttt{(val nil leaf)}
-            
-            A value \texttt{nil} that mirrors the built-in keyword leaf.
+        %     Purpose: Returns boolean val \texttt{\#t} iff \texttt{tr} is a leaf.
 
-            \item \texttt{(append xs ys)}
-            
-            Append the list of elements in \texttt{ys} to the end of \texttt{xs}.
+        %     \item \texttt{tree}
 
-            \item \texttt{(revapp xs ys)}
+        %     Usage: \texttt{(tree ELEMENT SIBLING CHILD)}
+
+        %     Purpose: constructs a tree value containing the value ELEMENT, with sibling SIBLING and child CHILD
+        % \end{enumerate}
+
+        % \subsubsection{Standard Library Functions}
+        % \textbf{Note}: Throughout this section, the character pair \texttt{tr} is used as shorthand to represent a tree value, an identifier bound to a tree value.
+
+        % The first set of functions introduced in the standard library allow for programmers to use some of their beloved list functions present in other languages:
+        % \begin{enumerate}
+        %     \item \texttt{(cons a b)}
             
-            Append the list of elements in \texttt{ys} to the reverse of \texttt{xs}.
+        %     Creates a 1-ary tree approximating the functionality of single-dimensional list in other functional languages. \texttt{a} is any value not a tree, \texttt{b} may be \texttt{leaf} or \texttt{nil}.
+
+        %     \item \texttt{(car tr)}
+            
+        %     Extracts the first value in the pair.
+
+        %     \item \texttt{(cdr tr)}
+            
+        %     Extracts the second value in the pair.
+
+        %     \item \texttt{(null? tr)}
+            
+        %     A predicate function that evaluates to true iff the pseudo-list is empty.
+
+        %     \item \texttt{(val nil leaf)}
+            
+        %     A value \texttt{nil} that mirrors the built-in keyword leaf.
+
+        %     \item \texttt{(append xs ys)}
+            
+        %     Append the list of elements in \texttt{ys} to the end of \texttt{xs}.
+
+        %     \item \texttt{(revapp xs ys)}
+            
+        %     Append the list of elements in \texttt{ys} to the reverse of \texttt{xs}.
 
             
-        \end{enumerate}
+        % \end{enumerate}
 
-        Now some useful tree functions!
-        \begin{enumerate}
-            \item \texttt{(graft oak fir)}
+        % Now some useful tree functions!
+        % \begin{enumerate}
+        %     \item \texttt{(graft oak fir)}
             
-            Appends a sibling tree \texttt{fir} to some other tree \texttt{oak}. The result of calling this function is a new tree in which \texttt{fir} is the rightmost sibling of \texttt{oak}. This function is extremely useful when re-shaping trees.
+        %     Appends a sibling tree \texttt{fir} to some other tree \texttt{oak}. The result of calling this function is a new tree in which \texttt{fir} is the rightmost sibling of \texttt{oak}. This function is extremely useful when re-shaping trees.
 
-            \item \texttt{(level-flatten tr)} 
+        %     \item \texttt{(level-flatten tr)} 
             
-            Flattens the provided tree to a 1-ary tree, arranging elements in level-order.
+        %     Flattens the provided tree to a 1-ary tree, arranging elements in level-order.
 
-            \item \texttt{(pre-flatten tr)}
+        %     \item \texttt{(pre-flatten tr)}
             
-            Flattens the provided tree to a 1-ary tree, arranging elements in pre-order.
+        %     Flattens the provided tree to a 1-ary tree, arranging elements in pre-order.
             
-            \item \texttt{(post-flatten tr)}
+        %     \item \texttt{(post-flatten tr)}
             
-            Flattens the provided tree to a 1-ary tree, arranging elements in post-order.
+        %     Flattens the provided tree to a 1-ary tree, arranging elements in post-order.
             
-            \item \texttt{(map f tr)}
-            Maps a function \texttt{f} over every element of the provided tree \texttt{tr}.
+        %     \item \texttt{(map f tr)}
+        %     Maps a function \texttt{f} over every element of the provided tree \texttt{tr}.
             
-            \item \texttt{(filter p? tr)}
+        %     \item \texttt{(filter p? tr)}
             
-            Constructs a new tree containing only elements that satisfy the predicate function \texttt{p?}, which must return a boolean value.
+        %     Constructs a new tree containing only elements that satisfy the predicate function \texttt{p?}, which must return a boolean value.
             
-            \item \texttt{(level-fold fn base tr)}
+        %     \item \texttt{(level-fold fn base tr)}
             
-            Folds a tree, visiting each element in a level-order traversal. Note that the accumulation function \texttt{fn} must take TWO arguments, the first of which is the current element, and second is the rest of the tree.
+        %     Folds a tree, visiting each element in a level-order traversal. Note that the accumulation function \texttt{fn} must take TWO arguments, the first of which is the current element, and second is the rest of the tree.
             
-            \item \texttt{(pre-fold fn base tr)}
+        %     \item \texttt{(pre-fold fn base tr)}
             
-            Folds a tree, visiting each element in a pre-order traversal. Note that the accumulation function \texttt{fn} must take TWO arguments, the first of which is the current element, and second is the rest of the tree.
+        %     Folds a tree, visiting each element in a pre-order traversal. Note that the accumulation function \texttt{fn} must take TWO arguments, the first of which is the current element, and second is the rest of the tree.
 
-            \item \texttt{(post-fold fn base tr)}
+        %     \item \texttt{(post-fold fn base tr)}
             
-            Folds a tree, visiting each element in a post-order traversal. Note that the accumulation function \texttt{fn} must take TWO arguments, the first of which is the current element, and second is the rest of the tree.
+        %     Folds a tree, visiting each element in a post-order traversal. Note that the accumulation function \texttt{fn} must take TWO arguments, the first of which is the current element, and second is the rest of the tree.
             
-            \item \texttt{(fold fn base tr)}
+        %     \item \texttt{(fold fn base tr)}
             
-            Folds a tree, in a more intuitively tree-like manner. Note that the accumulation function \texttt{fn} must take THREE arguments: the value of the current node, the sibling accumulator, and the child.accumulator.
+        %     Folds a tree, in a more intuitively tree-like manner. Note that the accumulation function \texttt{fn} must take THREE arguments: the value of the current node, the sibling accumulator, and the child.accumulator.
             
-            \item \texttt{(node-count tr)}
+        %     \item \texttt{(node-count tr)}
             
-            Evaluates to the number of nodes in the provided tree.
+        %     Evaluates to the number of nodes in the provided tree.
             
-            \item \texttt{(height tr)}
+        %     \item \texttt{(height tr)}
             
-            Evaluates to the height of the provided tree.
+        %     Evaluates to the height of the provided tree.
 
-        \end{enumerate}
+        % \end{enumerate}
 
-        Higher-Order Functions:
-        \begin{enumerate}
-            \item \texttt{(curry f)}
+        % Higher-Order Functions:
+        % \begin{enumerate}
+        %     \item \texttt{(curry f)}
             
-            Allows for the partial application of a two-argument function.
+        %     Allows for the partial application of a two-argument function.
             
-            \item \texttt{(uncurry f)}
+        %     \item \texttt{(uncurry f)}
             
-            Uncurries a previously curried function such that both of its arguments must be provided at the same time.
+        %     Uncurries a previously curried function such that both of its arguments must be provided at the same time.
             
-            \item \texttt{(o f g)}
+        %     \item \texttt{(o f g)}
             
-            Given two single-argument functions, returns a single function which is the composition of \texttt{f} and \texttt{g}.
+        %     Given two single-argument functions, returns a single function which is the composition of \texttt{f} and \texttt{g}.
             
-            \item \texttt{(flip f)}
+        %     \item \texttt{(flip f)}
             
-            Given a two argument function, reverses the order in which the arguments are evaluated and passed to the function.
+        %     Given a two argument function, reverses the order in which the arguments are evaluated and passed to the function.
             
-            \item \texttt{(flurry f)}
+        %     \item \texttt{(flurry f)}
             
-            Given a two argument function, reverses the order in which the arguments are evaluated and passed to the function, and allows for the partial application of that function. This function both flips and curries \texttt{f} (hence the fun name).
+        %     Given a two argument function, reverses the order in which the arguments are evaluated and passed to the function, and allows for the partial application of that function. This function both flips and curries \texttt{f} (hence the fun name).
 
-        \end{enumerate}
+        % \end{enumerate}
 
     \pagebreak
     %% End of Functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \subsection{LRM Appendix}
-    \label{sec:lrmapp}
+%     \subsection{LRM Appendix}
+%     \label{sec:lrmapp}
 
-\cbcolor{dkgreen}
-\cbstart
-\begin{lstlisting}
-(; We can define standard list functions with our tree data type! Fun! ;)
+% \cbcolor{dkgreen}
+% \cbstart
+% \begin{lstlisting}
+% (; We can define standard list functions with our tree data type! Fun! ;)
 
-(define (cons a b) (tree a leaf (tree b leaf leaf)))
-(define (car   tr) (elm tr))
-(define (cdr   tr) (cld tr))
-(define (nil     ) leaf)
-(define (null? tr) (leaf? tree))
+% (define (cons a b) (tree a leaf (tree b leaf leaf)))
+% (define (car   tr) (elm tr))
+% (define (cdr   tr) (cld tr))
+% (define (nil     ) leaf)
+% (define (null? tr) (leaf? tree))
    
-(; a list function! ;)
-(define append (xs ys)
-    (if (null? xs)
-        ys
-        (cons (car xs) (append (cdr xs) ys))
-    )
-)
+% (; a list function! ;)
+% (define append (xs ys)
+%     (if (null? xs)
+%         ys
+%         (cons (car xs) (append (cdr xs) ys))
+%     )
+% )
    
-(; another list function! ;)
-(define revapp (xs ys) ; (reverse xs) followed by ys
-    (if (null? xs)
-        ys
-        (revapp (cdr xs) (cons (car xs) ys))
-    )
-)
+% (; another list function! ;)
+% (define revapp (xs ys) ; (reverse xs) followed by ys
+%     (if (null? xs)
+%         ys
+%         (revapp (cdr xs) (cons (car xs) ys))
+%     )
+% )
    
-(; appends a sibling tree (fir) to tree (oak) ;)
-(define (graft oak fir)
-    (if (leaf? oak)
-        fir
-        (tree (elm oak) (graft (sib oak) fir) (cld oak))
-    )
-)
+% (; appends a sibling tree (fir) to tree (oak) ;)
+% (define (graft oak fir)
+%     (if (leaf? oak)
+%         fir
+%         (tree (elm oak) (graft (sib oak) fir) (cld oak))
+%     )
+% )
    
-(; attempt 4 
-   this function flattens a tree, level-order ;)
-(define (level-flatten tr)
-    (if (leaf? tr)
-        leaf
-        (tree
-            (elm tr)
-            leaf
-            (level-flatten (graft (sib tr) (cld tr)))
-        )
-    )
-)
-\end{lstlisting}
-\cbend
+% (; attempt 4 
+%    this function flattens a tree, level-order ;)
+% (define (level-flatten tr)
+%     (if (leaf? tr)
+%         leaf
+%         (tree
+%             (elm tr)
+%             leaf
+%             (level-flatten (graft (sib tr) (cld tr)))
+%         )
+%     )
+% )
+% \end{lstlisting}
+% \cbend
 
 
 
-flattening functions!
+% flattening functions!
 
-\cbcolor{dkgreen}
-\cbstart
-\begin{lstlisting}
-(; this function flattens a tree, pre-order ;)
-(define (pre-flatten tr)
-    (if (leaf? tr)
-        leaf
-        (tree
-            (elm tr)
-            leaf
-            (pre-flatten (graft (cld tr) (sib tr)))
-        )
-    )
-)
+% \cbcolor{dkgreen}
+% \cbstart
+% \begin{lstlisting}
+% (; this function flattens a tree, pre-order ;)
+% (define (pre-flatten tr)
+%     (if (leaf? tr)
+%         leaf
+%         (tree
+%             (elm tr)
+%             leaf
+%             (pre-flatten (graft (cld tr) (sib tr)))
+%         )
+%     )
+% )
    
    
-(; this function flattens a tree, post-order ;)
-(define (post-flatten tr)
-    (if (leaf? tr)
-        leaf
-        (if (leaf? (cld tr))
-            (tree
-                (elm tr)
-                leaf
-                (post-flatten (sib tr)))
-            (post-flatten (graft
-                                (graft
-                                    (cld tr)
-                                    (tree (elm tr) leaf leaf))
-                                (sib tr))
-            )
-        )
-    )
-)
-\end{lstlisting}
-\cbend
+% (; this function flattens a tree, post-order ;)
+% (define (post-flatten tr)
+%     (if (leaf? tr)
+%         leaf
+%         (if (leaf? (cld tr))
+%             (tree
+%                 (elm tr)
+%                 leaf
+%                 (post-flatten (sib tr)))
+%             (post-flatten (graft
+%                                 (graft
+%                                     (cld tr)
+%                                     (tree (elm tr) leaf leaf))
+%                                 (sib tr))
+%             )
+%         )
+%     )
+% )
+% \end{lstlisting}
+% \cbend
 
 
-Let's create some higher order functions! Yay!
+% Let's create some higher order functions! Yay!
 
-\cbcolor{dkgreen}
-\cbstart
-\begin{lstlisting}
-(define (curry   f)   (lambda (x)   (lambda (y) (f x y))))
-(define (uncurry f)   (lambda (x y) ((f x) y)))
-(define (o       f g) (lambda (x)   (f (g x))))
-(define (flip    f)   (lambda (x)   (lambda (y) (f y x))))
-
-
-\end{lstlisting}
-\cbend
+% \cbcolor{dkgreen}
+% \cbstart
+% \begin{lstlisting}
+% (define (curry   f)   (lambda (x)   (lambda (y) (f x y))))
+% (define (uncurry f)   (lambda (x y) ((f x) y)))
+% (define (o       f g) (lambda (x)   (f (g x))))
+% (define (flip    f)   (lambda (x)   (lambda (y) (f y x))))
 
 
+% \end{lstlisting}
+% \cbend
 
-function: (flurry func)
-\begin{itemize}
-    \item precondition:
+
+
+% function: (flurry func)
+% \begin{itemize}
+%     \item precondition:
     
-    func is a function that takes exactly two args
+%     func is a function that takes exactly two args
 
-    \item evalutation: 
+%     \item evalutation: 
     
-    evaluates to a curried form of func, where:
-        \begin{enumerate}
-            \item the first value passed to the curried function is treated as the second argument to (func).
-            \item the second value passed to the curried function is treated as the first argument to (func).
-        \end{enumerate}
+%     evaluates to a curried form of func, where:
+%         \begin{enumerate}
+%             \item the first value passed to the curried function is treated as the second argument to (func).
+%             \item the second value passed to the curried function is treated as the first argument to (func).
+%         \end{enumerate}
 
-    \item note: flurry is a contraction of ``flip \& curry'', and we're very proud of the wordplay there.
-\end{itemize}
-
-
-\cbcolor{dkgreen}
-\cbstart
-\begin{lstlisting}
-(define flurry (func)
-    (curry (lambda (a b) (func b a)))
-)
+%     \item note: flurry is a contraction of ``flip \& curry'', and we're very proud of the wordplay there.
+% \end{itemize}
 
 
-(; mapping function! ;)
-(define (map f tr)
-    (if (leaf? tr)
-        leaf
-        (tree
-            (f (elm tr))
-            (map f (sib tr))
-            (map f (cld tr))
-        )
-    )
-)
+% \cbcolor{dkgreen}
+% \cbstart
+% \begin{lstlisting}
+% (define flurry (func)
+%     (curry (lambda (a b) (func b a)))
+% )
+
+
+% (; mapping function! ;)
+% (define (map f tr)
+%     (if (leaf? tr)
+%         leaf
+%         (tree
+%             (f (elm tr))
+%             (map f (sib tr))
+%             (map f (cld tr))
+%         )
+%     )
+% )
    
 
-(; filter function! ;) 
-(define filter (p? tr)
-    (if (leaf? tr)
-        leaf
-        (if (p? (elm tr))
-            (tree (elm tr) (filter p? (sib tr)) (filter p? (cld tr)))
-            (filter p? (graft (cld tr) (sib tr)))
-        )
-    )
-)
+% (; filter function! ;) 
+% (define filter (p? tr)
+%     (if (leaf? tr)
+%         leaf
+%         (if (p? (elm tr))
+%             (tree (elm tr) (filter p? (sib tr)) (filter p? (cld tr)))
+%             (filter p? (graft (cld tr) (sib tr)))
+%         )
+%     )
+% )
    
-   
-   
-
-(; folding functions! ;) 
-
-(; attempt 4 
-   this function folds a tree, level-order ;) 
-(define (level-fold fn base tr)
-    (if (leaf? tr)
-        base
-        (fn
-            (elm tr)
-            (level-fold (graft (sib tr) (cld tr)))
-        )
-    )
-)
-   
-(; this function folds a tree, pre-order ;) 
-(define (pre-fold fn base tr)
-    (if (leaf? tr)
-        base
-        (fn
-            (elm tr)
-            (pre-fold (graft (cld tr) (sib tr)))
-        )
-    )
-)
-   
-(; this function folds a tree, post-order ;) 
-(define (post-fold fn base tr)
-    (if (leaf? tr)
-        base
-        (if (leaf? (cld tr))
-            (fn (elm tr) (post-fold (sib tr)))
-            (post-fold (graft
-                            (graft (cld tr) (tree (elm tr) leaf leaf))
-                                (sib tr)
-                        )
-            )
-        )
-    )
-)
-   
-(; once we implement first-class functions, we 
-   should find that the behaviors of these three
-   functions are exactly equivalent to their
-   lower-class cousins ;) 
-(define (level-fold-flatten tr) (level-fold cons nil tr))
-(define (pre-fold-flatten   tr) (pre-fold   cons nil tr))
-(define (post-fold-flatten  tr) (post-fold  cons nil tr))
-
-(; this function folds a tree, in a more intuitively 
-   tree-like manner
-   fn must take in three params: 
-   - the current value   
-   - the sibling accumulator
-   - the child accumulator ;)     
-(define (fold fn base tr)
-    (if (leaf? tr)
-        base
-        (fn
-            (elm tr)
-            (fold fn base (sib tr))
-            (fold fn base (cld tr))
-        )
-    )
-)
    
    
 
-(; some more fun folding functions! ;) 
-(define (node-count tr)
-    (pre-fold (lambda (elem count) (+ 1 count)) 0 tr)
-)
-   
-(; this uses the tree fold to calculate the height! ;) 
-(define (height tr)
-    (fold
-        (lambda (elem clds sibs) (+ 1 (max clds sibs)))
-        0 tr
-    )
-)
+% (; folding functions! ;) 
 
-(define (height-no-fold tr)
-    (if (leaf? tr)
-        0
-        (max (height (sib tr)) 
-            (+ 1 (height (cld tr)))
-        )
-    )
-)
-\end{lstlisting}
-\cbend
+% (; attempt 4 
+%    this function folds a tree, level-order ;) 
+% (define (level-fold fn base tr)
+%     (if (leaf? tr)
+%         base
+%         (fn
+%             (elm tr)
+%             (level-fold (graft (sib tr) (cld tr)))
+%         )
+%     )
+% )
+   
+% (; this function folds a tree, pre-order ;) 
+% (define (pre-fold fn base tr)
+%     (if (leaf? tr)
+%         base
+%         (fn
+%             (elm tr)
+%             (pre-fold (graft (cld tr) (sib tr)))
+%         )
+%     )
+% )
+   
+% (; this function folds a tree, post-order ;) 
+% (define (post-fold fn base tr)
+%     (if (leaf? tr)
+%         base
+%         (if (leaf? (cld tr))
+%             (fn (elm tr) (post-fold (sib tr)))
+%             (post-fold (graft
+%                             (graft (cld tr) (tree (elm tr) leaf leaf))
+%                                 (sib tr)
+%                         )
+%             )
+%         )
+%     )
+% )
+   
+% (; once we implement first-class functions, we 
+%    should find that the behaviors of these three
+%    functions are exactly equivalent to their
+%    lower-class cousins ;) 
+% (define (level-fold-flatten tr) (level-fold cons nil tr))
+% (define (pre-fold-flatten   tr) (pre-fold   cons nil tr))
+% (define (post-fold-flatten  tr) (post-fold  cons nil tr))
+
+% (; this function folds a tree, in a more intuitively 
+%    tree-like manner
+%    fn must take in three params: 
+%    - the current value   
+%    - the sibling accumulator
+%    - the child accumulator ;)     
+% (define (fold fn base tr)
+%     (if (leaf? tr)
+%         base
+%         (fn
+%             (elm tr)
+%             (fold fn base (sib tr))
+%             (fold fn base (cld tr))
+%         )
+%     )
+% )
+   
+   
+
+% (; some more fun folding functions! ;) 
+% (define (node-count tr)
+%     (pre-fold (lambda (elem count) (+ 1 count)) 0 tr)
+% )
+   
+% (; this uses the tree fold to calculate the height! ;) 
+% (define (height tr)
+%     (fold
+%         (lambda (elem clds sibs) (+ 1 (max clds sibs)))
+%         0 tr
+%     )
+% )
+
+% (define (height-no-fold tr)
+%     (if (leaf? tr)
+%         0
+%         (max (height (sib tr)) 
+%             (+ 1 (height (cld tr)))
+%         )
+%     )
+% )
+% \end{lstlisting}
+% \cbend
 
     % \pagebreak
     %% End of LRM Appendix %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1367,11 +1393,79 @@ function: (flurry func)
 \section{Architectural Design}
 \label{sec:DESIGN}
 
-    \begin{figure}[h]
-        \centering
-        \fbox{\includegraphics[width=1.1\linewidth]{images/phases.png}}
-    \end{figure}
-    
+  \begin{figure}[h]
+      \centering
+      \fbox{\includegraphics[width=1.1\linewidth]{images/phases.png}}
+  \end{figure}
+  
+
+  \subsection{Scanner/Parser}
+    \begin{itemize}
+      \item Given the groot source code, the Scanner/Parser scans and tokenizes sequences of characters to build the basic abstract syntax tree of the program. 
+      \item \emph{Authored by the whole group. Final syntax incorporated into Scanner/Parser done by Zach.}
+    \end{itemize}
+
+  \subsection{Scope Checker}
+    \begin{itemize}
+      \item This module performs a partial semantic check on a given abstract syntax tree, in which any variable name used has been bound and is used in the scope that it is allowed. The module reports an unbound variable, if any; otherwise, the same abstract syntax tree it receives is outputted. 
+      \item \emph{Authored by Amy, with help incorporating primitives from Eliza.}
+    \end{itemize}
+
+  \subsection{Type Inferencer}
+      \begin{itemize}
+        \item The type inference takes an abstract syntax tree, and assumes all named variables are bound to some value. (g)ROOT is implicitly typed, so this module detects the types of all expressions and definitions. We follow the Hindley-Milner type system method in order to infer types. Using the types already given by primitives and literals, the inferencer generates constraints and then solves those constraints in order to deduce the type of the current definition it is inferring; those constraints are then used to infer the type of the rest of the program. The type inferencer will throw an error if it catches any type errors, such as type mismatches in function application of arguments. The module allows for polymorphism, so a definition may be typed to a type variable; however, to make resolving polymorphic types easier, this module also disallows nested lambdas. The inferencer outputs the final typed abstract syntax tree, or TAST.
+        \item \emph{Authored by Sam and Nik, with help from Mert. Primitives were incorporated by Eliza.}
+      \end{itemize}
+
+  \subsection{Monomorphization}
+    \begin{itemize}
+      \item This module takes a typed abstract syntax tree, which may or may not have any type variables, and monomorphizes it, getting rid of any polymorphism such that the tree has concrete types for everything. This is accomplished by tagging expressions that are polymorphic, finding where they are used (application), and using the types of the arguments it is used with to match type variables to concrete types; a mono-typed definition of the original polymorphic variable is then inserted into the program for that specific use case. The module outputs a monomorphic-typed abstract syntax tree. 
+      \item Bug: The algorithm we implemented for this resolves polymorphic types for non-nested lambda definitions, but cannot resolve them for nested lambdas which involves partial function application in order to get concrete types for each type variables. We concluded additional passes to resolve polymorphic types was required, but ran out of time for this. So, to ensure no type variables leak through to subsequent phases, Mono does one additional pass through the program, re-typing any leftover type variables to our int type. It is a recognized bug, so nested lambdas may result in undefined behavior or llc will raise an error regarding any type mismatches. 
+      \item \emph{Authored by Amy.}
+    \end{itemize}
+
+  \subsection{Closure Conversion I (Hof)}
+    \begin{itemize}
+      \item Conversion I (or Hof) takes a monomorphic-typed abstract syntax tree, and creates partial closures for every lambda expression by re-typing every lambda expression from a function type to a new abstract type we called a closure type. Conversion I's closure types will carry a unique name to associate with the lambda expression (generated in the module), the original lambda's return type, the list of the formal types, AND a list of the types of the free variables. This is considered ``partial'' because no closure thus far is closed with the values or a reference to the values of the free variables. 
+      
+      Re-typing in this module helps subsequent modules deal with higher-order functions more easily, because Conversion I finds uses of a Hof, and re-types the function type to the appropriate closure type in function application 
+      
+      This module returns a h-abstract syntax tree. As indicated by the name, this intermediate phase makes handling higher-order functions easier in the next module.
+       
+      \item \emph{Authored by Amy.}
+    \end{itemize}
+
+  \subsection{Closure Conversion II (Conversion)}
+    \begin{itemize}
+      \item Conversion II takes a h-abstract syntax tree, and finishes creating closures for every lambda expression. The new closure type in this module now caries the unique name previously described in Conversion I appended with a string to indicate it is referring t othe type of the lambda, the lambda's function type augmented to include the types of the free variables appended to the list of the formal types, and a separate list of just the types of the free variables, if any. A closed lambda expression itself caries the original unique name, which will link it to its function definition later, and a list of the free variables converted into typed variable expressions. The closed lambda no longer carries the expression representing the body of the lambda, because this module creates a record type that represents a function defintion for the lambda, which does carry the lambda's body expression and has a function name that matches the name of the lambda. These function definitions are set aside in a separate list to be passed to the next phase. Also being passed to the next phase is a list of all closure types created. 
+      
+      The other significant task this module has is to track the number of times a named variable is redefined; this allows closures to use the original value of the free variable it was closed with even after that variable gets redefined elsewhere. 
+
+      The final output of this module is a struct containing the closed abstract syntax tree, list of function definitions, list of closure types generated during this phase, and a map of names to a list of their occurrences and types.
+
+      \item \emph{Authored by Amy, with help from Mert, and with help incorporating primitives from Eliza.}
+    \end{itemize}
+
+  \subsection{Code Generation}
+    \begin{itemize}
+      \item Code generation produces the llvm instruction for each definition and expression in the program. Each kind of definition and expression produce a particular pattern of llvm instructions. Given the information described in Closure Conversion II, code generation has four major steps to accomplish this: 
+      \begin{enumerate}
+        \item Every ``closure type'' mentioned previously gets declared a named struct type in the llvm (using the available function type and free variable types); they all have the following common structure: 
+      
+        \texttt{\big\{   fptr* ;}  \{ \texttt{typ ;} \}   \texttt{\big\} }
+
+        Where the first struct member is always a pointer to the function created as a lambda's function definition, and all subsequent member(s), if any, are where the values of free variables will get stored.
+
+        \item Every named variable (including versions of it, should it have been defined multiple times) is globally defined and initialized to zero or nullptr depending on whether or not it is a function type, struct type, or some constant. When global variables are referred to in the program, it is either to assign them a value or use them. Because all definitons are evaluated in order in a main function (discussed next), no variable is used before a value is stored in them in the llvm.
+
+        \item Every definition/expression in the closed ast gets turned into llvm instructions and put in a “main” function body. This allows us to mimic sequential execution. 
+        
+        \item Every ``function definition'' mentioned previously is declared and defined by generating llvm instruction for the body's expression.
+
+      \end{enumerate}
+  
+      \item \emph{Authored by Amy and Eliza.}
+    \end{itemize}
 
 \pagebreak
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -3504,9 +3598,11 @@ function: (flurry func)
 % (* Closure conversion for groot compiler *)
 % open Hast
 % open Cast
+
 % module StringMap = Map.Make(String)
 
 % (***********************************************************************)
+
 % (* Pre-load rho with prints built in *)
 % let prerho env =
 %   let add_prints map (k, v) =
@@ -3524,9 +3620,9 @@ function: (flurry func)
 
 % (* list of variable names that get ignored/are not to be considered frees *)
 % let ignores = [ "printi"; "printb"; "printc";
-%                   "+"; "-"; "*"; "/"; "mod";
-%                   "<"; ">"; ">="; "<="; "!=i"; "=i"; 
-%                   "&&"; "||"; "not"; "~"           ]
+%                 "+"; "-"; "*"; "/"; "mod";
+%                 "<"; ">"; ">="; "<="; "!=i"; "=i"; 
+%                 "&&"; "||"; "not"; "~"           ]
 
 
 % (* partial cprog to return from this module *)
@@ -3537,6 +3633,8 @@ function: (flurry func)
 %     rho         = prerho emptyEnv;
 %     structures  = emptyList
 %   }
+
+
 
 
 % (* Converts a htype to a ctype *)
@@ -3682,7 +3780,7 @@ function: (flurry func)
 %                 Conapp (Tarrow ret, _) -> (ret, List.length freetys)
 %               | _ -> raise (Failure "Non-function function type"))
 %             | _ -> (intty, 0)) in
-%         (retty, CApply ((retty, f'), normalargs, freesCount))
+%         (retty, CApply ((ctyp, f'), normalargs, freesCount))
 %     | HLet (bs, body) ->
 %         let bs' = List.map (fun (name, hex) -> (name, expr hex)) bs in
 %         let local_env = 
@@ -3773,6 +3871,7 @@ function: (flurry func)
 % (***********************************************************************)
 
 
+
 % (* Given an hprog (which is an hdefn list), convert returns a
 %     cprog version. *)
 % let conversion hdefns =
@@ -3784,13 +3883,14 @@ function: (flurry func)
 %     | HExpr e ->
 %         let cexp = hexprToCexpr res.rho e in addMain (CExpr cexp)
 %   in
+
 %   let _ = List.iter convert hdefns in
 %   {
 %     main       = List.rev res.main;
 %     functions  = res.functions;
 %     rho        = res.rho;
 %     structures = res.structures
-%   }  
+%   }
 % \end{lstlisting}
 %     \pagebreak
 
@@ -3808,9 +3908,9 @@ function: (flurry func)
 
 % (* Add types to the context to use in the LLVM code *)
 % let int_ty      = L.i32_type  context
-% let char_ty       = L.i8_type   context
+% let char_ty     = L.i8_type   context
 % let char_ptr_ty = L.pointer_type char_ty
-% let bool_ty       = L.i1_type   context
+% let bool_ty     = L.i1_type   context
 % let string_ty   = L.struct_type context [| L.pointer_type char_ty |]
 % let zero = L.const_int int_ty 0
 % (* REMOVE VOID later *)
@@ -3846,6 +3946,7 @@ function: (flurry func)
 %     the CAST. Throws exception if something is wrong. *)
 % let translate { main = main;  functions = functions;
 %                 rho = rho;    structures = structures } =
+
 
 %   (* Convert Cast.ctype types to LLVM types *)
 %   let ltype_of_type (struct_table : L.lltype StringMap.t) (ty : ctype) =
@@ -3956,7 +4057,7 @@ function: (flurry func)
 %     and const_tycon = function
 %         Intty            -> L.const_int  lltyp 0
 %       | Boolty           -> L.const_int  lltyp 0
-%       | Charty           -> L.const_int  lltyp 0
+%       | Charty           -> L.const_pointer_null  lltyp 
 %       | Tarrow _         -> L.const_pointer_null lltyp
 %       | Clo _            -> L.const_pointer_null lltyp
 %     and const_conapp (_, _) = L.const_pointer_null lltyp
@@ -4037,7 +4138,7 @@ function: (flurry func)
 %         in
 
 %         (* set aside the result of the condition expr *)
-%         let (_, bool_val) = expr builder lenv block e1 in
+%         let (newbuilder, bool_val) = expr builder lenv block e1 in
 
 %         (* Create the merge block for after exec of then or the else block *)
 %         let merge_bb = L.append_block context "merge" block in
@@ -4058,7 +4159,8 @@ function: (flurry func)
 %         let () = add_terminal else_builder branch_instr in
 
 %         (* Complete the if-then-else block, return should be llvalue *)
-%         let _ = L.build_cond_br bool_val then_bb else_bb builder in
+%         (* let _ = L.build_cond_br bool_val then_bb else_bb builder in *)
+%         let _ = L.build_cond_br bool_val then_bb else_bb newbuilder in
 %         (* Get the result of either the the or the else block *)
 %         let merge_builder = L.builder_at_end context merge_bb in
 %         let result_value = L.build_load result "if-res-val" merge_builder in
@@ -4324,7 +4426,7 @@ function: (flurry func)
 %   let _ = List.iter build_function_body functions in
 
 %   (* Return an llmodule *)
-%   the_module
+%   the_module  
 % \end{lstlisting}
 %     \pagebreak
 
