@@ -6,6 +6,7 @@
 % \usepackage{markdown} % inline mark down
 \usepackage[color, leftbars]{changebar}
 \usepackage{subcaption}
+\usepackage{minted} % llvm syntax highlighting
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Reduce margin
@@ -1526,11 +1527,18 @@ The following tree-related keywords are still recognized, but their uses are uni
 
     \subsection{Test Samples}
 
-      \subsubsection{}
+      \subsubsection{Sample 1: Closure}
 
 
 
-      \subsubsection{}
+      \subsubsection{Sample 2: Higher-Order Function}
+
+      \begin{figure}[h]
+        \centering
+          \includegraphics[width=0.5\textwidth]{images/test2.PNG}
+      \end{figure}
+
+      % \inputminted{llvm}{BitXorMatrix.m}
 
 \pagebreak
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1654,9 +1662,11 @@ The following tree-related keywords are still recognized, but their uses are uni
 % \section{Appendix}
 % \label{sec:APPENDIX}
 
-%     \subsection{\texttt{toplevel.ml}}
-%     \label{app:toplevel}
-%     Author(s): Sam, Eliza, Amy, Nik, Zach
+    \subsection{\texttt{toplevel.ml}}
+    \label{app:toplevel}
+    Author(s): Sam, Eliza, Amy, Nik, Zach
+    \inputminted{ocaml}{toplevel.ml} 
+
 % \begin{lstlisting}
 % (* Top-level of the groot compiler: scan & parse input,
 %    build the AST, generate LLVM IR *)
