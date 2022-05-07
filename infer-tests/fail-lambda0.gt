@@ -1,1 +1,0 @@
-((lambda (x y) (if y x y)) (5 5))

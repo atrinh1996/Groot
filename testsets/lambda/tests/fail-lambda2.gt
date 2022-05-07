@@ -1,0 +1,3 @@
+;; lambda, no args
+
+(lambda 4)

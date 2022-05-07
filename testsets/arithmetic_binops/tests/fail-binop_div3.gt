@@ -1,0 +1,4 @@
+;; ensure failure with lacking parens
+
+/ 0 4
+

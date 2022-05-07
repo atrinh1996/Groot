@@ -1,0 +1,3 @@
+;; ensure that division by zero is possible
+
+(/ 1 0) ;; cannot print this out; will be a different value each time

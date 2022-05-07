@@ -1,0 +1,3 @@
+;; ensure correct constraint for addition within lambda
+
+(lambda (n) (+ n 1))

@@ -1,0 +1,6 @@
+;; ensure correct behavior with constant literals
+
+(printb (=i 6  7))
+(printb (=i 6 -6))
+(printb (=i 6  6))
+

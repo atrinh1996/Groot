@@ -1,2 +1,0 @@
-(val retx (lambda (x) x))
-(if (> 32 2) (retx 1) #f)

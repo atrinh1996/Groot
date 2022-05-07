@@ -1,0 +1,5 @@
+;; partial function application; ; we except this to fail due to issues with the inferencer
+
+(val retn (lambda (n m) n)) 
+(val testAB (lambda (a) (lambda (b) (retn a b))))
+((testAB 4) #t)

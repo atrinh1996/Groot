@@ -1,0 +1,6 @@
+;; ensure correct truth table for all possible inputs
+
+(printb (&& #t #t))
+(printb (&& #t #f))
+(printb (&& #f #t))
+(printb (&& #f #f))

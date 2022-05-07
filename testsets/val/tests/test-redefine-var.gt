@@ -1,0 +1,6 @@
+;; reassignment of toplevel variable
+
+(val x 1)
+(printi x)
+(val x 2)
+(printi x)

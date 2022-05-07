@@ -1,0 +1,3 @@
+;; inline lambda application with conditional
+
+((lambda (y) (if y #t y)) #f)

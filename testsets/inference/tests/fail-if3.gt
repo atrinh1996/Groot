@@ -1,0 +1,3 @@
+;; ensure failure with nested conditional with type mismatch across branches
+
+(if (if #t #t #f) (if #t #t #f) (if #t 1 #f))
