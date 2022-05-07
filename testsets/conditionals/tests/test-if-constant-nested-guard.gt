@@ -1,0 +1,6 @@
+;; ensures that LLVM optimization of constant guard conditional does not break conditonal branchings
+
+(if (if (=i 0 0) #t #f)
+	(printc 'a')
+	(printc 'b')
+)
