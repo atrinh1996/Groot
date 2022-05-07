@@ -1,1 +1,1 @@
-(printi (let ([a 1]) (let ([a 2]) a)))
+(printi (let ([a 1]) (let ([b 2]) a)))
