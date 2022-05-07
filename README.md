@@ -101,3 +101,259 @@ This was created using opam-2.1 and llvm-13.
 
 If there are compilation issues that may be due to versioning, we have a docker image that may help:
 documentation on using it is available at https://hub.docker.com/r/zegger/llvm-opam
+
+
+
+
+
+## Testing descriptions
+
+---
+
+
+Testset: apply
+
+	- fail-application-less-args : test for failure when too few params provided to application
+	- fail-application-more-args : test for failure when too many params provided to application
+	- test-application1    : generic function application 
+	- test-application2    : global lambda closure stress-test
+	- test-application3    : no-args lambdas that return closures upon evaluation
+	- test-application4    : ensure correct behavior of global capture
+	- test-application5    : passing ID as param to application
+
+
+---
+
+
+Testset: arithmetic_binops
+
+	- fail-binop+1         : ensure failure with too few args
+	- fail-binop+2         : ensure failure with too many args
+	- fail-binop+3         : ensure failure with missing parens
+	- fail-binop-1         : ensure failure with too many args
+	- fail-binop-div-by-bool : ensure failure with type mismatch for div
+	- fail-binop-mul4      : ensure failure with type mismatch for multiply
+	- fail-binop_div1      : ensure failure with too few args
+	- fail-binop_div2      : ensure failure with too many args
+	- fail-binop_div3      : ensure failure with lacking parens
+	- fail-binop_mod1      : ensure failure with too many args
+	- fail-binop_mod2      : ensure failure with too few args
+	- fail-binop_mod3      : ensure failure with lacking parens
+	- fail-binop_mul1      : ensure failure with too few args
+	- fail-binop_mul2      : ensure failure with too many args
+	- fail-binop_mul3      : ensure failure with lacking parens
+	- fail-nestedbinops    : ensure failure when non-integer is given 
+	- test-add             : ensure correct basic arithmetic
+	- test-binop+          : additional sanity check
+	- test-binop-          : subtractional sanity check
+	- test-binop-div-divisible : divisional sanity check
+	- test-binop-mod       : modulo sanity check
+	- test-binop-mul       : multiplicational sanity check
+	- test-div-by-zero     : ensure that division by zero is possible
+	- test-nestedbinops    : basic arithmetic stresstest
+
+
+---
+
+
+Testset: boolean_binops
+
+	- fail-AND1            : ensure failure with too many args
+	- fail-AND2            : ensure failure with too many args that are ill-typed 
+	- fail-AND3            : ensure failure with lacking parens
+	- fail-AND4            : ensure failure with correct arg count but type mismatch
+	- fail-OR1             : ensure failure with too many args
+	- fail-OR2             : ensure failure with too many args that are ill-typed 
+	- fail-OR3             : ensure failure with lacking parens
+	- fail-OR4             : ensure failure with correct arg count but type mismatch
+	- test-AND             : ensure correct truth table for all possible inputs
+	- test-OR              : ensure correct truth table for all possible inputs
+
+
+---
+
+
+Testset: comparison_binops
+
+	- fail-equalto1        : ensure failure with too many args and type mismatch
+	- fail-equalto2        : ensure failure with too few args
+	- fail-equalto3        : ensure failure with lacking parens
+	- fail-equalto4        : ensure failure with type mismatch
+	- fail-equalto5        : ensure failure with unbound var
+	- fail-greaterequal1   : ensure failure with too many args and type mismatch
+	- fail-greaterequal2   : ensure failure with too few args
+	- fail-greaterequal3   : ensure failure with lacking parens
+	- fail-greaterequal4   : ensure failure with type mismatch
+	- fail-greaterthan1    : ensure failure with too many args
+	- fail-greaterthan2    : ensure failure with too few args
+	- fail-greaterthan3    : ensure failure with lacking parens
+	- fail-lessequal1      : ensure failure with too many args and type mismatch
+	- fail-lessequal2      : ensure failure with too few args
+	- fail-lessequal3      : ensure failure with lacking parens
+	- fail-lessthan1       : ensure failung with too many args
+	- fail-lessthan2       : ensure failure with too few args
+	- fail-lessthan3       : ensure failure with lacking parens
+	- fail-notequal1       : ensure failure with too many args and type mismatch
+	- fail-notequal2       : ensure failure with too few args
+	- fail-notequal3       : ensure failure with lacking parens
+	- test-equalto-var     : ensure that equivalence of vars is possible
+	- test-equalto         : ensure correct behavior with constant literals
+	- test-greaterequal    : ensure correct behavior
+	- test-greaterthan     : ensure correct behavior with constant literals and vars
+	- test-lessequal       : ensure correct behavior with constant literals and cars
+	- test-lessthan        : ensure correct behavior with constant literals and cars
+	- test-notequal        : ensure correct behavior with constant literals and cars
+
+
+---
+
+
+Testset: conditionals
+
+	- fail-if1             : ensure failure with too many sub-expressions
+	- fail-if2             : ensure failure with inconsitence branch types
+	- fail-if3             : ensure failure with bad guard conditional
+	- fail-if4             : ensure failure with bad bool literal
+	- test-if-constant-nested-guard : l a 'a')
+	- test-if              : simple sanity check
+
+
+---
+
+
+Testset: inference
+
+	- fail-if0             : ensure failure with incorrect sub expr types
+	- fail-if1             : ensure failure with type mismatch across branches
+	- fail-if2             : ensure failure with type mismatch across branches
+	- fail-if3             : ensure failure with nested conditional with type mismatch across branches
+	- fail-lambda0         : ensure failure with too many sub expressions
+	- fail-lambda1         : ensure failure with too many sub expressions and bogus function call
+	- fail-nlambda2        : partial function application with mixed type free variables ; we expect this to fail due to issues with nested lambdas
+	- test-add0            : ensure success of addition
+	- test-apply0          : ensure success with application of free var inside closure
+	- test-apply1          : ensure success of inline lambda application
+	- test-apply2          : assorted application tests; ensure free and bound vars behave
+	- test-apply3          : inline lambda application with conditional
+	- test-apply4          : use identity function in addition
+	- test-argorder0       : simple argument ordering
+	- test-if0             : simple conditional; all bools
+	- test-if1             : simple conditional, integer branches
+	- test-if2             : sanity check for conditional
+	- test-if3             : nested conditionals
+	- test-lambda0         : identity function; ensure success of polymorphic function
+	- test-lambda1         : ensure that guard conditional applies boolean constraint on lambda arg
+	- test-lambda2         : ensure correct constraint for addition within lambda
+	- test-lambda3         : ensure polymorphic type for unsued param in lambda
+	- test-lambda4         : ensure polymorphic type for unused lambda param
+	- test-lambda5         : ensure unused polymorphic type for identity function
+	- test-lambda7         : ensure success contraint propagation in conditional
+	- test-mert0           : typed ids in conditional
+	- test-mert1           : lambda application with inferred arg type
+	- test-nlambda0        : nested lambda with free vars; this passes with a polymorphism warning about resolution to ints
+	- test-nlambda1        : nested lambda to ensure constrain propagation
+	- test-nlambda2        : nested lambda application within nested lambda
+	- test-nlambda3        : nested lambda within nested lambda, no application
+	- test-nlambda4        : partial functional application, different types
+	- test-prims0          : ensure correct typing of all prims
+	- test-printall0       : ensure correct printing of values form each prim
+	- test-printi0         : print an integer
+	- test-val0            : simple assignment
+
+
+---
+
+
+Testset: lambda
+
+	- fail-lambda1         : lambda, no body
+	- fail-lambda2         : lambda, no args
+	- fail-lambda3         : improper function application wthin body of lambda
+	- test-lambda-apply    : print value of lambda application
+	- test-lambda-closure  : l x 42)
+	- test-lambda          : lambda stress-test
+
+
+---
+
+
+Testset: let
+
+	- fail-let1            : incorrect syntax
+	- fail-let2            : incorrect syntax; bind list improper
+	- fail-let3            : ensure that local vars are not bound at toplevel
+	- test-let             : let stress test
+
+
+---
+
+
+Testset: sanity_checks
+
+	- test-hello           : print single character
+	- test-print-false     : print false (#t)
+	- test-print-true      : print true (#t)
+	- test-print42         : print 42
+	- test-small           : small stress test of various functions
+	- test-smallprint      : small stress test of various functions, with printing
+	- test-val             : variable assignment
+
+
+---
+
+
+Testset: semantics
+
+	- fail-undefined-var   : reference to undefined var should fails
+	- fail-val-not-func    : applying non-function is not allowed
+	- test-closure         : ensure that lambda closures maintain static copies of free vars (unchanged when global vars change)
+	- test-fun-def-app     : apply one arg lambda function bound to toplevel id
+	- test-fun-def         : square an integer! a very useful function!
+
+
+---
+
+
+Testset: types
+
+	- fail-bad_boolean1    : bad boolean, should be a lexer error
+	- fail-bad_boolean2    : bad boolean, should be a lexer error
+	- fail-bad_boolean3    : another bad boolean, should be lexer error
+	- fail-bad_boolean4    : another bad boolean, should be lexer error
+	- fail-bool_stresstest : type mismatch in arithmetic and comparison operators
+	- fail-boolchar        : type mismatch in logical OR
+	- fail-char1           : bad char literal, too many chars; should be lexer error
+	- fail-char2           : attempt application of char literal
+	- fail-int1            : attempt application of integer literal
+	- fail-intchar         : type mismatch in addition
+	- test-bool-stresstest : boolean stress test; test everything
+	- test-boolean         : just lex two boolean literals
+	- test-char            : just test three char literals
+	- test-integers        : just lex four integer literals
+
+
+---
+
+
+Testset: unops
+
+	- fail-NOT1            : too few args and type mismatch 
+	- fail-NOT2            : set of parens missing
+	- fail-NOT3            : set of parens missing
+	- test-NOT             : invert some booleans
+	- test-neg1            : negate an integer
+
+
+---
+
+
+Testset: val
+
+	- fail-val1            : invalid identifier used for toplevel binding
+	- fail-val2            : too many subexpressions
+	- fail-val3            : too few subexpressions
+	- fail-val4            : too many subexpressions and invalid identifier
+	- fail-val5            : no subexpressions
+	- test-redefine-var    : reassignment of toplevel variable
+	- test-val-var         : simple assignment
+	- test-val             : val stress test
