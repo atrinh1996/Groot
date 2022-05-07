@@ -90,9 +90,6 @@ let translate { main = main;  functions = functions;
               (Diagnostic.GenerationError "lambda is non-closure type")
     in
     let structs = List.rev structures in
-    (* let structs = structures in *)
-    (* List.fold_left gen_struct_def StringMap.empty structs *)
-
     let rec declare_structs clsTyList result = 
       match clsTyList with 
         [] -> result 
