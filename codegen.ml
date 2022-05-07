@@ -379,7 +379,7 @@ let translate { main = main;  functions = functions;
                 let _ = L.build_store llcexp loc bld' in
                 let map' = StringMap.add name loc map in
                 (bld', map'))
-            (builder, StringMap.empty) bs
+            (builder, lenv) bs
             (* Evaulate the body *)
         in expr builder' local_env block body
     | CLambda (id, freeargs)->
