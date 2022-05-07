@@ -1,5 +1,5 @@
-;; partial function application; ; we except this to fail due to issues with the inferencer
+;; partial functional application, different types
 
 (val retn (lambda (n m) n)) 
-(val testAB (lambda (a) (lambda (b) (retn a b))))
-((testAB 4) #t)
+(val testAB (lambda (a) (lambda (b) (+ a b))))
+((testAB 9) 8)

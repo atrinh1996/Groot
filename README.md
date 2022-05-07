@@ -22,7 +22,7 @@ lexer for the (g)ROOT language, and are able to compile and print literals.
     > make
     > make toplevel.native
 - **Run test(s)**
-    > ./testall.sh
+    > ./testall.bash
 - **Compile a source file: hello.gt, to executable, hello.exe**
     > make hello
 - **Run hello executable (prints 'h')**
