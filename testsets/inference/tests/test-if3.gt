@@ -1,0 +1,3 @@
+;; nested conditionals
+
+(if (if #t #t #f) (if #t #t #f) (if #t #f #f))

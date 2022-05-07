@@ -1,0 +1,4 @@
+;; just lex two boolean literals
+
+#t
+#f

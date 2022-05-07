@@ -5,6 +5,18 @@
 
 DEPENDS=toplevel.ml ast.ml tast.ml parser.mly scanner.mll diagnostic.ml infer.ml mast.ml mono.ml codegen.ml cast.ml conversion.ml 
 
+default:
+	make toplevel.native
+
+dev:
+	docker run --rm -it -v `pwd`:/home/dev/workdir -w=/home/dev/workdir zegger/llvm-opam
+
+tests:
+	bash maketests.bash
+
+validate:
+	bash testall.bash
+
 # IMPORTANT Note from Zach:
 #	the _tags file contains arguments that are ingested by ocamlbuild
 #   and alter it's behavior
@@ -17,7 +29,7 @@ hello:
 	make toExe
 
 %.exe: %.gt
-	./toplevel.native -c $< > tmp.ll && llc -relocation-model=pic tmp.ll > tmp.s && cc -o $@ tmp.s
+	./toplevel.native -l $< > tmp.ll && llc -relocation-model=pic tmp.ll > tmp.s && cc -o $@ tmp.s
 
 parser: parser.mly
 	ocamlyacc parser.mly

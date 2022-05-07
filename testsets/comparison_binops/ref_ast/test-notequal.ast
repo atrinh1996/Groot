@@ -1,0 +1,6 @@
+(printb (!=i 6 7))
+(val a 4)
+(printb (!=i 6 a))
+(printb (!=i a 6))
+(printb (!=i a a))
+(printb (!=i 6 6))

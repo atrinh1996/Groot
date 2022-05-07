@@ -1,0 +1,3 @@
+;; ensure correct basic arithmetic
+
+(printi (+ 1 2))

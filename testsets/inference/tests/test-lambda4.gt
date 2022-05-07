@@ -1,0 +1,3 @@
+;; ensure polymorphic type for unused lambda param
+
+(lambda (n) 1)

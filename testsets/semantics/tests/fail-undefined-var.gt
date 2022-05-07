@@ -1,0 +1,3 @@
+;; reference to undefined var should fails
+
+x

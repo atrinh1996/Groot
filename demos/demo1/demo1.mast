@@ -1,0 +1,7 @@
+(val letterGrade [char (int)] (lambda (int test) [char] (if [bool] ([bool (int int)] < [int] 90 [int] test) [char] A [char] (if [bool] ([bool (int int)] < [int] 80 [int] test) [char] B [char] (if [bool] ([bool (int int)] < [int] 70 [int] test) [char] C [char] D)))))
+[int] ([int (char)] printc [char] ([char (int)] letterGrade [int] 89))
+(val computeGrade [char (int int int)] (lambda (int test, int test2, int test3) [char] (let ([sum [int] ([int (int int)] + [int] ([int (int int)] + [int] test [int] test2) [int] test3)]) [char] (let ([avg [int] ([int (int int)] / [int] sum [int] 3)]) [char] ([char (int)] letterGrade [int] avg)))))
+[int] ([int (char)] printc [char] ([char (int int int)] computeGrade [int] 88 [int] 90 [int] 91))
+(val letterGrade [char (int)] (lambda (int test) [char] (if [bool] ([bool (int int)] < [int] 85 [int] test) [char] A [char] (if [bool] ([bool (int int)] < [int] 75 [int] test) [char] B [char] (if [bool] ([bool (int int)] < [int] 65 [int] test) [char] C [char] D)))))
+[int] ([int (char)] printc [char] ([char (int)] letterGrade [int] 89))
+[int] ([int (char)] printc [char] ([char (int int int)] computeGrade [int] 88 [int] 90 [int] 91))

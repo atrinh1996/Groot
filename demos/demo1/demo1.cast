@@ -1,0 +1,59 @@
+Main:
+(val _letterGrade_1 (_anon0 ))
+(printc (_letterGrade_1 89))
+(val _computeGrade_1 (_anon1 _letterGrade_1))
+(printc (_computeGrade_1 88 90 91))
+(val _letterGrade_2 (_anon2 ))
+(printc (_letterGrade_2 89))
+(printc (_computeGrade_1 88 90 91))
+
+
+Functions:
+char _anon2 (int test)
+{
+(if (< 85 test) A (if (< 75 test) B (if (< 65 test) C D)))
+}
+
+char _anon1 (int test, int test2, int test3, _anon0_struct { char (int); } _letterGrade_1)
+{
+(let ([sum (+ (+ test test2) test3)]) (let ([avg (/ sum 3)]) (_letterGrade_1 avg)))
+}
+
+char _anon0 (int test)
+{
+(if (< 90 test) A (if (< 80 test) B (if (< 70 test) C D)))
+}
+
+
+
+Rho:
+!=i: bool !=i0
+&&: bool &&0
+*: int *0
++: int +0
+-: int -0
+/: int /0
+<: bool <0
+<=: bool <=0
+=i: bool =i0
+>: bool >0
+>=: bool >=0
+_anon0: char (int) _anon01
+_anon1: char (int, int, int, _anon0_struct { char (int); }) _anon11
+_anon2: char (int) _anon21
+computeGrade: _anon1_struct { char (int, int, int, _anon0_struct { char (int); }); _anon0_struct { char (int); }} computeGrade1
+letterGrade: _anon2_struct { char (int); } letterGrade2
+mod: int mod0
+not: bool not0
+printb: bool printb0
+printc: char printc0
+printi: int printi0
+||: bool ||0
+~: int ~0
+
+
+Structures:
+struct _anon2_struct { char (int); }
+struct _anon1_struct { char (int, int, int, _anon0_struct { char (int); }); _anon0_struct { char (int); }}
+struct _anon0_struct { char (int); }
+

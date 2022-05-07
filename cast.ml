@@ -3,15 +3,13 @@
     Assumes name-check and type-check have already happened
 *)
 
-(* open Ast *)
-(* open Sast  *)
+
 module StringMap = Map.Make(String)
 
 type cname = string
 
 type ctype =
     Tycon of tycon
-  (* | Tyvar of tyvar *)
   | Conapp of conapp
 and tycon =
     Intty
@@ -19,19 +17,16 @@ and tycon =
   | Boolty
   | Tarrow of ctype
   | Clo of cname * ctype * ctype list
-  (* and tyvar =
-      Tparam of int *)
 and conapp = (tycon * ctype list)
 
 
 let intty = Tycon Intty
 let charty = Tycon Charty
 let boolty = Tycon Boolty
-(* let treetype ty = CONAPP () *)
-(* let funty (ret, args) = Tycon (Tarrow (ret, args)) *)
+
 let funty (ret, args) =
   Conapp (Tarrow ret, args)
-let closurety (id, functy, freetys) =
+let closuretype (id, functy, freetys) =
   Tycon (Clo (id, functy, freetys))
 
 (* int StringMap.t - for our rho/variable environment
@@ -89,32 +84,29 @@ type cprog =
   }
 
 
-
-
-
 (* Pretty Print *)
+(* returns string of a ctype *)
 let rec string_of_ctype = function
     Tycon ty -> string_of_tycon ty
-  (* | Tyvar tp -> string_of_tyvar tp *)
   | Conapp con -> string_of_conapp con
 and string_of_tycon = function
     Intty  -> "int"
   | Charty -> "char"
   | Boolty -> "bool"
   | Tarrow (retty) -> string_of_ctype retty
-  (* ^ " (" ^ String.concat " " (List.map string_of_ctype argsty) ^ ")"  *)
   | Clo (sname, funty, freetys) ->
-    sname ^ " {\n"
-    ^ string_of_ctype funty ^ "\n"
-    ^ String.concat "\n" (List.map string_of_ctype freetys)
-    ^ "\n} ;; "
-(* and string_of_tyvar = function
-    Tparam n -> string_of_int n *)
+    sname 
+    (* ^ " {}" *)
+    ^ " { "
+    ^ string_of_ctype funty ^ "; "
+    ^ String.concat ", " (List.map string_of_ctype freetys)
+    ^ "}"
 and string_of_conapp (tyc, tys) =
-  string_of_tycon tyc ^ " (" ^ String.concat " " (List.map string_of_ctype tys) ^ ")"
+  string_of_tycon tyc ^ " (" 
+  ^ String.concat ", " (List.map string_of_ctype tys) ^ ")"
 
 
-
+(* stringifies cexpr *)
 let rec string_of_cexpr (_, e) =
   (* "["  *)
   (* ^ string_of_ctype ty ^ " : "  *)
@@ -152,7 +144,7 @@ and string_of_ctree = function
     ^ string_of_ctree sib ^ " "
     ^ string_of_ctree child ^ ")"
 
-
+(* stingifies a cdefn *)
 let string_of_cdefn = function
   | CVal (id, e) -> "(val " ^ id ^ " " ^ string_of_cexpr e ^ ")"
   | CExpr (cexp) -> string_of_cexpr cexp
@@ -160,6 +152,7 @@ let string_of_cdefn = function
 let string_of_main main =
   String.concat "\n" (List.map string_of_cdefn main) ^ "\n"
 
+(* stringifies a ist of fdefs *)
 let string_of_functions (funcs : fdef list) =
   let string_of_fdef ret_string {
       rettyp = return;
@@ -177,18 +170,23 @@ let string_of_functions (funcs : fdef list) =
     in ret_string ^ def ^ "\n"
   in List.fold_left string_of_fdef "" funcs
 
+(* stringifies the variable lookup table *)
 let string_of_rho rho =
   StringMap.fold (fun id occursList s ->
       let (num, ty) = List.nth occursList 0 in
-      s ^ id ^ ": " ^ string_of_ctype ty ^ " "
-      ^ id ^ string_of_int num ^ "\n")
+      s ^ id ^ ": " ^ string_of_ctype ty 
+      ^ " " ^ id ^ string_of_int num 
+      ^ "\n"
+        )
     rho ""
 
+(* Returns string of the list of closure/struct types *)
 let string_of_structures structss =
   let string_of_struct tyc = "struct " ^ string_of_ctype tyc
   in String.concat "\n" (List.map string_of_struct structss)
 
 
+(* Returns string of a cprog *)
 let string_of_cprog { main = main; functions = functions;
                       rho = rho;   structures = structures } =
   "Main:\n" ^

@@ -1,0 +1,3 @@
+;; ensure failure with correct arg count but type mismatch
+
+(&& 88 #t)

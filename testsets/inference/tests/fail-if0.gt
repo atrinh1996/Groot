@@ -1,0 +1,3 @@
+;; ensure failure with incorrect sub expr types
+
+( if 10 #t 2 )

@@ -1,0 +1,7 @@
+(val x 42)
+x
+(printi x)
+(val x 12)
+x
+(printi x)
+(if #t (printc 'c') (printi x))

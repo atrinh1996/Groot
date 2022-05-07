@@ -1,0 +1,19 @@
+;; ensure correct printing of values form each prim
+
+(printi (+ 1 0))
+(printi (- 4 2))
+(printi (/ 6 2))
+(printi (* 2 2))
+(printi (mod 13 8))
+
+(; comparisons ;)
+(printb (< 13 8))
+(printb (> 13 8))
+(printb (<= 13 8))
+(printb (>= 13 8))
+(printb (=i 13 8))
+(printb (!=i 13 8))
+
+(; Boolean algebra ;)
+(printb (&& #f #t))
+(printb (|| #f #t))

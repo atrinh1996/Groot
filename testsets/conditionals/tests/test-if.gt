@@ -1,0 +1,4 @@
+;; simple sanity check
+
+(if #t 2 3)
+(if (> 34 2) (+ 2 3) (- 4 2))

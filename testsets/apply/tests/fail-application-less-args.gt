@@ -1,0 +1,4 @@
+;; test for failure when too few params provided to application
+
+(val retn (lambda (n m) n))
+(retn)

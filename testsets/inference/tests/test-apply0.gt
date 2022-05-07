@@ -1,0 +1,4 @@
+;; ensure success with application of free var inside closure
+
+(val retn (lambda (n) n))
+(val test (lambda () (retn 5)))

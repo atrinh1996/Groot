@@ -1,0 +1,3 @@
+;; ensure failure with lacking parens
+
+* 23 79

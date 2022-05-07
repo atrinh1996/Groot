@@ -1,0 +1,10 @@
+;; global lambda closure stress-test
+
+(val x 17)
+(val testAB (lambda (a) (lambda (b) x)))
+(testAB 5)
+((testAB 20) 12)
+(printi ((testAB 20) 12))
+(val x 42)
+(val retx (lambda () x))
+(printi (retx ))

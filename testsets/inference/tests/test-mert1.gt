@@ -1,0 +1,4 @@
+;; lambda application with inferred arg type
+
+(val x (lambda (x) (if x 3 1)))
+(val y (x #f))
