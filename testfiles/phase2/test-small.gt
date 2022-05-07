@@ -1,5 +1,6 @@
-(let ([x 5]) 
-	(let ([y 9]) (+ x y)))
+(printi (let ([x 5]) 
+		(let ([y 9]) 
+			(+ x y))))
 
 (;
 (val callFunc (lambda (func a) (func a)))
