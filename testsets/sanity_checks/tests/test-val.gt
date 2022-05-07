@@ -1,0 +1,3 @@
+;; variable assignment
+
+(val x 42)

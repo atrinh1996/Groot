@@ -1,0 +1,2 @@
+(val x (let ([a 1]) a))
+(val y a)

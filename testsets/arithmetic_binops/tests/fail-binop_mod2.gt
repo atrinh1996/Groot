@@ -1,0 +1,4 @@
+;; ensure failure with too few args
+
+(mod 380)
+

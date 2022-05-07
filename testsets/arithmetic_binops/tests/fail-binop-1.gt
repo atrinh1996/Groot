@@ -1,0 +1,4 @@
+;; ensure failure with too many args
+
+(- 3 5 8)
+

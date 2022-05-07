@@ -1,0 +1,3 @@
+;; print single character
+
+(printc 'h')

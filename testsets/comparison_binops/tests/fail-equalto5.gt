@@ -1,0 +1,3 @@
+;; ensure failure with unbound var
+
+(== abcd 6)

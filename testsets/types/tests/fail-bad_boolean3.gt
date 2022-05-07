@@ -1,0 +1,4 @@
+;; another bad boolean, should be lexer error
+
+(#nottrue)
+

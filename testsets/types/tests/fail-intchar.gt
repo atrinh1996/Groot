@@ -1,0 +1,4 @@
+;; type mismatch in addition
+
+(+ 3 'a')
+

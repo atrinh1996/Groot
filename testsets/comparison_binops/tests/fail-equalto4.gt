@@ -1,0 +1,3 @@
+;; ensure failure with type mismatch
+
+(== 209 #f)

@@ -1,0 +1,20 @@
+;; small stress test of various functions, with printing
+(val x 42)
+
+x
+
+(printi x)
+
+(; redefine x and print it ;)
+
+(val x 12)
+
+x
+
+(printi x)
+
+(if #t (printc 'c') (printi x))
+
+(; Unbound variable ;)
+(; y ;)
+

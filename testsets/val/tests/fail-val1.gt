@@ -1,0 +1,3 @@
+;; invalid identifier used for toplevel binding
+
+(val 17 42)

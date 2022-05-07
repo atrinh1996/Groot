@@ -1,0 +1,4 @@
+;; simple assignment
+
+(val x 42)
+(printi x)

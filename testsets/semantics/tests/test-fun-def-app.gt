@@ -1,0 +1,5 @@
+;; apply one arg lambda function bound to toplevel id
+
+(val foo (lambda (x) x))
+
+(foo 1)
