@@ -1,8 +1,12 @@
+(val callFunc (lambda (func a) (func a)))
+(printi (callFunc (lambda (n) n) 5))
 
+(;
 (val x 42)
 (val retn (lambda (n) n))
 (val retx (lambda () (retn x)))
 (printi (retx))
+;)
 
 (;
 

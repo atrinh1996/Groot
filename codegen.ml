@@ -69,11 +69,12 @@ let translate { main = main;  functions = functions;
   (* helper to construct named structs  *)
   let create_struct (name : cname) (membertys : ctype list)
       (map : L.lltype StringMap.t) =
+    let llmembertys = List.map (ltype_of_type map) membertys in 
     let new_struct_ty = L.named_struct_type context name in
     let () =
       L.struct_set_body
         new_struct_ty
-        (Array.of_list (List.map (ltype_of_type map) membertys))
+        (Array.of_list llmembertys)
         false
     in new_struct_ty
   in
@@ -82,15 +83,29 @@ let translate { main = main;  functions = functions;
   (* Declare the NAMED struct definitions *)
   let struct_table : L.lltype StringMap.t =
     let gen_struct_def map closure = match closure with
-        Tycon (Clo (name, anonFunTy, freetys)) ->
-          let v = create_struct name (anonFunTy :: freetys) map
-          in StringMap.add name v map
+        Tycon (Clo (name, anonFunTy, freetys)) -> 
+          let v = create_struct name (anonFunTy :: freetys) map in 
+          StringMap.add name v map
       | _ -> Diagnostic.error 
               (Diagnostic.GenerationError "lambda is non-closure type")
     in
     let structs = List.rev structures in
-    List.fold_left gen_struct_def StringMap.empty structs
+    (* let structs = structures in *)
+    (* List.fold_left gen_struct_def StringMap.empty structs *)
+
+    let rec declare_structs clsTyList result = 
+      match clsTyList with 
+        [] -> result 
+      | front :: rest -> 
+          (try 
+              let result' = gen_struct_def result front in 
+              declare_structs rest result' 
+           with Not_found ->
+              let rest' = rest @ [front] in 
+              declare_structs rest' result)
+    in declare_structs structs StringMap.empty
   in
+
 
   (* Lookup table of function names (lambdas) to
      (function block, function def) *)
