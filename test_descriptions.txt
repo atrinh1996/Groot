@@ -106,7 +106,7 @@ Testset: conditionals
 	- fail-if2             : ensure failure with inconsitence branch types
 	- fail-if3             : ensure failure with bad guard conditional
 	- fail-if4             : ensure failure with bad bool literal
-	- test-if-constant-nested-guard : ensures that LLVM optimization of constant guard conditional does not break conditonal branchings
+	- test-if-constant-nested-guard : l a 'a')
 	- test-if              : simple sanity check
 
 
@@ -121,6 +121,7 @@ Testset: inference
 	- fail-if3             : ensure failure with nested conditional with type mismatch across branches
 	- fail-lambda0         : ensure failure with too many sub expressions
 	- fail-lambda1         : ensure failure with too many sub expressions and bogus function call
+	- fail-nlambda2        : partial function application with mixed type free variables ; we expect this to fail due to issues with nested lambdas
 	- test-add0            : ensure success of addition
 	- test-apply0          : ensure success with application of free var inside closure
 	- test-apply1          : ensure success of inline lambda application
@@ -141,12 +142,11 @@ Testset: inference
 	- test-lambda7         : ensure success contraint propagation in conditional
 	- test-mert0           : typed ids in conditional
 	- test-mert1           : lambda application with inferred arg type
-	- test-nlambda0        : nested lambda with free vars; we except this to fail due to issues with the inferencer
+	- test-nlambda0        : nested lambda with free vars; this passes with a polymorphism warning about resolution to ints
 	- test-nlambda1        : nested lambda to ensure constrain propagation
 	- test-nlambda2        : nested lambda application within nested lambda
 	- test-nlambda3        : nested lambda within nested lambda, no application
-	- test-nlambda4        : partial function application; ; we except this to fail due to issues with the inferencer
-	- test-nlambda5        : partial functional application, different types
+	- test-nlambda4        : partial functional application, different types
 	- test-prims0          : ensure correct typing of all prims
 	- test-printall0       : ensure correct printing of values form each prim
 	- test-printi0         : print an integer
@@ -162,7 +162,8 @@ Testset: lambda
 	- fail-lambda2         : lambda, no args
 	- fail-lambda3         : improper function application wthin body of lambda
 	- test-lambda-apply    : print value of lambda application
-	- test-lambda          : lambda stress test; we except this to fail due to issues with the inferencer
+	- test-lambda-closure  : l x 42)
+	- test-lambda          : lambda stress-test
 
 
 ---
