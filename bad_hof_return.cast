@@ -1,0 +1,151 @@
+Main:
+(val _add1_1 (_anon0 ))
+(val _sub1_1 (_anon1 ))
+(val _retx_1 (_anon2 ))
+(val _callFunc_1 (_anon4 ))
+(printi (_callFunc_1 _add1_1 41))
+(val _callFunc_2 (_anon5 ))
+(printi (_callFunc_2 _sub1_1 43))
+(val _retx_2 (_anon7 ))
+(val _callFunc_3 (_anon6 ))
+(printc (_callFunc_3 _retx_2 c))
+(val _callFunc_4 (_anon8 ))
+(printi (_callFunc_4 (_anon9 ) 2))
+(val _retx_3 (_anon11 ))
+(val _callFunc_5 (_anon10 ))
+(printi (_callFunc_5 _retx_3 42))
+(val _retx_4 (_anon13 ))
+(val _callFunc_6 (_anon12 ))
+(printb (_callFunc_6 _retx_4 #t))
+(val _callFunc_7 (_anon14 ))
+(printi ((_callFunc_7 _retx_4 _add1_1) 500))
+
+
+Functions:
+int (int) _anon14 (_anon15_struct { int (int) (int (int)); } func, _anon0_struct { int (int); } arg)
+{
+(func arg)
+}
+
+bool _anon12 (_anon13_struct { bool (bool); } func, bool arg)
+{
+(func arg)
+}
+
+bool _anon13 (bool x)
+{
+x
+}
+
+int _anon10 (_anon11_struct { int (int); } func, int arg)
+{
+(func arg)
+}
+
+int _anon11 (int x)
+{
+x
+}
+
+int _anon9 (int x)
+{
+(* x x)
+}
+
+int _anon8 (_anon9_struct { int (int); } func, int arg)
+{
+(func arg)
+}
+
+char _anon6 (_anon7_struct { char (char); } func, char arg)
+{
+(func arg)
+}
+
+char _anon7 (char x)
+{
+x
+}
+
+int _anon5 (_anon1_struct { int (int); } func, int arg)
+{
+(func arg)
+}
+
+int _anon4 (_anon0_struct { int (int); } func, int arg)
+{
+(func arg)
+}
+
+int _anon2 (int x)
+{
+x
+}
+
+int _anon1 (int x)
+{
+(- x 1)
+}
+
+int _anon0 (int x)
+{
+(+ x 1)
+}
+
+
+
+Rho:
+!=i: bool !=i0
+&&: bool &&0
+*: int *0
++: int +0
+-: int -0
+/: int /0
+<: bool <0
+<=: bool <=0
+=i: bool =i0
+>: bool >0
+>=: bool >=0
+_anon0: int (int) _anon01
+_anon1: int (int) _anon11
+_anon10: int (_anon11_struct { int (int); }, int) _anon101
+_anon11: int (int) _anon111
+_anon12: bool (_anon13_struct { bool (bool); }, bool) _anon121
+_anon13: bool (bool) _anon131
+_anon14: int (int) (_anon15_struct { int (int) (int (int)); }, _anon0_struct { int (int); }) _anon141
+_anon2: int (int) _anon21
+_anon4: int (_anon0_struct { int (int); }, int) _anon41
+_anon5: int (_anon1_struct { int (int); }, int) _anon51
+_anon6: char (_anon7_struct { char (char); }, char) _anon61
+_anon7: char (char) _anon71
+_anon8: int (_anon9_struct { int (int); }, int) _anon81
+_anon9: int (int) _anon91
+add1: _anon0_struct { int (int); } add11
+callFunc: _anon14_struct { int (int) (_anon15_struct { int (int) (int (int)); }, _anon0_struct { int (int); }); } callFunc7
+mod: int mod0
+not: bool not0
+printb: bool printb0
+printc: char printc0
+printi: int printi0
+retx: _anon13_struct { bool (bool); } retx4
+sub1: _anon1_struct { int (int); } sub11
+||: bool ||0
+~: int ~0
+
+
+Structures:
+struct _anon14_struct { int (int) (_anon15_struct { int (int) (int (int)); }, _anon0_struct { int (int); }); }
+struct _anon12_struct { bool (_anon13_struct { bool (bool); }, bool); }
+struct _anon13_struct { bool (bool); }
+struct _anon10_struct { int (_anon11_struct { int (int); }, int); }
+struct _anon11_struct { int (int); }
+struct _anon9_struct { int (int); }
+struct _anon8_struct { int (_anon9_struct { int (int); }, int); }
+struct _anon6_struct { char (_anon7_struct { char (char); }, char); }
+struct _anon7_struct { char (char); }
+struct _anon5_struct { int (_anon1_struct { int (int); }, int); }
+struct _anon4_struct { int (_anon0_struct { int (int); }, int); }
+struct _anon2_struct { int (int); }
+struct _anon1_struct { int (int); }
+struct _anon0_struct { int (int); }
+
