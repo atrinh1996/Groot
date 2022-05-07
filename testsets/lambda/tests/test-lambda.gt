@@ -1,4 +1,4 @@
-;; lambda stress test; we except this to fail due to issues with the inferencer
+;; lambda stress-test
 
 (lambda (x y z) (if z (|| x y) (&& x y)))
 (lambda () 4) 
