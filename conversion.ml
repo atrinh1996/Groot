@@ -12,8 +12,8 @@ let prerho env =
     StringMap.add k [v] map
   in List.fold_left add_prints env 
      [("printi", (0, funty (intty, [intty])));   
-      ("printb", (0, funty (boolty, [boolty])));
-      ("printc", (0, funty (charty, [charty])));  
+      ("printb", (0, funty (intty, [boolty])));
+      ("printc", (0, funty (intty, [charty])));  
       ("+", (0, funty (intty, [intty; intty])));
       ("-", (0, funty (intty, [intty; intty])));        
       ("*", (0, funty (intty, [intty; intty])));
