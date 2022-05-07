@@ -1,3 +1,8 @@
-(val retn (lambda (n m) n)) 
-(val testAB (lambda (a) (lambda (b) (retn a b))))
-((testAB 4) #t)
+(val a 'a')
+(val b 'b')
+
+(printc (if (if (=i 0 0) 
+		#t 
+		#f)
+	a
+	b))

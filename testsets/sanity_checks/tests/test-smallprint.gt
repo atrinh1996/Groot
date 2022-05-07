@@ -13,8 +13,3 @@ x
 
 (printi x)
 
-(if #t (printc 'c') (printi x))
-
-(; Unbound variable ;)
-(; y ;)
-

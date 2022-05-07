@@ -1,7 +1,7 @@
 ; ModuleID = 'gROOT'
 source_filename = "gROOT"
 
-%_anon0_struct = type { i32 (i1, i1, i1)* }
+%_anon0_struct = type { i1 (i1, i1, i1)* }
 %_anon1_struct = type { i32 ()* }
 %_anon2_struct = type { i32 (i32)* }
 %_anon3_struct = type { i32 (i32)* }
@@ -13,7 +13,7 @@ source_filename = "gROOT"
 @fmt = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
 @boolT = private unnamed_addr constant [3 x i8] c"#t\00", align 1
 @boolF = private unnamed_addr constant [3 x i8] c"#f\00", align 1
-@__anon0_1 = global i32 (i1, i1, i1)* null
+@__anon0_1 = global i1 (i1, i1, i1)* null
 @__anon1_1 = global i32 ()* null
 @__anon2_1 = global i32 (i32)* null
 @__anon3_1 = global i32 (i32)* null
@@ -30,7 +30,7 @@ define i32 @main() {
 entry:
   %gstruct = alloca %_anon0_struct, align 8
   %funcField = getelementptr inbounds %_anon0_struct, %_anon0_struct* %gstruct, i32 0, i32 0
-  store i32 (i1, i1, i1)* @_anon0, i32 (i1, i1, i1)** %funcField, align 8
+  store i1 (i1, i1, i1)* @_anon0, i1 (i1, i1, i1)** %funcField, align 8
   %gstruct1 = alloca %_anon1_struct, align 8
   %funcField2 = getelementptr inbounds %_anon1_struct, %_anon1_struct* %gstruct1, i32 0, i32 0
   store i32 ()* @_anon1, i32 ()** %funcField2, align 8
@@ -108,7 +108,7 @@ entry:
   ret i32 4
 }
 
-define i32 @_anon0(i1 %x, i1 %y, i1 %z) {
+define i1 @_anon0(i1 %x, i1 %y, i1 %z) {
 entry:
   %x1 = alloca i1, align 1
   store i1 %x, i1* %x1, align 1
@@ -116,25 +116,25 @@ entry:
   store i1 %y, i1* %y2, align 1
   %z3 = alloca i1, align 1
   store i1 %z, i1* %z3, align 1
-  %if-res-ptr = alloca i32, align 4
+  %if-res-ptr = alloca i1, align 1
   %z4 = load i1, i1* %z3, align 1
   br i1 %z4, label %then, label %else
 
 merge:                                            ; preds = %else, %then
-  %if-res-val = load i32, i32* %if-res-ptr, align 4
-  ret i32 %if-res-val
+  %if-res-val = load i1, i1* %if-res-ptr, align 1
+  ret i1 %if-res-val
 
 then:                                             ; preds = %entry
   %x5 = load i1, i1* %x1, align 1
   %y6 = load i1, i1* %y2, align 1
   %logOR = or i1 %x5, %y6
-  store i1 %logOR, i32* %if-res-ptr, align 1
+  store i1 %logOR, i1* %if-res-ptr, align 1
   br label %merge
 
 else:                                             ; preds = %entry
   %x7 = load i1, i1* %x1, align 1
   %y8 = load i1, i1* %y2, align 1
   %logAND = and i1 %x7, %y8
-  store i1 %logAND, i32* %if-res-ptr, align 1
+  store i1 %logAND, i1* %if-res-ptr, align 1
   br label %merge
 }

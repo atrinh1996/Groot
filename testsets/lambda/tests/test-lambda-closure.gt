@@ -1,0 +1,3 @@
+(val x 42)
+(val retx (lambda (n) x))
+(printi (retx 6))

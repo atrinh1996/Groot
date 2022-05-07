@@ -1,1 +1,1 @@
-(if (if (=i 0 0) #t #f) (printc 'a') (printc 'b'))
+(not (< 1 (if (> (if (&& #t (|| #f (!=i 5 5))) 9 6) 3) 5 6)))
