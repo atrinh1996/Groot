@@ -160,7 +160,7 @@ entry:
   %sum9 = load i32, i32* %sum, align 4
   %division = sdiv i32 %sum9, 3
   store i32 %division, i32* %avg, align 4
-  %_letterGrade_110 = load %_anon0_struct*, %_anon0_struct** @_letterGrade_1, align 8
+  %_letterGrade_110 = load %_anon0_struct*, %_anon0_struct** %_letterGrade_14, align 8
   %avg11 = load i32, i32* %avg, align 4
   %function_access = getelementptr inbounds %_anon0_struct, %_anon0_struct* %_letterGrade_110, i32 0, i32 0
   %function_call = load i8* (i32)*, i8* (i32)** %function_access, align 8

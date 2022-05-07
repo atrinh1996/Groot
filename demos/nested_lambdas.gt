@@ -1,8 +1,0 @@
-(val threeEqualFlips 
-	(lambda (flip0)
-		(lambda (flip1)
-			(if (!=i flip0 flip1)
-				(lambda (flip2) #f)
-				(lambda (flip2) (=i flip2 flip1))))))
-
-(printb (((threeEqualFlips 0) 0) 1))
