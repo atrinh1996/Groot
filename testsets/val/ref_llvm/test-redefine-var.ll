@@ -1,3 +1,5 @@
+<<<<<<< HEAD:tmp.ll
+=======
 ; ModuleID = 'gROOT'
 source_filename = "gROOT"
 
@@ -21,3 +23,4 @@ entry:
   %printi1 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt, i32 0, i32 0), i32 %_x_2)
   ret i32 0
 }
+>>>>>>> cee37390aadc41be62844abc89fe84ec33a2b50f:testsets/val/ref_llvm/test-redefine-var.ll
