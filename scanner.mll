@@ -63,10 +63,6 @@ and apos_handler = parse
   | _ as c         { char_builder c lexbuf }
 
 and tree_builder = parse
-  (* TODO - give baby groot trees *)
-  (* | ")" { TREE(1, 1) } *)
-  (* | _+ { TREE(tokenize "5", tree_builder lexbuf, tree_builder lexbuf)} *)
-  (* | "()" { LEAF } *)
   | _ { Diagnostic.error (Diagnostic.Unimplemented "in-place tree syntax") }
 
 and char_builder c = parse
