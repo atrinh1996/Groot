@@ -1492,6 +1492,46 @@ The following tree-related keywords are still recognized, but their uses are uni
 \section{Test Plan}
 \label{sec:TEST}
 
+  \subsection{Test Method}
+  Professor Richard Townsend's testing script used in his MicroC compiler, testall.sh, was adapted to perform testing for the g(ROOT) compiler. Changes were made to add support for .gt files, and support the testing file directory tree we had decided upon, however, the general control flow and output remains the same.
+
+  As our compiler matured, the testing script also needed to mature. Based on the compiler's current phase, different components needed to be tested to ensure they all were in working order. In addition to the testing script, many printing functions were written to assist in the debugging process. The most critical change to the testing script was the inclusion of test sets. Tests are grouped according to language aspect, and each test set in run individually. The testing script no longer executes a set of tests; now it processes a series of test sets, each containing a set of tests pertaining to that testset. This allows us to organize our tests logically and helps us localize bugs quickly. In our submission, the folder containing the test sets is simply called ``testsets''. The test sets therein are listed below:
+
+  \begin{figure}[h]
+    \centering
+      \includegraphics[width=0.3\textwidth]{images/testtree.PNG}
+  \end{figure}
+
+  Each test set has several subdirectories. The “tests” subdirectory contains the g(ROOT) files comprising each test. The ``ref_ast'', ``ref_llvm'', ``ref_stderr'', and ``ref_stdout'' subdirectories contain the reference output for each aspect of the compilation (ASTs, LLVM, errors, and output). When the testing script is run, additional subdirectories are generated, each containing some of the output from the tests. The ``asm'', ``ast'', ``diff'', ``exe'', ``llvm'', ``stderr'', and ``stdout'' subdirectories contain the assembly, ASTs, diff output, LLVM, errors, and output respectively. An example testset structure is given below.
+
+  \begin{figure}[h]
+    \centering
+      \includegraphics[width=0.2\textwidth]{images/testtree2.PNG}
+  \end{figure}
+
+  We established various roles for each member of the group. Each role was made to divide key responsibilities that person was responsible for.  though as we progressed through the development process these roles tended to be passed amongst other group members depending on various factors (i.e. availability) and simply what made the most practical sense. For instance, testing was a role that was shared across group members. The testing script was largely modified and updated by Nickolas Gravel and Zach Goldstein because they had the most experience working in bash than other members of the group. Furthermore, all members spent time creating tests and test references for modules.
+
+    Note that there are three tests that still fail; these all pertain to the propagation of free variables in nested lambda expressions and nested let expressions. The current type inferencer implementation is not able to consistently resolve the type of free variables in nested expressions containing several levels of lets or lambdas.
+
+    \texttt{let/test-let}
+
+    \texttt{lambda/test-lambda}
+    
+    \texttt{inference/test-nlambda4}
+
+    To maximize the portability of our language development environment, we developed a docker image. You may opt to install the dependencies and resolve issues on your own machine if you choose, but working within the docker image will guarantee success. To initialize the development environment docker container, simply enter:
+
+
+    \texttt{make dev}
+
+    \subsection{Test Samples}
+
+      \subsubsection{}
+
+
+
+      \subsubsection{}
+
 \pagebreak
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1561,7 +1601,6 @@ The following tree-related keywords are still recognized, but their uses are uni
 
     Working with a group as big as ours for as long as we did (and I know in the scheme of things our team wasn't that big and we weren't working together for that long) is really hard. Challenges were mostly accountability (definitely including my own) and stemmed from everyone's having different schedules and different workloads. Different workloads meant that people 1) prioritized our project different amounts, 2) had differing amounts of time to dedicate to it, and 3) had different ideas of how to spend the time when we worked on it together. Specifically, the grad students in our group had much more time to work on the project, which led to pretty different levels of contribution. For future mixed grad-undergrad groups, I would think about this before committing to such a group, and if people decide to stick with it, then they should be very clear around group expectations.
 
-  
     
     \subsection{Eliza Encherman}
     
@@ -1570,10 +1609,29 @@ The following tree-related keywords are still recognized, but their uses are uni
     I also would emphasize the importance of good practices like documentation, throwing specific error statements, and making functions to print structures as you introduce structures - I frequently would be spending hours in debugging just finding where a specific error was coming from, which would then often be followed by hours more because it was hard to understand what a function did or what a variable was at a certain moment in time. 
     
     \subsection{Zachary Goldstein}
-        \begin{itemize}
-            \item Takeaway:
-            \item Advice: 
-        \end{itemize}
+       Upon reflection I have the following takeaways:
+              \begin{itemize}
+                \item It is critically important to ensure that all group members understand every aspect of the language design and how each module interfaces with other modules. Throughout the development of the compiler, different group members working on different modules made different assumptions about the structure of each augmented AST; this led to some frustrating refactoring when we brought all the pieces together.
+                \item I benefit a great deal from synchronous, in-person work sessions. When working alone on the project, I found I used my time less effectively than when working in a shared space with other group members. Unfortunately, the group was not able to meet for more than an hour or two a week (which is to be expected for a group of 5 busy collegians), and nearly all of our meetings were virtual.
+              \end{itemize}
+
+      To future groups I give the following advice:
+              \begin{itemize}
+                \item When designing the language and deciding what features you will implement, prioritize feasibility. While type-inferencing is useful and interesting, our choice to implement an inferencer came at the expense of several other features that were ultimately more integral to our design goals.
+                \item While functional languages are beautifully simple for programmers, they are not so simple to compile. Most of the functional features that we implemented/attempted (like higher-order functions, lambda closures, and inferred polymorphism) are not native to the imperative LLVM IR. It may be easier to design an imperative side-effecting language given the time constraints of the course. This is especially true if group members are unfamiliar with functional programming.
+                \item Decide upon a consistent interface for each module. 
+                \item Work in person whenever possible. Spending time in a shared space increases the accountability of yourself and others, and allows for quick and easy idea sharing.
+              \end{itemize} 
+
+
+        
+
+
+
+
+
+
+
 
 \pagebreak
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -4007,11 +4065,12 @@ The following tree-related keywords are still recognized, but their uses are uni
 %   (* helper to construct named structs  *)
 %   let create_struct (name : cname) (membertys : ctype list)
 %       (map : L.lltype StringMap.t) =
+%     let llmembertys = List.map (ltype_of_type map) membertys in 
 %     let new_struct_ty = L.named_struct_type context name in
 %     let () =
 %       L.struct_set_body
 %         new_struct_ty
-%         (Array.of_list (List.map (ltype_of_type map) membertys))
+%         (Array.of_list llmembertys)
 %         false
 %     in new_struct_ty
 %   in
@@ -4020,15 +4079,26 @@ The following tree-related keywords are still recognized, but their uses are uni
 %   (* Declare the NAMED struct definitions *)
 %   let struct_table : L.lltype StringMap.t =
 %     let gen_struct_def map closure = match closure with
-%         Tycon (Clo (name, anonFunTy, freetys)) ->
-%           let v = create_struct name (anonFunTy :: freetys) map
-%           in StringMap.add name v map
+%         Tycon (Clo (name, anonFunTy, freetys)) -> 
+%           let v = create_struct name (anonFunTy :: freetys) map in 
+%           StringMap.add name v map
 %       | _ -> Diagnostic.error 
 %               (Diagnostic.GenerationError "lambda is non-closure type")
 %     in
 %     let structs = List.rev structures in
-%     List.fold_left gen_struct_def StringMap.empty structs
+%     let rec declare_structs clsTyList result = 
+%       match clsTyList with 
+%         [] -> result 
+%       | front :: rest -> 
+%           (try 
+%               let result' = gen_struct_def result front in 
+%               declare_structs rest result' 
+%             with Not_found ->
+%               let rest' = rest @ [front] in 
+%               declare_structs rest' result)
+%     in declare_structs structs StringMap.empty
 %   in
+
 
 %   (* Lookup table of function names (lambdas) to
 %       (function block, function def) *)
@@ -4305,7 +4375,7 @@ The following tree-related keywords are still recognized, but their uses are uni
 %                 let _ = L.build_store llcexp loc bld' in
 %                 let map' = StringMap.add name loc map in
 %                 (bld', map'))
-%             (builder, StringMap.empty) bs
+%             (builder, lenv) bs
 %             (* Evaulate the body *)
 %         in expr builder' local_env block body
 %     | CLambda (id, freeargs)->
@@ -4426,7 +4496,8 @@ The following tree-related keywords are still recognized, but their uses are uni
 %   let _ = List.iter build_function_body functions in
 
 %   (* Return an llmodule *)
-%   the_module  
+%   the_module
+
 % \end{lstlisting}
 %     \pagebreak
 
