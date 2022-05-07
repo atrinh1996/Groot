@@ -25,7 +25,7 @@ entry:
   store i8* getelementptr inbounds ([2 x i8], [2 x i8]* @globalChar.1, i32 0, i32 0), i8** %loc2, align 8
   %character_ptr3 = load i8*, i8** %spc1, align 8
   store i8* %character_ptr3, i8** @_b_1, align 8
-  %if-res-ptr = alloca i8*, align 8
+  %if-res-ptr = alloca i32, align 4
   %if-res-ptr4 = alloca i1, align 1
   br i1 true, label %then, label %else
 
@@ -42,18 +42,18 @@ else:                                             ; preds = %entry
   br label %merge
 
 merge5:                                           ; preds = %else7, %then6
-  %if-res-val9 = load i8*, i8** %if-res-ptr, align 8
+  %if-res-val9 = load i32, i32* %if-res-ptr, align 4
   ret i32 0
 
 then6:                                            ; preds = %merge
   %_a_1 = load i8*, i8** @_a_1, align 8
   %printc = call i32 @puts(i8* %_a_1)
-  store i32 %printc, i8** %if-res-ptr, align 4
+  store i32 %printc, i32* %if-res-ptr, align 4
   br label %merge5
 
 else7:                                            ; preds = %merge
   %_b_1 = load i8*, i8** @_b_1, align 8
   %printc8 = call i32 @puts(i8* %_b_1)
-  store i32 %printc8, i8** %if-res-ptr, align 4
+  store i32 %printc8, i32* %if-res-ptr, align 4
   br label %merge5
 }

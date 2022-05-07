@@ -1,3 +1,0 @@
-llc: error: llc: testsets/sanity_checks/ref_llvm/test-smallprint.ll:38:9: error: stored value and pointer type do not match
-  store i32 %printc, i8** %if-res-ptr, align 4
-        ^

@@ -22,11 +22,11 @@ entry:
   %_x_2 = load i32, i32* @_x_2, align 4
   %_x_22 = load i32, i32* @_x_2, align 4
   %printi3 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt, i32 0, i32 0), i32 %_x_22)
-  %if-res-ptr = alloca i8*, align 8
+  %if-res-ptr = alloca i32, align 4
   br i1 true, label %then, label %else
 
 merge:                                            ; preds = %else, %then
-  %if-res-val = load i8*, i8** %if-res-ptr, align 8
+  %if-res-val = load i32, i32* %if-res-ptr, align 4
   ret i32 0
 
 then:                                             ; preds = %entry
@@ -35,12 +35,12 @@ then:                                             ; preds = %entry
   store i8* getelementptr inbounds ([2 x i8], [2 x i8]* @globalChar, i32 0, i32 0), i8** %loc, align 8
   %character_ptr = load i8*, i8** %spc, align 8
   %printc = call i32 @puts(i8* %character_ptr)
-  store i32 %printc, i8** %if-res-ptr, align 4
+  store i32 %printc, i32* %if-res-ptr, align 4
   br label %merge
 
 else:                                             ; preds = %entry
   %_x_24 = load i32, i32* @_x_2, align 4
   %printi5 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt, i32 0, i32 0), i32 %_x_24)
-  store i32 %printi5, i8** %if-res-ptr, align 4
+  store i32 %printi5, i32* %if-res-ptr, align 4
   br label %merge
 }

@@ -1,3 +1,0 @@
-llc: error: llc: testsets/conditionals/llvm/test-if-constant-nested-guard.ll:51:9: error: stored value and pointer type do not match
-  store i32 %printc, i8** %if-res-ptr, align 4
-        ^

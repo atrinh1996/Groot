@@ -1,3 +1,0 @@
-(val a 'a')
-(val b 'b')
-(if (if (=i 0 0) #t #f) (printc a) (printc b))
