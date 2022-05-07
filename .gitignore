@@ -2,7 +2,6 @@ _build/*
 *.native
 *.log
 
-
 *.out
 *.err
 *.diff

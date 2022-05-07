@@ -1,3 +1,0 @@
-llc: error: llc: testsets/inference/ref_llvm/test-if3.ll:22:1: error: expected instruction opcode
-then:                                             ; preds = %entry
-^

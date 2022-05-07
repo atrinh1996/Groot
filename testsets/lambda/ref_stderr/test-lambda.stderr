@@ -1,1 +1,3 @@
-[31;1mType Error: [0mtype constructor mismatch int != bool
+llc: error: llc: testsets/lambda/ref_llvm/test-lambda.ll:131:9: error: stored value and pointer type do not match
+  store i1 %logOR, i32* %if-res-ptr, align 1
+        ^

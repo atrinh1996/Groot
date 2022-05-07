@@ -14,10 +14,10 @@ entry:
   %if-res-ptr = alloca i1, align 1
   %if-res-ptr1 = alloca i1, align 1
   br i1 true, label %then, label %else
-  br i1 %if-res-val, label %then3, label %else9
 
 merge:                                            ; preds = %else, %then
   %if-res-val = load i1, i1* %if-res-ptr1, align 1
+  br i1 %if-res-val, label %then3, label %else9
 
 then:                                             ; preds = %entry
   store i1 true, i1* %if-res-ptr1, align 1
@@ -31,7 +31,7 @@ merge2:                                           ; preds = %merge11, %merge5
   %if-res-val15 = load i1, i1* %if-res-ptr, align 1
   ret i32 0
 
-then3:                                            ; preds = %entry
+then3:                                            ; preds = %merge
   %if-res-ptr4 = alloca i1, align 1
   br i1 true, label %then6, label %else7
 
@@ -48,7 +48,7 @@ else7:                                            ; preds = %then3
   store i1 false, i1* %if-res-ptr4, align 1
   br label %merge5
 
-else9:                                            ; preds = %entry
+else9:                                            ; preds = %merge
   %if-res-ptr10 = alloca i1, align 1
   br i1 true, label %then12, label %else13
 

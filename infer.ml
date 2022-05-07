@@ -259,8 +259,7 @@ let apply_subs (sub : (tyvar * gtype) list) =
                 (* updated_tast_tx - matches texpr with tx and recurses on expressions *)
                 let updated_tast_tx = match tast_tx with
                   | TypedIf (x, y, z) ->
-                    TypedIf (expr_only_case x, expr_only_case y, expr_only_case z)
-                    
+                      TypedIf (expr_only_case x, expr_only_case y, expr_only_case z)
                   | TypedApply (x, xs) ->
                     let txs = List.map expr_only_case xs in
                     TypedApply (expr_only_case x, txs)

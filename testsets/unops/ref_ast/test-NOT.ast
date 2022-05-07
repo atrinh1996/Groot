@@ -1,2 +1,2 @@
-(printb (! (=i 6 7)))
-(printb (! (!=i 6 7)))
+(printb (not (=i 6 7)))
+(printb (not (!=i 6 7)))
