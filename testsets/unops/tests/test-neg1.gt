@@ -1,0 +1,4 @@
+;; negate an integer
+
+(printi (~ 3))
+

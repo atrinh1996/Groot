@@ -50,7 +50,9 @@ let isBound id env = StringMap.mem id env
    StringMap env. If the binding doesn't exist, Not_Found exception 
    is raised. *)
 let find id env =
-  let occursList = StringMap.find id env in List.nth occursList 0
+  let occursList = (try StringMap.find id env
+                      with Not_found -> Diagnostic.error (Diagnostic.Unbound (id ^ " not found")))
+                   in List.nth occursList 0
 
 (* Adds a binding of k to v in the global StringMap env *)
 let bindGamma k v = res.gamma <-

@@ -1,0 +1,3 @@
+;; identity function; ensure success of polymorphic function
+
+(lambda (x) x)

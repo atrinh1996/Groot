@@ -1,3 +1,0 @@
-(val retn (lambda (n m) n)) 
-(val testAB (lambda (a) (lambda (b) (+ a b))))
-((testAB 9) 8)

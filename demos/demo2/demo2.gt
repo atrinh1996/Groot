@@ -6,8 +6,13 @@
 
 (val callFunc (lambda (func arg) (func arg)))
 
-(printi (callFunc add1 41))		(; prints 42 ;)
-(printi (callFunc sub1 43))		(; prints 42 ;)
-(printc (callFunc retx 'c'))	(; prints c  ;)
-(printi (callFunc retx 42))		(; prints 42 ;)
-(printb (callFunc retx #t))		(; prints #t ;)
+(val retDoubleLambda (lambda () (lambda (x) ( * x 2))))
+
+(printi (callFunc add1 41))						(; prints 42 ;)
+(printi (callFunc sub1 43))						(; prints 42 ;)
+(printc (callFunc retx 'c'))					(; prints c  ;)
+(printi (callFunc (lambda (x) ( * x x)) 2))		(; prints 4 ;)
+(printi (callFunc retx 42))						(; prints 42 ;)
+(printb (callFunc retx #t))						(; prints #t ;)
+(printi ((retDoubleLambda) 500))				(; prints 1000 ;)
+(printi ((retx add1) 5))						(; prints 6;)

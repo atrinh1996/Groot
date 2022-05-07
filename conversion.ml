@@ -11,15 +11,24 @@ let prerho env =
   let add_prints map (k, v) =
     StringMap.add k [v] map
   in List.fold_left add_prints env 
-     [("printi", (0, intty));   ("printb", (0, boolty));
-      ("printc", (0, charty));  ("+", (0, intty));
-      ("-", (0, intty));        ("*", (0, intty));
-      ("/", (0, intty));        ("mod", (0, intty));
-      ("<", (0, boolty));       (">", (0, boolty));
-      ("<=", (0, boolty));      (">=", (0, boolty));
-      ("!=i", (0, boolty));     ("=i", (0, boolty));
-      ("&&", (0, boolty));      ("||", (0, boolty));
-      ("not", (0, boolty));     ("~", (0, intty))       ]
+     [("printi", (0, funty (intty, [intty])));   
+      ("printb", (0, funty (intty, [boolty])));
+      ("printc", (0, funty (intty, [charty])));  
+      ("+", (0, funty (intty, [intty; intty])));
+      ("-", (0, funty (intty, [intty; intty])));        
+      ("*", (0, funty (intty, [intty; intty])));
+      ("/", (0, funty (intty, [intty; intty])));        
+      ("mod", (0, funty (intty, [intty; intty])));
+      ("<", (0, funty (boolty, [intty; intty])));       
+      (">", (0, funty (boolty, [intty; intty])));
+      ("<=", (0, funty (boolty, [intty; intty])));      
+      (">=", (0, funty (boolty, [intty; intty])));
+      ("!=i", (0, funty (boolty, [intty; intty])));     
+      ("=i", (0, funty (boolty, [intty; intty])));
+      ("&&", (0, funty (boolty, [boolty; boolty])));      
+      ("||", (0, funty (boolty, [boolty; boolty])));
+      ("not", (0, funty (boolty, [boolty])));     
+      ("~", (0, funty (intty, [intty])))       ]
 
 (* list of variable names that get ignored/are not to be considered frees *)
 let ignores = [ "printi"; "printb"; "printc";
@@ -182,6 +191,7 @@ let rec hexprToCexpr (env : var_env) (e : hexpr)  =
              (match functy with
                 Conapp (Tarrow ret, _) -> (ret, List.length freetys)
               | _ -> raise (Failure "Non-function function type"))
+           | Conapp (Tarrow ret, _) -> (ret, 0)
            | _ -> (intty, 0)) in
         (retty, CApply ((ctyp, f'), normalargs, freesCount))
     | HLet (bs, body) ->

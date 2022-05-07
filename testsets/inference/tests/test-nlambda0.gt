@@ -1,0 +1,3 @@
+;; nested lambda with free vars; this passes with a polymorphism warning about resolution to ints
+
+(lambda (n) (lambda () n))

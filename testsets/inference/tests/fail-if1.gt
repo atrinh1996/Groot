@@ -1,0 +1,3 @@
+;; ensure failure with type mismatch across branches
+
+( if #t #t 2 )

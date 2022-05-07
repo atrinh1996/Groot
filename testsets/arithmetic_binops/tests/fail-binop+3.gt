@@ -1,0 +1,4 @@
+;; ensure failure with missing parens
+
++ 3 4
+

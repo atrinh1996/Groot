@@ -1,0 +1,3 @@
+;; ensure failure when non-integer is given 
+
+(mod (* (+ 3 (- + 4)) (/ 8 2)) 0)

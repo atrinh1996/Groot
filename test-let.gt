@@ -1,1 +1,8 @@
-(printi (let ([a 1]) (let ([a 2]) a)))
+(val a 'a')
+(val b 'b')
+
+(printc (if (if (=i 0 0) 
+		#t 
+		#f)
+	a
+	b))

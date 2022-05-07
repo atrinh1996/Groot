@@ -1,0 +1,5 @@
+;; partial function application with mixed type free variables ; we expect this to fail due to issues with nested lambdas
+
+(val retn (lambda (n m) n)) 
+(val testAB (lambda (a) (lambda (b) (retn a b))))
+((testAB 4) #t)

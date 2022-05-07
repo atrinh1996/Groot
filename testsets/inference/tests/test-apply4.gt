@@ -1,0 +1,3 @@
+;; use identity function in addition
+
+(printi (+ ((lambda (x) x) 3) 2))

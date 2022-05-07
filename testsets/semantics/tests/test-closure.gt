@@ -1,0 +1,11 @@
+;; ensure that lambda closures maintain static copies of free vars (unchanged when global vars change)
+
+(val x 1)
+(printi x)
+
+(val retx1 (lambda () x))
+(printi (retx1))
+
+(val x 42)
+(printi x)
+(printi (retx1))

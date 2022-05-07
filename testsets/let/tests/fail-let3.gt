@@ -1,0 +1,5 @@
+;; ensure that local vars are not bound at toplevel
+
+(val x (let ([a 1]) a))
+
+(val y a)

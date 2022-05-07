@@ -1,6 +1,0 @@
-(!= 6 7)
-(!= 6 -6)
-(!= 6 6)
-(!= 209 #f)
-(!= avariable anothervariable)
-(!= avariable 7)
