@@ -6,6 +6,7 @@ coincide with tree implementation. It is a functional programming language
 based on LISP-style syntax.
 
 Final Paper & Language Reference Manual: https://github.com/atrinh1996/groot/blob/main/FinalReport/groot.pdf
+
 Slide Presentation: https://github.com/atrinh1996/groot/blob/main/FinalPresentation/groot-presentation.pdf
 
 
