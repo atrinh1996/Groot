@@ -5,8 +5,8 @@ from the tree abstract data type in order to curtail the complexities that
 coincide with tree implementation. It is a functional programming language
 based on LISP-style syntax.
 
-Currently we have implemented toplevel.native, which drives the parser and
-lexer for the (g)ROOT language, and are able to compile and print literals.
+Final Paper & Language Reference Manual: https://github.com/atrinh1996/groot/blob/main/FinalReport/groot.pdf
+Slide Presentation: https://github.com/atrinh1996/groot/blob/main/FinalPresentation/groot-presentation.pdf
 
 
 ## Contributors
